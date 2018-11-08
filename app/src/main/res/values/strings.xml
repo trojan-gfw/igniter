@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Igniter</string>
+    <string name="remote_addr">Remote Address</string>
+    <string name="remote_port">Remote Port</string>
+    <string name="default_port">443</string>
+    <string name="password">Password</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
 </resources>
