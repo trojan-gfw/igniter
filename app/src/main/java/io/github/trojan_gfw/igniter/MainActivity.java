@@ -1,5 +1,8 @@
 package io.github.trojan_gfw.igniter;
 
+import android.content.Intent;
+import android.net.VpnService;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +12,7 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 import java.io.File;
 import java.io.FileOutputStream;
+import android.app.Activity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
                 String config = getConfig(remoteAddrText.getText().toString(),
                         Short.parseShort(remotePortText.getText().toString()),
                         passwordText.getText().toString());
-                File file = new File(getApplicationContext().getCacheDir(), "config.json");
+                File file = new File(getCacheDir(), "config.json");
                 try {
                     FileOutputStream os = new FileOutputStream(file);
                     os.write(config.getBytes());
@@ -57,7 +61,21 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                Intent i = VpnService.prepare(getApplicationContext());
+                if (i != null) {
+                    startActivityForResult(i, 0);
+                } else {
+                    onActivityResult(0, Activity.RESULT_OK, null);
+                }
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 0 && resultCode == Activity.RESULT_OK) {
+            startService(new Intent(this, TrojanService.class));
+        }
     }
 }
