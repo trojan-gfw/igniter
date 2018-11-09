@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     EditText passwordText;
     Button startStopButton;
 
-    private String getConfig(String remoteAddr, short remotePort, String password) {
+    private static String getConfig(String remoteAddr, short remotePort, String password) {
         try {
             return new JSONObject()
                     .put("local_addr", "127.0.0.1")
