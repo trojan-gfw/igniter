@@ -1,4 +1,4 @@
-package trojan_gfw.github.io.igniter;
+package io.github.trojan_gfw.igniter;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

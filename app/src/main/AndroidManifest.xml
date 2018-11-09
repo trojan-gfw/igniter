@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="trojan_gfw.github.io.igniter">
+    package="io.github.trojan_gfw.igniter">
 
     <application
         android:allowBackup="true"

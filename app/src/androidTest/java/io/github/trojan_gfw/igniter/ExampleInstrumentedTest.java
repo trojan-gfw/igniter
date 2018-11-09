@@ -1,4 +1,4 @@
-package trojan_gfw.github.io.igniter;
+package io.github.trojan_gfw.igniter;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("trojan_gfw.github.io.igniter", appContext.getPackageName());
+        assertEquals("io.github.trojan_gfw.igniter", appContext.getPackageName());
     }
 }
