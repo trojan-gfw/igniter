@@ -4,3 +4,11 @@
 [submodule "app/src/main/cpp/libs"]
 	path = app/src/main/cpp/libs
 	url = https://github.com/trojan-gfw/igniter-armeabi-v7a-libs.git
+[submodule "app/src/main/cpp/tun2socks"]
+	path = app/src/main/cpp/tun2socks
+	url = https://github.com/shadowsocks/badvpn.git
+	branch = shadowsocks-android
+[submodule "app/src/main/cpp/libancillary"]
+	path = app/src/main/cpp/libancillary
+	url = https://github.com/shadowsocks/libancillary.git
+	branch = shadowsocks-android
