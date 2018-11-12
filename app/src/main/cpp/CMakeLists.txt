@@ -108,5 +108,5 @@ target_compile_definitions(libtun2socks.so PRIVATE
 add_library(jni-helper SHARED
     jni-helper.cpp
     libancillary/fd_send.c)
-target_include_directories(jni-helper PRIVATE libancillary)
+target_include_directories(jni-helper PRIVATE ${CMAKE_SOURCE_DIR}/libancillary)
 target_link_libraries(jni-helper dl log)
