@@ -1,0 +1,6 @@
+[submodule "app/src/main/cpp/trojan"]
+	path = app/src/main/cpp/trojan
+	url = https://github.com/trojan-gfw/trojan.git
+[submodule "app/src/main/cpp/libs"]
+	path = app/src/main/cpp/libs
+	url = https://github.com/trojan-gfw/igniter-armeabi-v7a-libs.git
