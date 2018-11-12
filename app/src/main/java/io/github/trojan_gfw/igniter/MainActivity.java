@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
                     .put("password", new JSONArray()
                             .put(password))
                     .put("ssl", new JSONObject()
+                            .put("verify", false) // TODO: Very bad idea. Remove after including CA certificates.
                             .put("cipher", "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305-SHA256:ECDHE-RSA-CHACHA20-POLY1305-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:RSA-AES128-GCM-SHA256:RSA-AES256-GCM-SHA384:RSA-AES128-SHA:RSA-AES256-SHA:RSA-3DES-EDE-SHA")
                             .put("alpn", new JSONArray().put("h2").put("http/1.1")))
                     .toString();
