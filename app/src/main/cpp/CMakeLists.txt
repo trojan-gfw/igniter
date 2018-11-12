@@ -105,3 +105,8 @@ target_compile_definitions(libtun2socks.so PRIVATE
     -DBADVPN_LITTLE_ENDIAN
     -DBADVPN_THREAD_SAFE
     -DANDROID)
+add_library(jni-helper SHARED
+    jni-helper.cpp
+    libancillary/fd_send.c)
+target_include_directories(jni-helper PRIVATE libancillary)
+target_link_libraries(jni-helper dl log)
