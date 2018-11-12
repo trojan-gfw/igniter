@@ -2,8 +2,11 @@ package io.github.trojan_gfw.igniter;
 
 import android.content.Intent;
 import android.net.VpnService;
+import android.os.ParcelFileDescriptor;
 
 public class TrojanService extends VpnService {
+    private ParcelFileDescriptor pfd;
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         VpnService.Builder b = new VpnService.Builder();
@@ -22,9 +25,10 @@ public class TrojanService extends VpnService {
         b.addDnsServer("8.8.4.4");
         b.addDnsServer("1.1.1.1");
         b.addDnsServer("8.8.8.8");
-        int fd = b.establish().detachFd();
+        pfd = b.establish();
+        int fd = pfd.getFd();
         String path = getCacheDir() + "/config.json";
-        // TODO: Launch tun2socks and trojan.
+        // TODO: Launch trojan and tun2socks, and send fd to tun2socks.
         return START_STICKY;
     }
 }
