@@ -58,7 +58,7 @@ public class TrojanService extends VpnService {
             new File(trojanExePath).setExecutable(true);
             new File(tun2socksExePath).setExecutable(true);
             trojanProcess = exec(trojanExePath + ' ' + trojanConfigPath);
-            tun2socksProcess = exec(tun2socksExePath + " --netif-ipaddr 10.114.51.5 --netif-netmask 255.255.255.254 --socks-server-addr 127.0.0.1:1080 --tunfd " + String.valueOf(fd) + " --tunmtu 1500 --sock-path " + sockPath + " --loglevel debug --enable-udprelay --udprelay-max-connections 20");
+            tun2socksProcess = exec(tun2socksExePath + " --netif-ipaddr 10.114.51.5 --netif-netmask 255.255.255.254 --socks-server-addr 127.0.0.1:1080 --tunfd " + String.valueOf(fd) + " --tunmtu 1500 --sock-path " + sockPath);
             for (int i = 0; i < 5; ++i) {
                 try {
                     JNIHelper.sendFd(fd, sockPath);
