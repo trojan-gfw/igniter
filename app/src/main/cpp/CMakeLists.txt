@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.6)
 project(igniter)
-add_library(trojan SHARED
+add_library(trojan
     trojan/src/authenticator.cpp
     trojan/src/clientsession.cpp
     trojan/src/config.cpp
@@ -23,7 +23,7 @@ target_link_libraries(trojan
     ${CMAKE_SOURCE_DIR}/libs/lib/${ANDROID_ABI}/libboost_system.a
     ${CMAKE_SOURCE_DIR}/libs/lib/${ANDROID_ABI}/libssl.a
     ${CMAKE_SOURCE_DIR}/libs/lib/${ANDROID_ABI}/libcrypto.a)
-add_library(n2t SHARED
+add_library(n2t
     libn2t/src/n2t/n2s.cpp
     libn2t/src/n2t/n2t.cpp
     libn2t/src/n2t/socket.cpp
@@ -61,5 +61,7 @@ target_link_libraries(n2t ${CMAKE_SOURCE_DIR}/libs/lib/${ANDROID_ABI}/libboost_s
 add_library(jni-helper SHARED jni-helper.cpp)
 target_include_directories(jni-helper PRIVATE
     ${CMAKE_SOURCE_DIR}/trojan/src
-    ${CMAKE_SOURCE_DIR}/libn2t/src)
+    ${CMAKE_SOURCE_DIR}/libn2t/src
+    ${CMAKE_SOURCE_DIR}/libs/include
+    ${CMAKE_SOURCE_DIR}/libs/include/${ANDROID_ABI})
 target_link_libraries(jni-helper trojan n2t)
