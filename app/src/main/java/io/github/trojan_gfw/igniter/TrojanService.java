@@ -3,11 +3,6 @@ package io.github.trojan_gfw.igniter;
 import android.content.Intent;
 import android.net.VpnService;
 import android.os.ParcelFileDescriptor;
-import android.util.Log;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Scanner;
 
 public class TrojanService extends VpnService {
     @Override
@@ -27,8 +22,20 @@ public class TrojanService extends VpnService {
         b.addDnsServer("1.1.1.1");
         b.addDnsServer("8.8.8.8");
         ParcelFileDescriptor pfd = b.establish();
-        int fd = pfd.detachFd();
-        String trojanConfigPath = getCacheDir() + "/config.json";
+        final int fd = pfd.detachFd();
+        final String trojanConfigPath = getCacheDir() + "/config.json";
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                JNIHelper.trojan(trojanConfigPath);
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                JNIHelper.n2s(fd, "10.114.51.5", "255.255.255.254", "", 1500, "127.0.0.1", 1080);
+            }
+        }).start();
         return START_STICKY;
     }
 }
