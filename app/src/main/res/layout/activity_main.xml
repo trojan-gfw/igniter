@@ -55,7 +55,7 @@
                 android:id="@+id/startStopButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/start" />
+                android:text="@string/startStop" />
         </LinearLayout>
     </ScrollView>
 

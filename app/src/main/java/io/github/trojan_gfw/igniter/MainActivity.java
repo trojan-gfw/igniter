@@ -16,10 +16,10 @@ import android.app.Activity;
 
 public class MainActivity extends AppCompatActivity {
 
-    EditText remoteAddrText;
-    EditText remotePortText;
-    EditText passwordText;
-    Button startStopButton;
+    private EditText remoteAddrText;
+    private EditText remotePortText;
+    private EditText passwordText;
+    private Button startStopButton;
 
     private static String getConfig(String remoteAddr, short remotePort, String password) {
         try {
@@ -52,22 +52,27 @@ public class MainActivity extends AppCompatActivity {
         startStopButton = findViewById(R.id.startStopButton);
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                String config = getConfig(remoteAddrText.getText().toString(),
-                        Short.parseShort(remotePortText.getText().toString()),
-                        passwordText.getText().toString());
-                File file = new File(getCacheDir(), "config.json");
-                try {
-                    FileOutputStream os = new FileOutputStream(file);
-                    os.write(config.getBytes());
-                    os.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                Intent i = VpnService.prepare(getApplicationContext());
-                if (i != null) {
-                    startActivityForResult(i, 0);
+                TrojanService serviceInstance = TrojanService.getInstance();
+                if (serviceInstance == null) {
+                    String config = getConfig(remoteAddrText.getText().toString(),
+                            Short.parseShort(remotePortText.getText().toString()),
+                            passwordText.getText().toString());
+                    File file = new File(getCacheDir(), "config.json");
+                    try {
+                        FileOutputStream os = new FileOutputStream(file);
+                        os.write(config.getBytes());
+                        os.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    Intent i = VpnService.prepare(getApplicationContext());
+                    if (i != null) {
+                        startActivityForResult(i, 0);
+                    } else {
+                        onActivityResult(0, Activity.RESULT_OK, null);
+                    }
                 } else {
-                    onActivityResult(0, Activity.RESULT_OK, null);
+                    serviceInstance.stop();
                 }
             }
         });
