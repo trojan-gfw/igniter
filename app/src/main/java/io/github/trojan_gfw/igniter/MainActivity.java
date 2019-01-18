@@ -11,7 +11,9 @@ import android.widget.EditText;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import android.app.Activity;
 
 public class MainActivity extends AppCompatActivity {
@@ -21,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText passwordText;
     private Button startStopButton;
 
-    private static String getConfig(String remoteAddr, short remotePort, String password) {
+    private String getConfig(String remoteAddr, short remotePort, String password, boolean verify) {
         try {
             return new JSONObject()
                     .put("local_addr", "127.0.0.1")
@@ -32,7 +34,8 @@ public class MainActivity extends AppCompatActivity {
                             .put(password))
                     .put("log_level", 5)
                     .put("ssl", new JSONObject()
-                            .put("verify", false) // TODO: Very bad idea. Remove after including CA certificates.
+                            .put("verify", verify)
+                            .put("cert", getCacheDir() + "/cacert.pem")
                             .put("cipher", "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305-SHA256:ECDHE-RSA-CHACHA20-POLY1305-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:RSA-AES128-GCM-SHA256:RSA-AES256-GCM-SHA384:RSA-AES128-SHA:RSA-AES256-SHA:RSA-3DES-EDE-SHA")
                             .put("alpn", new JSONArray().put("h2").put("http/1.1")))
                     .toString();
@@ -56,8 +59,9 @@ public class MainActivity extends AppCompatActivity {
                 if (serviceInstance == null) {
                     String config = getConfig(remoteAddrText.getText().toString(),
                             Short.parseShort(remotePortText.getText().toString()),
-                            passwordText.getText().toString());
-                    File file = new File(getCacheDir(), "config.json");
+                            passwordText.getText().toString(),
+                            true);
+                    File file = new File(getFilesDir(), "config.json");
                     try {
                         FileOutputStream os = new FileOutputStream(file);
                         os.write(config.getBytes());
@@ -76,6 +80,37 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        File file = new File(getFilesDir(), "config.json");
+        if (file.exists()) {
+            try {
+                FileInputStream is = new FileInputStream(file);
+                byte[] content = new byte[(int) file.length()];
+                is.read(content);
+                JSONObject json = new JSONObject(new String(content));
+                remoteAddrText.setText(json.getString("remote_addr"));
+                remotePortText.setText(String.valueOf(json.getInt("remote_port")));
+                passwordText.setText(json.getJSONArray("password").getString(0));
+                is.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        file = new File(getCacheDir(), "cacert.pem");
+        if (!file.exists()) {
+            try {
+                InputStream is = getResources().openRawResource(R.raw.cacert);
+                FileOutputStream os = new FileOutputStream(file);
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = is.read(buf)) > 0) {
+                    os.write(buf, 0, len);
+                }
+                os.close();
+                is.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override

@@ -41,7 +41,7 @@ public class TrojanService extends VpnService {
         b.addDnsServer("1.1.1.1");
         b.addDnsServer("8.8.8.8");
         pfd = b.establish();
-        JNIHelper.trojan(getCacheDir() + "/config.json");
+        JNIHelper.trojan(getFilesDir() + "/config.json");
         JNIHelper.n2s(pfd.getFd(), "10.114.51.5", "255.255.255.254", "", 1500, "127.0.0.1", 1080);
         return START_STICKY;
     }
