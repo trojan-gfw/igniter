@@ -51,11 +51,20 @@
                 android:hint="@string/password"
                 android:inputType="textPassword" />
 
+            <ToggleButton
+                android:id="@+id/verifyButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="ToggleButton"
+                android:textOff="@string/verify_certificate"
+                android:textOn="@string/verify_certificate" />
+
             <Button
                 android:id="@+id/startStopButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/startStop" />
+                android:text="@string/start_stop" />
         </LinearLayout>
     </ScrollView>
 

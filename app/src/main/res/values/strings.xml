@@ -4,5 +4,6 @@
     <string name="remote_port">Remote Port</string>
     <string name="default_port">443</string>
     <string name="password">Password</string>
-    <string name="startStop">Start/Stop</string>
+    <string name="start_stop">Start/Stop</string>
+    <string name="verify_certificate">Verify Certificate</string>
 </resources>

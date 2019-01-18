@@ -15,12 +15,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import android.app.Activity;
+import android.widget.ToggleButton;
 
 public class MainActivity extends AppCompatActivity {
 
     private EditText remoteAddrText;
     private EditText remotePortText;
     private EditText passwordText;
+    private ToggleButton verifyButton;
     private Button startStopButton;
 
     private String getConfig(String remoteAddr, short remotePort, String password, boolean verify) {
@@ -52,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         remoteAddrText = findViewById(R.id.remoteAddrText);
         remotePortText = findViewById(R.id.remotePortText);
         passwordText = findViewById(R.id.passwordText);
+        verifyButton = findViewById(R.id.verifyButton);
         startStopButton = findViewById(R.id.startStopButton);
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -60,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                     String config = getConfig(remoteAddrText.getText().toString(),
                             Short.parseShort(remotePortText.getText().toString()),
                             passwordText.getText().toString(),
-                            true);
+                            verifyButton.isChecked());
                     File file = new File(getFilesDir(), "config.json");
                     try {
                         FileOutputStream os = new FileOutputStream(file);
@@ -90,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
                 remoteAddrText.setText(json.getString("remote_addr"));
                 remotePortText.setText(String.valueOf(json.getInt("remote_port")));
                 passwordText.setText(json.getJSONArray("password").getString(0));
+                verifyButton.setChecked(json.getJSONObject("ssl").getBoolean("verify"));
                 is.close();
             } catch (Exception e) {
                 e.printStackTrace();
