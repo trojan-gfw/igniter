@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private ToggleButton verifyButton;
     private Button startStopButton;
 
-    private String getConfig(String remoteAddr, short remotePort, String password, boolean verify) {
+    private String getConfig(String remoteAddr, int remotePort, String password, boolean verify) {
         try {
             return new JSONObject()
                     .put("local_addr", "127.0.0.1")
@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 TrojanService serviceInstance = TrojanService.getInstance();
                 if (serviceInstance == null) {
                     String config = getConfig(remoteAddrText.getText().toString(),
-                            Short.parseShort(remotePortText.getText().toString()),
+                            Integer.parseInt(remotePortText.getText().toString()),
                             passwordText.getText().toString(),
                             verifyButton.isChecked());
                     File file = new File(getFilesDir(), "config.json");
