@@ -17,6 +17,7 @@ out/
 .gradle/
 build/
 release/
+debug/
 
 # Local configuration file (sdk path, etc)
 local.properties
