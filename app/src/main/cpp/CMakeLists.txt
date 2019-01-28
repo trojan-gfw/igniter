@@ -30,31 +30,46 @@ add_library(n2t
     libn2t/src/n2t/tcpsession.cpp
     libn2t/src/n2t/udpsession.cpp
     libn2t/src/n2t/utils.cpp
-    libn2t/src/sys_arch.c
-    libn2t/src/lwip/src/core/tcp_out.c
-    libn2t/src/lwip/src/core/tcp_in.c
+    libn2t/src/custom/sys_arch.c
+    libn2t/src/lwip/src/core/init.c
+    libn2t/src/lwip/src/core/def.c
+    libn2t/src/lwip/src/core/dns.c
+    libn2t/src/lwip/src/core/inet_chksum.c
+    libn2t/src/lwip/src/core/ip.c
+    libn2t/src/lwip/src/core/mem.c
     libn2t/src/lwip/src/core/memp.c
     libn2t/src/lwip/src/core/netif.c
-    libn2t/src/lwip/src/core/ipv6/ip6_frag.c
-    libn2t/src/lwip/src/core/ipv6/ip6.c
-    libn2t/src/lwip/src/core/ipv6/icmp6.c
-    libn2t/src/lwip/src/core/ipv6/ip6_addr.c
-    libn2t/src/lwip/src/core/ipv6/mld6.c
-    libn2t/src/lwip/src/core/ipv6/nd6.c
-    libn2t/src/lwip/src/core/timeouts.c
-    libn2t/src/lwip/src/core/tcp.c
-    libn2t/src/lwip/src/core/ip.c
-    libn2t/src/lwip/src/core/udp.c
-    libn2t/src/lwip/src/core/mem.c
-    libn2t/src/lwip/src/core/def.c
-    libn2t/src/lwip/src/core/init.c
     libn2t/src/lwip/src/core/pbuf.c
+    libn2t/src/lwip/src/core/raw.c
+    libn2t/src/lwip/src/core/stats.c
+    libn2t/src/lwip/src/core/sys.c
+    libn2t/src/lwip/src/core/altcp.c
+    libn2t/src/lwip/src/core/altcp_alloc.c
+    libn2t/src/lwip/src/core/altcp_tcp.c
+    libn2t/src/lwip/src/core/tcp.c
+    libn2t/src/lwip/src/core/tcp_in.c
+    libn2t/src/lwip/src/core/tcp_out.c
+    libn2t/src/lwip/src/core/timeouts.c
+    libn2t/src/lwip/src/core/udp.c
+    libn2t/src/lwip/src/core/ipv4/autoip.c
+    libn2t/src/lwip/src/core/ipv4/dhcp.c
+    libn2t/src/lwip/src/core/ipv4/etharp.c
     libn2t/src/lwip/src/core/ipv4/icmp.c
+    libn2t/src/lwip/src/core/ipv4/igmp.c
+    libn2t/src/lwip/src/core/ipv4/ip4_frag.c
     libn2t/src/lwip/src/core/ipv4/ip4.c
     libn2t/src/lwip/src/core/ipv4/ip4_addr.c
-    libn2t/src/lwip/src/core/inet_chksum.c)
+    libn2t/src/lwip/src/core/ipv6/dhcp6.c
+    libn2t/src/lwip/src/core/ipv6/ethip6.c
+    libn2t/src/lwip/src/core/ipv6/icmp6.c
+    libn2t/src/lwip/src/core/ipv6/inet6.c
+    libn2t/src/lwip/src/core/ipv6/ip6.c
+    libn2t/src/lwip/src/core/ipv6/ip6_addr.c
+    libn2t/src/lwip/src/core/ipv6/ip6_frag.c
+    libn2t/src/lwip/src/core/ipv6/mld6.c
+    libn2t/src/lwip/src/core/ipv6/nd6.c)
 target_include_directories(n2t PRIVATE
-    ${CMAKE_SOURCE_DIR}/libn2t/src
+    ${CMAKE_SOURCE_DIR}/libn2t/src/custom
     ${CMAKE_SOURCE_DIR}/libn2t/src/lwip/src/include
     ${CMAKE_SOURCE_DIR}/libs/include)
 target_link_libraries(n2t ${CMAKE_SOURCE_DIR}/libs/lib/${ANDROID_ABI}/libboost_system.a)
