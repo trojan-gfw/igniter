@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.6)
 project(igniter)
+find_library( # Sets the name of the path variable.
+          androidLogLib
+
+          # Specifies the name of the NDK library that
+          # you want CMake to locate.
+          log)
 add_library(trojan
     trojan/src/authenticator.cpp
     trojan/src/clientsession.cpp
@@ -72,7 +78,9 @@ target_include_directories(n2t PRIVATE
     ${CMAKE_SOURCE_DIR}/libn2t/src/custom
     ${CMAKE_SOURCE_DIR}/libn2t/src/lwip/src/include
     ${CMAKE_SOURCE_DIR}/libs/include)
-target_link_libraries(n2t ${CMAKE_SOURCE_DIR}/libs/lib/${ANDROID_ABI}/libboost_system.a)
+target_link_libraries(n2t
+    ${CMAKE_SOURCE_DIR}/libs/lib/${ANDROID_ABI}/libboost_system.a
+    ${androidLogLib})
 add_library(jni-helper SHARED jni-helper.cpp)
 target_include_directories(jni-helper PRIVATE
     ${CMAKE_SOURCE_DIR}/trojan/src
