@@ -19,6 +19,8 @@ import android.widget.ToggleButton;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int VPN_REQUEST_CODE = 0;
+
     private EditText remoteAddrText;
     private EditText remotePortText;
     private EditText passwordText;
@@ -65,18 +67,19 @@ public class MainActivity extends AppCompatActivity {
                             passwordText.getText().toString(),
                             verifyButton.isChecked());
                     File file = new File(getFilesDir(), "config.json");
+
                     try {
-                        FileOutputStream os = new FileOutputStream(file);
-                        os.write(config.getBytes());
-                        os.close();
+                        try (FileOutputStream fos = new FileOutputStream(file)) {
+                            fos.write(config.getBytes());
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                     Intent i = VpnService.prepare(getApplicationContext());
                     if (i != null) {
-                        startActivityForResult(i, 0);
+                        startActivityForResult(i, VPN_REQUEST_CODE);
                     } else {
-                        onActivityResult(0, Activity.RESULT_OK, null);
+                        onActivityResult(VPN_REQUEST_CODE, Activity.RESULT_OK, null);
                     }
                 } else {
                     serviceInstance.stop();
@@ -86,15 +89,15 @@ public class MainActivity extends AppCompatActivity {
         File file = new File(getFilesDir(), "config.json");
         if (file.exists()) {
             try {
-                FileInputStream is = new FileInputStream(file);
-                byte[] content = new byte[(int) file.length()];
-                is.read(content);
-                JSONObject json = new JSONObject(new String(content));
-                remoteAddrText.setText(json.getString("remote_addr"));
-                remotePortText.setText(String.valueOf(json.getInt("remote_port")));
-                passwordText.setText(json.getJSONArray("password").getString(0));
-                verifyButton.setChecked(json.getJSONObject("ssl").getBoolean("verify"));
-                is.close();
+                try (FileInputStream fis = new FileInputStream(file)) {
+                    byte[] content = new byte[(int) file.length()];
+                    fis.read(content);
+                    JSONObject json = new JSONObject(new String(content));
+                    remoteAddrText.setText(json.getString("remote_addr"));
+                    remotePortText.setText(String.valueOf(json.getInt("remote_port")));
+                    passwordText.setText(json.getJSONArray("password").getString(0));
+                    verifyButton.setChecked(json.getJSONObject("ssl").getBoolean("verify"));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -102,15 +105,14 @@ public class MainActivity extends AppCompatActivity {
         file = new File(getCacheDir(), "cacert.pem");
         if (!file.exists()) {
             try {
-                InputStream is = getResources().openRawResource(R.raw.cacert);
-                FileOutputStream os = new FileOutputStream(file);
-                byte[] buf = new byte[1024];
-                int len;
-                while ((len = is.read(buf)) > 0) {
-                    os.write(buf, 0, len);
+                try (InputStream is = getResources().openRawResource(R.raw.cacert);
+                     FileOutputStream fos = new FileOutputStream(file)) {
+                    byte[] buf = new byte[1024];
+                    int len;
+                    while ((len = is.read(buf)) > 0) {
+                        fos.write(buf, 0, len);
+                    }
                 }
-                os.close();
-                is.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -120,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 0 && resultCode == Activity.RESULT_OK) {
+        if (requestCode == VPN_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
             startService(new Intent(this, TrojanService.class));
         }
     }
