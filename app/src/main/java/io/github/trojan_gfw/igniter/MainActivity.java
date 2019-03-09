@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
                     .put("remote_port", remotePort)
                     .put("password", new JSONArray()
                             .put(password))
-                    .put("log_level", 5)
+                    .put("log_level", 2) // WARN
                     .put("ssl", new JSONObject()
                             .put("verify", verify)
                             .put("cert", getCacheDir() + "/cacert.pem")
