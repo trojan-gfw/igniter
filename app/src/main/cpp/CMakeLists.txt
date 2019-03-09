@@ -28,7 +28,8 @@ target_link_libraries(trojan
     ${CMAKE_SOURCE_DIR}/libs/lib/${ANDROID_ABI}/libboost_program_options.a
     ${CMAKE_SOURCE_DIR}/libs/lib/${ANDROID_ABI}/libboost_system.a
     ${CMAKE_SOURCE_DIR}/libs/lib/${ANDROID_ABI}/libssl.a
-    ${CMAKE_SOURCE_DIR}/libs/lib/${ANDROID_ABI}/libcrypto.a)
+    ${CMAKE_SOURCE_DIR}/libs/lib/${ANDROID_ABI}/libcrypto.a
+    ${androidLogLib})
 add_library(n2t
     libn2t/src/n2t/n2s.cpp
     libn2t/src/n2t/n2t.cpp
