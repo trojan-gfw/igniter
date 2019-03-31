@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.6)
 project(igniter)
+add_definitions(-DENABLE_ANDROID_LOG)
 find_library( # Sets the name of the path variable.
           androidLogLib
 
