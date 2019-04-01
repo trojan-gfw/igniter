@@ -20,6 +20,7 @@ add_library(trojan
     trojan/src/ssldefaults.cpp
     trojan/src/sslsession.cpp
     trojan/src/trojanrequest.cpp
+    trojan/src/udpforwardsession.cpp
     trojan/src/udppacket.cpp
     trojan/src/version.cpp)
 target_include_directories(trojan PRIVATE
