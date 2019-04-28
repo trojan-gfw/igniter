@@ -51,14 +51,12 @@
                 android:hint="@string/password"
                 android:inputType="textPassword" />
 
-            <ToggleButton
-                android:id="@+id/verifyButton"
+            <Switch
+                android:id="@+id/verifySwitch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="ToggleButton"
-                android:textOff="@string/verify_certificate"
-                android:textOn="@string/verify_certificate" />
+                android:text="@string/verify_certificate" />
 
             <Button
                 android:id="@+id/startStopButton"
