@@ -24,10 +24,11 @@ public class MainActivity extends AppCompatActivity {
     private EditText remoteAddrText;
     private EditText remotePortText;
     private EditText passwordText;
+    private Switch ipv6Switch;
     private Switch verifySwitch;
     private Button startStopButton;
 
-    private String getConfig(String remoteAddr, int remotePort, String password, boolean verify) {
+    private String getConfig(String remoteAddr, int remotePort, String password, boolean enableIpv6, boolean verify) {
         try {
             return new JSONObject()
                     .put("local_addr", "127.0.0.1")
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
                             .put("cert", getCacheDir() + "/cacert.pem")
                             .put("cipher", "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305-SHA256:ECDHE-RSA-CHACHA20-POLY1305-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:RSA-AES128-GCM-SHA256:RSA-AES256-GCM-SHA384:RSA-AES128-SHA:RSA-AES256-SHA:RSA-3DES-EDE-SHA")
                             .put("alpn", new JSONArray().put("h2").put("http/1.1")))
+                    .put("enable_ipv6", enableIpv6)
                     .toString();
         } catch (Exception e) {
             e.printStackTrace();
@@ -56,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         remoteAddrText = findViewById(R.id.remoteAddrText);
         remotePortText = findViewById(R.id.remotePortText);
         passwordText = findViewById(R.id.passwordText);
+        ipv6Switch = findViewById(R.id.ipv6Switch);
         verifySwitch = findViewById(R.id.verifySwitch);
         startStopButton = findViewById(R.id.startStopButton);
         startStopButton.setOnClickListener(new View.OnClickListener() {
@@ -65,9 +68,9 @@ public class MainActivity extends AppCompatActivity {
                     String config = getConfig(remoteAddrText.getText().toString(),
                             Integer.parseInt(remotePortText.getText().toString()),
                             passwordText.getText().toString(),
+                            ipv6Switch.isChecked(),
                             verifySwitch.isChecked());
                     File file = new File(getFilesDir(), "config.json");
-
                     try {
                         try (FileOutputStream fos = new FileOutputStream(file)) {
                             fos.write(config.getBytes());
@@ -96,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
                     remoteAddrText.setText(json.getString("remote_addr"));
                     remotePortText.setText(String.valueOf(json.getInt("remote_port")));
                     passwordText.setText(json.getJSONArray("password").getString(0));
+                    ipv6Switch.setChecked(json.getBoolean("enable_ipv6"));
                     verifySwitch.setChecked(json.getJSONObject("ssl").getBoolean("verify"));
                 }
             } catch (Exception e) {
@@ -107,11 +111,11 @@ public class MainActivity extends AppCompatActivity {
             try {
                 try (InputStream is = getResources().openRawResource(R.raw.cacert);
                      FileOutputStream fos = new FileOutputStream(file)) {
-                    byte[] buf = new byte[1024];
-                    int len;
-                    while ((len = is.read(buf)) > 0) {
-                        fos.write(buf, 0, len);
-                    }
+                     byte[] buf = new byte[1024];
+                     int len;
+                     while ((len = is.read(buf)) > 0) {
+                         fos.write(buf, 0, len);
+                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();

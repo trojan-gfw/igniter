@@ -6,4 +6,5 @@
     <string name="password">Password</string>
     <string name="start_stop">Start/Stop</string>
     <string name="verify_certificate">Verify Certificate</string>
+    <string name="enable_ipv6">Enable IPv6</string>
 </resources>

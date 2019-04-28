@@ -58,6 +58,12 @@
                 android:inputType="textPassword" />
 
             <Switch
+                android:id="@+id/ipv6Switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/enable_ipv6" />
+
+            <Switch
                 android:id="@+id/verifySwitch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
