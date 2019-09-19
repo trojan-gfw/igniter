@@ -5,6 +5,7 @@ import android.net.VpnService;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +17,8 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import android.app.Activity;
 import android.widget.Switch;
+import android.text.method.LinkMovementMethod;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,12 +30,14 @@ public class MainActivity extends AppCompatActivity {
     private Switch ipv6Switch;
     private Switch verifySwitch;
     private Button startStopButton;
+    private Switch clashSwitch;
+    private TextView clashLink;
 
     private String getConfig(String remoteAddr, int remotePort, String password, boolean enableIpv6, boolean verify) {
         try {
             return new JSONObject()
                     .put("local_addr", "127.0.0.1")
-                    .put("local_port", 1080)
+                    .put("local_port", 1081)
                     .put("remote_addr", remoteAddr)
                     .put("remote_port", remotePort)
                     .put("password", new JSONArray()
@@ -60,6 +65,9 @@ public class MainActivity extends AppCompatActivity {
         passwordText = findViewById(R.id.passwordText);
         ipv6Switch = findViewById(R.id.ipv6Switch);
         verifySwitch = findViewById(R.id.verifySwitch);
+        clashSwitch = findViewById(R.id.clashSwitch);
+        clashLink = findViewById(R.id.clashLink);
+        clashLink.setMovementMethod(LinkMovementMethod.getInstance());
         startStopButton = findViewById(R.id.startStopButton);
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -82,10 +90,26 @@ public class MainActivity extends AppCompatActivity {
                     if (i != null) {
                         startActivityForResult(i, VPN_REQUEST_CODE);
                     } else {
-                        onActivityResult(VPN_REQUEST_CODE, Activity.RESULT_OK, null);
+                        Intent intent = new Intent();
+                        intent.putExtra("enable_clash", clashSwitch.isChecked());
+                        onActivityResult(VPN_REQUEST_CODE, Activity.RESULT_OK, intent);
+                        startStopButton.setText(R.string.start_stop_stop);
+                        remoteAddrText.setEnabled(false);
+                        remotePortText.setEnabled(false);
+                        ipv6Switch.setEnabled(false);
+                        passwordText.setEnabled(false);
+                        verifySwitch.setEnabled(false);
+                        clashSwitch.setEnabled(false);
                     }
                 } else {
                     serviceInstance.stop();
+                    startStopButton.setText(R.string.start_stop);
+                    remoteAddrText.setEnabled(true);
+                    remotePortText.setEnabled(true);
+                    ipv6Switch.setEnabled(true);
+                    passwordText.setEnabled(true);
+                    verifySwitch.setEnabled(true);
+                    clashSwitch.setEnabled(true);
                 }
             }
         });
@@ -111,12 +135,60 @@ public class MainActivity extends AppCompatActivity {
             try {
                 try (InputStream is = getResources().openRawResource(R.raw.cacert);
                      FileOutputStream fos = new FileOutputStream(file)) {
-                     byte[] buf = new byte[1024];
-                     int len;
-                     while ((len = is.read(buf)) > 0) {
-                         fos.write(buf, 0, len);
-                     }
+                    byte[] buf = new byte[1024];
+                    int len;
+                    while ((len = is.read(buf)) > 0) {
+                        fos.write(buf, 0, len);
+                    }
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        file = new File(getFilesDir(), "config.yaml");
+        if (!file.exists()) {
+            try {
+                try (InputStream is = getResources().openRawResource(R.raw.clash);
+                     FileOutputStream fos = new FileOutputStream(file)) {
+                    byte[] buf = new byte[1024];
+                    int len;
+                    while ((len = is.read(buf)) > 0) {
+                        fos.write(buf, 0, len);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        file = new File(getFilesDir(), "Country.mmdb");
+        if (!file.exists()) {
+            try {
+                try (InputStream is = getResources().openRawResource(R.raw.country);
+                     FileOutputStream fos = new FileOutputStream(file)) {
+                    byte[] buf = new byte[1024];
+                    int len;
+                    while ((len = is.read(buf)) > 0) {
+                        fos.write(buf, 0, len);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        file = new File(getFilesDir(), "clash");
+        if (!file.exists()) {
+            try {
+                try (InputStream is = getResources().openRawResource(R.raw.clash_armv7);  // TODO: more platform
+                     FileOutputStream fos = new FileOutputStream(file)) {
+                    byte[] buf = new byte[1024];
+                    int len;
+                    while ((len = is.read(buf)) > 0) {
+                        fos.write(buf, 0, len);
+                    }
+                }
+                Process p = Runtime.getRuntime().exec("chmod a+x " + getFilesDir() + "/clash");
+                int status = p.waitFor();
+                assert status == 0;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -126,8 +198,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == VPN_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            startService(new Intent(this, TrojanService.class));
+            Intent intent = new Intent(this, TrojanService.class);
+            if (data != null){
+                intent.putExtra("enable_clash",
+                        data.getBooleanExtra("enable_clash", true));
+            }
+            startService(intent);
         }
     }
 }

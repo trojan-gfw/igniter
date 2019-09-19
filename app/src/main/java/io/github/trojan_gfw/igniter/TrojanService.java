@@ -3,6 +3,8 @@ package io.github.trojan_gfw.igniter;
 import android.content.Intent;
 import android.net.VpnService;
 import android.os.ParcelFileDescriptor;
+import android.util.Log;
+
 
 import org.json.JSONObject;
 
@@ -17,6 +19,7 @@ public class TrojanService extends VpnService {
     private static final String PRIVATE_VLAN6_ROUTER = "fdfe:dcba:9876::2";
     private static TrojanService instance;
     private ParcelFileDescriptor pfd;
+    private Process clash_proc = null;
 
     @Override
     public void onCreate() {
@@ -43,7 +46,9 @@ public class TrojanService extends VpnService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        boolean enable_clash = intent.getBooleanExtra("enable_clash", true);
         boolean enable_ipv6 = false;
+
         File file = new File(getFilesDir(), "config.json");
         if (file.exists()) {
             try {
@@ -75,12 +80,30 @@ public class TrojanService extends VpnService {
         }
         pfd = b.establish();
         JNIHelper.trojan(getFilesDir() + "/config.json");
-        JNIHelper.n2s(pfd.getFd(), PRIVATE_VLAN4_ROUTER, "255.255.255.253", PRIVATE_VLAN6_ROUTER, VPN_MTU, "127.0.0.1", 1080);
+
+        if (enable_clash) {
+            try{
+                this.clash_proc = Runtime.getRuntime().exec(getFilesDir() + "/clash -d " + getFilesDir());
+                Log.e("Clash", "clash started");
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+            JNIHelper.n2s(pfd.getFd(), PRIVATE_VLAN4_ROUTER, "255.255.255.253", PRIVATE_VLAN6_ROUTER, VPN_MTU, "127.0.0.1", 1080);
+        } else {
+            JNIHelper.n2s(pfd.getFd(), PRIVATE_VLAN4_ROUTER, "255.255.255.253", PRIVATE_VLAN6_ROUTER, VPN_MTU, "127.0.0.1", 1081);
+        }
+
         return START_STICKY;
     }
 
     private void shutdown() {
         try {
+            if (this.clash_proc != null) {
+                this.clash_proc.destroy();
+                this.clash_proc.waitFor();
+                this.clash_proc = null;
+                Log.e("Clash", "clash stopped");
+            }
             JNIHelper.stop();
             pfd.close();
         } catch (Exception e) {
