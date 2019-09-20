@@ -1,21 +1,26 @@
 package io.github.trojan_gfw.igniter;
 
+
+import android.app.Activity;
 import android.content.Intent;
 import android.net.VpnService;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import org.json.JSONObject;
+import android.widget.Switch;
+import android.widget.TextView;
+
 import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import android.app.Activity;
-import android.widget.Switch;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,21 +32,34 @@ public class MainActivity extends AppCompatActivity {
     private Switch ipv6Switch;
     private Switch verifySwitch;
     private Button startStopButton;
+    private Switch clashSwitch;
+    private TextView clashLink;
 
-    private String getConfig(String remoteAddr, int remotePort, String password, boolean enableIpv6, boolean verify) {
+    private String getConfig(String remoteAddr, int remotePort, String password,
+                             boolean enableIpv6, boolean verify) {
         try {
             return new JSONObject()
                     .put("local_addr", "127.0.0.1")
-                    .put("local_port", 1080)
+                    .put("local_port", 1081)
                     .put("remote_addr", remoteAddr)
                     .put("remote_port", remotePort)
-                    .put("password", new JSONArray()
-                            .put(password))
+                    .put("password", new JSONArray().put(password))
                     .put("log_level", 2) // WARN
                     .put("ssl", new JSONObject()
                             .put("verify", verify)
                             .put("cert", getCacheDir() + "/cacert.pem")
-                            .put("cipher", "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:RSA-AES128-GCM-SHA256:RSA-AES256-GCM-SHA384:RSA-AES128-SHA:RSA-AES256-SHA:RSA-3DES-EDE-SHA")
+                            .put("cipher", "ECDHE-ECDSA-AES128-GCM-SHA256:"
+                                    + "ECDHE-RSA-AES128-GCM-SHA256:"
+                                    + "ECDHE-ECDSA-AES256-GCM-SHA384:"
+                                    + "ECDHE-RSA-AES256-GCM-SHA384:"
+                                    + "ECDHE-ECDSA-CHACHA20-POLY1305:"
+                                    + "ECDHE-RSA-CHACHA20-POLY1305:"
+                                    + "ECDHE-RSA-AES128-SHA:"
+                                    + "ECDHE-RSA-AES256-SHA:"
+                                    + "RSA-AES128-GCM-SHA256:"
+                                    + "RSA-AES256-GCM-SHA384:"
+                                    + "RSA-AES128-SHA:RSA-AES256-SHA:"
+                                    + "RSA-3DES-EDE-SHA")
                             .put("alpn", new JSONArray().put("h2").put("http/1.1")))
                     .put("enable_ipv6", enableIpv6)
                     .toString();
@@ -49,6 +67,42 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private void copyRawToDir(int res_from, File fileDir, String filename_to, boolean override){
+        File file = new File(fileDir, filename_to);
+        if (override || !file.exists()) {
+            try {
+                try (InputStream is = getResources().openRawResource(res_from);
+                     FileOutputStream fos = new FileOutputStream(file)) {
+                    byte[] buf = new byte[1024];
+                    int len;
+                    while ((len = is.read(buf)) > 0) {
+                        fos.write(buf, 0, len);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void updateViews(boolean started){
+        boolean enable;
+        if (started) {
+            startStopButton.setText(R.string.start_stop_stop);
+            enable = false;
+        } else {
+            startStopButton.setText(R.string.start_stop);
+            enable = true;
+        }
+        remoteAddrText.setEnabled(enable);
+        remotePortText.setEnabled(enable);
+        ipv6Switch.setEnabled(enable);
+        passwordText.setEnabled(enable);
+        verifySwitch.setEnabled(enable);
+        clashSwitch.setEnabled(enable);
+        clashLink.setEnabled(enable);
     }
 
     @Override
@@ -60,7 +114,14 @@ public class MainActivity extends AppCompatActivity {
         passwordText = findViewById(R.id.passwordText);
         ipv6Switch = findViewById(R.id.ipv6Switch);
         verifySwitch = findViewById(R.id.verifySwitch);
+        clashSwitch = findViewById(R.id.clashSwitch);
+        clashLink = findViewById(R.id.clashLink);
+        clashLink.setMovementMethod(LinkMovementMethod.getInstance());
         startStopButton = findViewById(R.id.startStopButton);
+
+        TrojanService serviceInstance = TrojanService.getInstance();
+        updateViews(serviceInstance != null);
+
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 TrojanService serviceInstance = TrojanService.getInstance();
@@ -83,10 +144,13 @@ public class MainActivity extends AppCompatActivity {
                         startActivityForResult(i, VPN_REQUEST_CODE);
                     } else {
                         onActivityResult(VPN_REQUEST_CODE, Activity.RESULT_OK, null);
+                        updateViews(true);
                     }
                 } else {
                     serviceInstance.stop();
+                    updateViews(false);
                 }
+
             }
         });
         File file = new File(getFilesDir(), "config.json");
@@ -106,28 +170,18 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        file = new File(getCacheDir(), "cacert.pem");
-        if (!file.exists()) {
-            try {
-                try (InputStream is = getResources().openRawResource(R.raw.cacert);
-                     FileOutputStream fos = new FileOutputStream(file)) {
-                     byte[] buf = new byte[1024];
-                     int len;
-                     while ((len = is.read(buf)) > 0) {
-                         fos.write(buf, 0, len);
-                     }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        copyRawToDir(R.raw.cacert, getCacheDir(), "cacert.pem", false);
+        copyRawToDir(R.raw.country, getFilesDir(), "Country.mmdb", false);
+        copyRawToDir(R.raw.clash, getFilesDir(),"config.yaml", false);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == VPN_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            startService(new Intent(this, TrojanService.class));
+            Intent intent = new Intent(this, TrojanService.class);
+            intent.putExtra("enable_clash", clashSwitch.isChecked());
+            startService(intent);
         }
     }
 }

@@ -1,0 +1,35 @@
+#port: 7890
+socks-port: 1080
+udp: true
+allow-lan: false
+mode: Rule
+log-level: silent
+#external-controller: 127.0.0.1:9090
+#experimental:
+#  ignore-resolve-fail: true
+
+dns:
+  enable: false
+  nameserver:
+    - 114.114.114.114
+
+
+
+Proxy:
+- { name: "trojan", type: socks5, server: "127.0.0.1", port: 1081, udp: true}
+
+Proxy Group:
+- { name: "Proxy", type: select, proxies: ["trojan"] }
+
+
+Rule:
+
+- IP-CIDR,127.0.0.0/8,DIRECT
+- IP-CIDR,172.16.0.0/12,DIRECT
+- IP-CIDR,172.19.0.0/12,DIRECT
+- IP-CIDR,192.168.0.0/16,DIRECT
+- IP-CIDR,10.0.0.0/8,DIRECT
+- IP-CIDR,17.0.0.0/8,DIRECT
+- IP-CIDR,100.64.0.0/10,DIRECT
+- GEOIP,CN,DIRECT
+- MATCH,Proxy
