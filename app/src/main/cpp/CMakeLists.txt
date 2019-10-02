@@ -8,24 +8,26 @@ find_library( # Sets the name of the path variable.
           # you want CMake to locate.
           log)
 add_library(trojan
-    trojan/src/authenticator.cpp
-    trojan/src/clientsession.cpp
-    trojan/src/config.cpp
-    trojan/src/forwardsession.cpp
-    trojan/src/log.cpp
-    trojan/src/serversession.cpp
-    trojan/src/service.cpp
-    trojan/src/session.cpp
-    trojan/src/socks5address.cpp
-    trojan/src/ssldefaults.cpp
-    trojan/src/sslsession.cpp
-    trojan/src/trojanrequest.cpp
-    trojan/src/udpforwardsession.cpp
-    trojan/src/udppacket.cpp
-    trojan/src/version.cpp)
+    trojan/src/core/authenticator.cpp
+    trojan/src/core/config.cpp
+    trojan/src/core/log.cpp
+    trojan/src/core/service.cpp
+    trojan/src/core/version.cpp
+    trojan/src/proto/socks5address.cpp
+    trojan/src/proto/trojanrequest.cpp
+    trojan/src/proto/udppacket.cpp
+    trojan/src/session/clientsession.cpp
+    trojan/src/session/forwardsession.cpp
+    trojan/src/session/natsession.cpp
+    trojan/src/session/serversession.cpp
+    trojan/src/session/session.cpp
+    trojan/src/session/udpforwardsession.cpp
+    trojan/src/ssl/ssldefaults.cpp
+    trojan/src/ssl/sslsession.cpp)
 target_include_directories(trojan PRIVATE
     ${CMAKE_SOURCE_DIR}/libs/include
-    ${CMAKE_SOURCE_DIR}/libs/include/${ANDROID_ABI})
+    ${CMAKE_SOURCE_DIR}/libs/include/${ANDROID_ABI}
+    ${CMAKE_SOURCE_DIR}/trojan/src)
 target_link_libraries(trojan
     ${CMAKE_SOURCE_DIR}/libs/lib/${ANDROID_ABI}/libboost_program_options.a
     ${CMAKE_SOURCE_DIR}/libs/lib/${ANDROID_ABI}/libboost_system.a

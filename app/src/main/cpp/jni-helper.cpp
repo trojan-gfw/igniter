@@ -2,8 +2,8 @@
 #include <cstdint>
 #include <string>
 #include <thread>
-#include <config.h>
-#include <service.h>
+#include <core/config.h>
+#include <core/service.h>
 #include <n2t/n2t.h>
 #include <n2t/n2s.h>
 using namespace std;
