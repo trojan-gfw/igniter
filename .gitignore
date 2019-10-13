@@ -8,10 +8,14 @@
 # Java class files
 *.class
 
+# android lib
+*.aar
+
 # Generated files
 bin/
 gen/
 out/
+app/.cxx/
 
 # Gradle files
 .gradle/
