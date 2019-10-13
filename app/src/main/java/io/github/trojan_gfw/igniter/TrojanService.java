@@ -129,10 +129,10 @@ public class TrojanService extends VpnService {
             b.addDnsServer("2001:4860:4860::8888");
             b.addDnsServer("2001:4860:4860::8844");
         }
+        b.setBlocking(true);
         pfd = b.establish();
 
-        if ((pfd == null) || !Tun2socks.setNonblock((long) pfd.getFd(), false)) {
-            Log.e("tun2socks", "failed to put tunFd in blocking mode");
+        if (pfd == null) {
             shutdown();
             return START_NOT_STICKY;
         }
