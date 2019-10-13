@@ -1,4 +1,4 @@
-#port: 7890
+port: 0  # HTTP proxy, not used
 socks-port: 1080
 udp: true
 allow-lan: false
@@ -7,13 +7,14 @@ log-level: silent
 #experimental:
 #  ignore-resolve-fail: true
 
+
 dns:
   enable: true
-  listen: 0.0.0.0:10053
+  listen: 0.0.0.0:0  # the DNS server in clash is actually not used, turn it off
   enhanced-mode: fake-ip
   fake-ip-range: 255.0.128.1/20 # 255.0.128.1  - 255.0.143.254
   nameserver:
-    - 114.114.114.114
+    - 114.114.114.114  # not used, just a placeholder
 
 
 
