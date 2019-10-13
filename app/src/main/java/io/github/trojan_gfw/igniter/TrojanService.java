@@ -69,10 +69,10 @@ public class TrojanService extends VpnService {
     }
 
     class PacketThread extends Thread {
+        private static final String TAG = "TrojanPacketThread";
         public void run()
         {
-            System.out.println("Current thread name: "
-                    + Thread.currentThread().getName());
+            Log.i(TAG, Thread.currentThread().getName() + " thread start");
             while (running) {
                 try {
                     int n = inputStream.read(buffer.array());
@@ -85,8 +85,7 @@ public class TrojanService extends VpnService {
                     break;
                 }
             }
-            System.out.println("thread quit");
-            return;
+            Log.i(TAG, Thread.currentThread().getName() + " thread exit");
         }
     }
 
