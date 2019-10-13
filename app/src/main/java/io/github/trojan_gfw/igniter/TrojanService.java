@@ -47,7 +47,7 @@ public class TrojanService extends VpnService {
     private ParcelFileDescriptor pfd;
     private InputStream inputStream;
     private FileOutputStream outputStream;
-    private ByteBuffer buffer = ByteBuffer.allocate(1501);
+    private ByteBuffer buffer = ByteBuffer.allocate(16 * 1024);
     private boolean running = false;
     private Thread packetThread;
 
