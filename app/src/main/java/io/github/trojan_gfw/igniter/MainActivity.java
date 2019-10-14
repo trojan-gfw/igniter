@@ -2,10 +2,14 @@ package io.github.trojan_gfw.igniter;
 
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.VpnService;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
@@ -22,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int VPN_REQUEST_CODE = 0;
@@ -34,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private Button startStopButton;
     private Switch clashSwitch;
     private TextView clashLink;
+
+    private BroadcastReceiver serviceStateReceiver;
 
     private String getConfig(String remoteAddr, int remotePort, String password,
                              boolean enableIpv6, boolean verify) {
@@ -87,22 +94,41 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void updateViews(boolean started){
-        boolean enable;
-        if (started) {
-            startStopButton.setText(R.string.button_service__stop);
-            enable = false;
-        } else {
-            startStopButton.setText(R.string.button_service__start);
-            enable = true;
+    private void updateViews(String state){
+        boolean inputEnabled;
+        switch (state){
+            case "starting": {
+                inputEnabled = false;
+                startStopButton.setText(R.string.button_service__starting);
+                startStopButton.setEnabled(false);
+                break;
+            }
+            case "started": {
+                inputEnabled = false;
+                startStopButton.setText(R.string.button_service__stop);
+                startStopButton.setEnabled(true);
+                break;
+            }
+            case "stopping": {
+                inputEnabled = false;
+                startStopButton.setText(R.string.button_service__stopping);
+                startStopButton.setEnabled(false);
+                break;
+            }
+            default:{
+                inputEnabled = true;
+                startStopButton.setText(R.string.button_service__start);
+                startStopButton.setEnabled(true);
+                break;
+            }
         }
-        remoteAddrText.setEnabled(enable);
-        remotePortText.setEnabled(enable);
-        ipv6Switch.setEnabled(enable);
-        passwordText.setEnabled(enable);
-        verifySwitch.setEnabled(enable);
-        clashSwitch.setEnabled(enable);
-        clashLink.setEnabled(enable);
+        remoteAddrText.setEnabled(inputEnabled);
+        remotePortText.setEnabled(inputEnabled);
+        ipv6Switch.setEnabled(inputEnabled);
+        passwordText.setEnabled(inputEnabled);
+        verifySwitch.setEnabled(inputEnabled);
+        clashSwitch.setEnabled(inputEnabled);
+        clashLink.setEnabled(inputEnabled);
     }
 
     @Override
@@ -120,7 +146,13 @@ public class MainActivity extends AppCompatActivity {
         startStopButton = findViewById(R.id.startStopButton);
 
         TrojanService serviceInstance = TrojanService.getInstance();
-        updateViews(serviceInstance != null);
+        if (serviceInstance == null){
+            updateViews("stopped");
+        }else{
+            updateViews(serviceInstance.state);
+        }
+
+
 
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -144,15 +176,22 @@ public class MainActivity extends AppCompatActivity {
                         startActivityForResult(i, VPN_REQUEST_CODE);
                     } else {
                         onActivityResult(VPN_REQUEST_CODE, Activity.RESULT_OK, null);
-                        updateViews(true);
                     }
                 } else {
                     serviceInstance.stop();
-                    updateViews(false);
                 }
 
             }
         });
+
+        serviceStateReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String state = intent.getStringExtra("service_state");
+                updateViews(state);
+            }
+        };
+
         File file = new File(getFilesDir(), "config.json");
         if (file.exists()) {
             try {
@@ -183,5 +222,19 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("enable_clash", clashSwitch.isChecked());
             startService(intent);
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                serviceStateReceiver, new IntentFilter(getString(R.string.bc_service_state))
+        );
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceStateReceiver);
     }
 }

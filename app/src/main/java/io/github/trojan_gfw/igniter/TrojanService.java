@@ -3,6 +3,7 @@ package io.github.trojan_gfw.igniter;
 import android.content.Intent;
 import android.net.VpnService;
 import android.os.ParcelFileDescriptor;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -50,18 +51,30 @@ public class TrojanService extends VpnService {
     private ByteBuffer buffer = ByteBuffer.allocate(16 * 1024);
     private boolean running = false;
     private Thread packetThread;
+    public String state = "stopped";
+    private LocalBroadcastManager broadcastManager;
 
 
     @Override
     public void onCreate() {
         super.onCreate();
         instance = this;
+        broadcastManager = LocalBroadcastManager.getInstance(this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        state = "stopped";
+        sendStateChangeBroadcast();
         instance = null;
+        broadcastManager = null;
+    }
+
+    private void sendStateChangeBroadcast(){
+        Intent intent = new Intent(getString(R.string.bc_service_state));
+        intent.putExtra("service_state", state);
+        broadcastManager.sendBroadcast(intent);
     }
 
     public static TrojanService getInstance() {
@@ -91,11 +104,14 @@ public class TrojanService extends VpnService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        state = "starting";
+        sendStateChangeBroadcast();
         VpnService.Builder b = new VpnService.Builder();
         try {
             b.addDisallowedApplication(getPackageName());
         } catch (Exception e) {
             e.printStackTrace();
+            state = "stopped";
         }
         boolean enable_clash = intent.getBooleanExtra("enable_clash", true);
         boolean enable_ipv6 = false;
@@ -159,10 +175,16 @@ public class TrojanService extends VpnService {
         packetThread = new PacketThread();
         packetThread.start();
 
+        state = "started";
+        sendStateChangeBroadcast();
+
         return START_STICKY;
     }
 
     private void shutdown() {
+        state = "stopping";
+        sendStateChangeBroadcast();
+
         running = false;
         try {
             if (Clash.isRunning()) {
