@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void copyRawToDir(int resFrom, File fileDir, String filenameTo, boolean override){
+    private void copyRawToDir(int resFrom, File fileDir, String filenameTo, boolean override) {
         File file = new File(fileDir, filenameTo);
         if (override || !file.exists()) {
             try {
@@ -94,28 +94,28 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void updateViews(String state){
+    private void updateViews(int state) {
         boolean inputEnabled;
-        switch (state){
-            case "starting": {
+        switch (state) {
+            case ProxyService.STARTING: {
                 inputEnabled = false;
                 startStopButton.setText(R.string.button_service__starting);
                 startStopButton.setEnabled(false);
                 break;
             }
-            case "started": {
+            case ProxyService.STARTED: {
                 inputEnabled = false;
                 startStopButton.setText(R.string.button_service__stop);
                 startStopButton.setEnabled(true);
                 break;
             }
-            case "stopping": {
+            case ProxyService.STOPPING: {
                 inputEnabled = false;
                 startStopButton.setText(R.string.button_service__stopping);
                 startStopButton.setEnabled(false);
                 break;
             }
-            default:{
+            default: {
                 inputEnabled = true;
                 startStopButton.setText(R.string.button_service__start);
                 startStopButton.setEnabled(true);
@@ -145,18 +145,16 @@ public class MainActivity extends AppCompatActivity {
         clashLink.setMovementMethod(LinkMovementMethod.getInstance());
         startStopButton = findViewById(R.id.startStopButton);
 
-        TrojanService serviceInstance = TrojanService.getInstance();
-        if (serviceInstance == null){
-            updateViews("stopped");
-        }else{
-            updateViews(serviceInstance.state);
+        ProxyService serviceInstance = ProxyService.getInstance();
+        if (serviceInstance == null) {
+            updateViews(ProxyService.STOPPED);
+        } else {
+            updateViews(serviceInstance.getState());
         }
-
-
 
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                TrojanService serviceInstance = TrojanService.getInstance();
+                ProxyService serviceInstance = ProxyService.getInstance();
                 if (serviceInstance == null) {
                     String config = getConfig(remoteAddrText.getText().toString(),
                             Integer.parseInt(remotePortText.getText().toString()),
@@ -167,6 +165,8 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         try (FileOutputStream fos = new FileOutputStream(file)) {
                             fos.write(config.getBytes());
+                        } catch (NullPointerException e){
+                            e.printStackTrace();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
         serviceStateReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String state = intent.getStringExtra("service_state");
+                int state = intent.getIntExtra(ProxyService.STATUS_EXTRA_NAME, ProxyService.STARTED);
                 updateViews(state);
             }
         };
@@ -211,15 +211,15 @@ public class MainActivity extends AppCompatActivity {
         }
         copyRawToDir(R.raw.cacert, getCacheDir(), "cacert.pem", false);
         copyRawToDir(R.raw.country, getFilesDir(), "Country.mmdb", false);
-        copyRawToDir(R.raw.clash, getFilesDir(),"config.yaml", false);
+        copyRawToDir(R.raw.clash, getFilesDir(), "config.yaml", false);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == VPN_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Intent intent = new Intent(this, TrojanService.class);
-            intent.putExtra("enable_clash", clashSwitch.isChecked());
+            Intent intent = new Intent(this, ProxyService.class);
+            intent.putExtra(ProxyService.CLASH_EXTRA_NAME, clashSwitch.isChecked());
             startService(intent);
         }
     }

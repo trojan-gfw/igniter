@@ -1,6 +1,7 @@
 package io.github.trojan_gfw.igniter;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.VpnService;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.content.LocalBroadcastManager;
@@ -16,44 +17,62 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 import clash.Clash;
-import tun2socks.Tun2socks;
 import tun2socks.PacketFlow;
+import tun2socks.Tun2socks;
 
 
 class Flow implements PacketFlow {
     private FileOutputStream flowOutputStream;
 
-    Flow(FileOutputStream stream){
+    Flow(FileOutputStream stream) {
         flowOutputStream = stream;
     }
 
     @Override
     public void writePacket(byte[] bytes) {
-        try{
-            flowOutputStream.write(bytes);
-        } catch (java.io.IOException e){
+        try {
+            if (flowOutputStream.getFD().valid())
+                flowOutputStream.write(bytes);
+        } catch (java.io.IOException e) {
             e.printStackTrace();
         }
     }
 }
 
 
-public class TrojanService extends VpnService {
+public class ProxyService extends VpnService {
+    public static final int STARTING = 0;
+    public static final int STARTED = 1;
+    public static final int STOPPING = 2;
+    public static final int STOPPED = 3;
+    public static final String STATUS_EXTRA_NAME = "service_state";
+    public static final String CLASH_EXTRA_NAME = "enable_clash";
+
     private static final int VPN_MTU = 1500;
     private static final String PRIVATE_VLAN4_CLIENT = "172.19.0.1";
-    private static final String PRIVATE_VLAN4_ROUTER = "172.19.0.2";
+    //private static final String PRIVATE_VLAN4_ROUTER = "172.19.0.2";
     private static final String PRIVATE_VLAN6_CLIENT = "fdfe:dcba:9876::1";
-    private static final String PRIVATE_VLAN6_ROUTER = "fdfe:dcba:9876::2";
-    private static TrojanService instance;
+    //private static final String PRIVATE_VLAN6_ROUTER = "fdfe:dcba:9876::2";
+    private static ProxyService instance;
+    private int state = STARTED;
     private ParcelFileDescriptor pfd;
     private InputStream inputStream;
     private FileOutputStream outputStream;
-    private ByteBuffer buffer = ByteBuffer.allocate(16 * 1024);
-    private boolean running = false;
-    private Thread packetThread;
-    public String state = "stopped";
+    private ByteBuffer packetBuffer = ByteBuffer.allocate(16 * 1024);
     private LocalBroadcastManager broadcastManager;
 
+    public static ProxyService getInstance() {
+        return instance;
+    }
+
+    private void setState(int state) {
+        this.state = state;
+        sendStateChangeBroadcast();
+    }
+
+    public int getState(){
+        return state;
+    }
 
     @Override
     public void onCreate() {
@@ -65,55 +84,32 @@ public class TrojanService extends VpnService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        state = "stopped";
-        sendStateChangeBroadcast();
+        setState(STOPPED);
         instance = null;
         broadcastManager = null;
+        pfd = null;
+        inputStream = null;
+        outputStream = null;
     }
 
-    private void sendStateChangeBroadcast(){
+    private void sendStateChangeBroadcast() {
         Intent intent = new Intent(getString(R.string.bc_service_state));
-        intent.putExtra("service_state", state);
+        intent.putExtra(STATUS_EXTRA_NAME, state);
         broadcastManager.sendBroadcast(intent);
-    }
-
-    public static TrojanService getInstance() {
-        return instance;
-    }
-
-    class PacketThread extends Thread {
-        private static final String TAG = "TrojanPacketThread";
-        public void run()
-        {
-            Log.i(TAG, Thread.currentThread().getName() + " thread start");
-            while (running) {
-                try {
-                    int n = inputStream.read(buffer.array());
-                    if (n > 0) {
-                        buffer.limit(n);
-                        Tun2socks.inputPacket(buffer.array());
-                        buffer.clear();
-                    }
-                } catch (IOException e) {
-                    break;
-                }
-            }
-            Log.i(TAG, Thread.currentThread().getName() + " thread exit");
-        }
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        state = "starting";
-        sendStateChangeBroadcast();
+        setState(STARTING);
+
         VpnService.Builder b = new VpnService.Builder();
         try {
             b.addDisallowedApplication(getPackageName());
-        } catch (Exception e) {
+        } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
-            state = "stopped";
+            setState(STOPPED);
         }
-        boolean enable_clash = intent.getBooleanExtra("enable_clash", true);
+        boolean enable_clash = intent.getBooleanExtra(CLASH_EXTRA_NAME, true);
         boolean enable_ipv6 = false;
 
         File file = new File(getFilesDir(), "config.json");
@@ -147,6 +143,7 @@ public class TrojanService extends VpnService {
         }
         b.setBlocking(true);
         pfd = b.establish();
+        Log.e("VPN", "pfd established");
 
         if (pfd == null) {
             shutdown();
@@ -171,39 +168,53 @@ public class TrojanService extends VpnService {
             tun2socksPort = 1081;
         }
         Tun2socks.start(flow, "127.0.0.1:" + tun2socksPort, "255.0.128.1", "255.0.143.254");
-        running = true;
-        packetThread = new PacketThread();
-        packetThread.start();
+        new PacketThread().start();
 
-        state = "started";
-        sendStateChangeBroadcast();
+        setState(STARTED);
 
         return START_STICKY;
     }
 
     private void shutdown() {
-        state = "stopping";
-        sendStateChangeBroadcast();
+        setState(STOPPING);
 
-        running = false;
-        try {
-            if (Clash.isRunning()) {
-                Clash.stop();
-                Log.e("Clash", "clash stopped");
-            }
-            Tun2socks.stop();
-            JNIHelper.stop();
-            pfd.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        JNIHelper.stop();
+        if (Clash.isRunning()) {
+            Clash.stop();
+            Log.e("Clash", "clash stopped");
         }
-        pfd = null;
-        inputStream = null;
-        outputStream = null;
+        Tun2socks.stop();
     }
 
     public void stop() {
         shutdown();
-        stopSelf();
+    }
+
+    class PacketThread extends Thread {
+        private static final String TAG = "TunPacketThread";
+
+        public void run() {
+            Log.e(TAG, Thread.currentThread().getName() + " thread start");
+            while (state == STARTING || state == STARTED) {
+                try {
+                    int n = inputStream.read(packetBuffer.array());
+                    if (n > 0) {
+                        packetBuffer.limit(n);
+                        Tun2socks.inputPacket(packetBuffer.array());
+                        packetBuffer.clear();
+                    }
+                } catch (IOException e) {
+                    break;
+                }
+            }
+            Log.e(TAG, Thread.currentThread().getName() + " thread exit");
+            try {
+                pfd.close();
+                Log.e("VPN", "pfd closed");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            stopSelf();
+        }
     }
 }
