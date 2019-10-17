@@ -61,6 +61,7 @@ public class ProxyService extends VpnService {
     private ByteBuffer packetBuffer = ByteBuffer.allocate(16 * 1024);
     private LocalBroadcastManager broadcastManager;
 
+    public boolean enable_clash = false;
     public static ProxyService getInstance() {
         return instance;
     }
@@ -109,7 +110,7 @@ public class ProxyService extends VpnService {
             e.printStackTrace();
             setState(STOPPED);
         }
-        boolean enable_clash = intent.getBooleanExtra(CLASH_EXTRA_NAME, true);
+        enable_clash = intent.getBooleanExtra(CLASH_EXTRA_NAME, true);
         boolean enable_ipv6 = false;
 
         File file = new File(getFilesDir(), "config.json");
@@ -209,6 +210,7 @@ public class ProxyService extends VpnService {
             }
             Log.e(TAG, Thread.currentThread().getName() + " thread exit");
             try {
+                Thread.sleep(300);
                 pfd.close();
                 Log.e("VPN", "pfd closed");
             } catch (Exception e) {

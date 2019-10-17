@@ -36,9 +36,9 @@ public class MainActivity extends AppCompatActivity {
     private EditText passwordText;
     private Switch ipv6Switch;
     private Switch verifySwitch;
-    private Button startStopButton;
     private Switch clashSwitch;
     private TextView clashLink;
+    private Button startStopButton;
 
     private BroadcastReceiver serviceStateReceiver;
 
@@ -145,13 +145,6 @@ public class MainActivity extends AppCompatActivity {
         clashLink.setMovementMethod(LinkMovementMethod.getInstance());
         startStopButton = findViewById(R.id.startStopButton);
 
-        ProxyService serviceInstance = ProxyService.getInstance();
-        if (serviceInstance == null) {
-            updateViews(ProxyService.STOPPED);
-        } else {
-            updateViews(serviceInstance.getState());
-        }
-
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 ProxyService serviceInstance = ProxyService.getInstance();
@@ -165,8 +158,6 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         try (FileOutputStream fos = new FileOutputStream(file)) {
                             fos.write(config.getBytes());
-                        } catch (NullPointerException e){
-                            e.printStackTrace();
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -192,6 +183,24 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        copyRawToDir(R.raw.cacert, getCacheDir(), "cacert.pem", false);
+        copyRawToDir(R.raw.country, getFilesDir(), "Country.mmdb", false);
+        copyRawToDir(R.raw.clash, getFilesDir(), "config.yaml", false);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == VPN_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Intent intent = new Intent(this, ProxyService.class);
+            intent.putExtra(ProxyService.CLASH_EXTRA_NAME, clashSwitch.isChecked());
+            startService(intent);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         File file = new File(getFilesDir(), "config.json");
         if (file.exists()) {
             try {
@@ -209,18 +218,13 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        copyRawToDir(R.raw.cacert, getCacheDir(), "cacert.pem", false);
-        copyRawToDir(R.raw.country, getFilesDir(), "Country.mmdb", false);
-        copyRawToDir(R.raw.clash, getFilesDir(), "config.yaml", false);
-    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == VPN_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Intent intent = new Intent(this, ProxyService.class);
-            intent.putExtra(ProxyService.CLASH_EXTRA_NAME, clashSwitch.isChecked());
-            startService(intent);
+        ProxyService serviceInstance = ProxyService.getInstance();
+        if (serviceInstance == null) {
+            updateViews(ProxyService.STOPPED);
+        } else {
+            updateViews(serviceInstance.getState());
+            clashSwitch.setChecked(serviceInstance.enable_clash);
         }
     }
 
