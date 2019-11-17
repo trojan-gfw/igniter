@@ -2,6 +2,7 @@ package io.github.trojan_gfw.igniter;
 
 import android.content.Intent;
 import android.net.VpnService;
+import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -121,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+//        ContactsContract.CommonDataKinds.Phone
+
     }
 
     @Override
