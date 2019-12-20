@@ -5,8 +5,11 @@
     <string name="default_port">443</string>
     <string name="password">Password</string>
     <string name="button_service__start">Start</string>
+    <string name="button_service__starting">Starting</string>
     <string name="button_service__stop">Stop</string>
+    <string name="button_service__stopping">Stopping</string>
     <string name="verify_certificate">Verify Certificate</string>
     <string name="label_clash">Bypass China with <a href="https://github.com/Dreamacro/clash">Clash</a></string>
     <string name="enable_ipv6">Enable IPv6</string>
+    <string name="bc_service_state">io.github.trojan_gfw.igniter.BC_SERVICE_STATE</string>
 </resources>

@@ -2,10 +2,14 @@ package io.github.trojan_gfw.igniter;
 
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.VpnService;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
@@ -22,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
+
 public class MainActivity extends AppCompatActivity {
 
     private static final int VPN_REQUEST_CODE = 0;
@@ -31,9 +36,11 @@ public class MainActivity extends AppCompatActivity {
     private EditText passwordText;
     private Switch ipv6Switch;
     private Switch verifySwitch;
-    private Button startStopButton;
     private Switch clashSwitch;
     private TextView clashLink;
+    private Button startStopButton;
+
+    private BroadcastReceiver serviceStateReceiver;
 
     private String getConfig(String remoteAddr, int remotePort, String password,
                              boolean enableIpv6, boolean verify) {
@@ -69,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void copyRawToDir(int resFrom, File fileDir, String filenameTo, boolean override){
+    private void copyRawToDir(int resFrom, File fileDir, String filenameTo, boolean override) {
         File file = new File(fileDir, filenameTo);
         if (override || !file.exists()) {
             try {
@@ -87,22 +94,41 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void updateViews(boolean started){
-        boolean enable;
-        if (started) {
-            startStopButton.setText(R.string.button_service__stop);
-            enable = false;
-        } else {
-            startStopButton.setText(R.string.button_service__start);
-            enable = true;
+    private void updateViews(int state) {
+        boolean inputEnabled;
+        switch (state) {
+            case ProxyService.STARTING: {
+                inputEnabled = false;
+                startStopButton.setText(R.string.button_service__starting);
+                startStopButton.setEnabled(false);
+                break;
+            }
+            case ProxyService.STARTED: {
+                inputEnabled = false;
+                startStopButton.setText(R.string.button_service__stop);
+                startStopButton.setEnabled(true);
+                break;
+            }
+            case ProxyService.STOPPING: {
+                inputEnabled = false;
+                startStopButton.setText(R.string.button_service__stopping);
+                startStopButton.setEnabled(false);
+                break;
+            }
+            default: {
+                inputEnabled = true;
+                startStopButton.setText(R.string.button_service__start);
+                startStopButton.setEnabled(true);
+                break;
+            }
         }
-        remoteAddrText.setEnabled(enable);
-        remotePortText.setEnabled(enable);
-        ipv6Switch.setEnabled(enable);
-        passwordText.setEnabled(enable);
-        verifySwitch.setEnabled(enable);
-        clashSwitch.setEnabled(enable);
-        clashLink.setEnabled(enable);
+        remoteAddrText.setEnabled(inputEnabled);
+        remotePortText.setEnabled(inputEnabled);
+        ipv6Switch.setEnabled(inputEnabled);
+        passwordText.setEnabled(inputEnabled);
+        verifySwitch.setEnabled(inputEnabled);
+        clashSwitch.setEnabled(inputEnabled);
+        clashLink.setEnabled(inputEnabled);
     }
 
     @Override
@@ -119,12 +145,9 @@ public class MainActivity extends AppCompatActivity {
         clashLink.setMovementMethod(LinkMovementMethod.getInstance());
         startStopButton = findViewById(R.id.startStopButton);
 
-        TrojanService serviceInstance = TrojanService.getInstance();
-        updateViews(serviceInstance != null);
-
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                TrojanService serviceInstance = TrojanService.getInstance();
+                ProxyService serviceInstance = ProxyService.getInstance();
                 if (serviceInstance == null) {
                     String config = getConfig(remoteAddrText.getText().toString(),
                             Integer.parseInt(remotePortText.getText().toString()),
@@ -144,15 +167,40 @@ public class MainActivity extends AppCompatActivity {
                         startActivityForResult(i, VPN_REQUEST_CODE);
                     } else {
                         onActivityResult(VPN_REQUEST_CODE, Activity.RESULT_OK, null);
-                        updateViews(true);
                     }
                 } else {
                     serviceInstance.stop();
-                    updateViews(false);
                 }
 
             }
         });
+
+        serviceStateReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                int state = intent.getIntExtra(ProxyService.STATUS_EXTRA_NAME, ProxyService.STARTED);
+                updateViews(state);
+            }
+        };
+
+        copyRawToDir(R.raw.cacert, getCacheDir(), "cacert.pem", false);
+        copyRawToDir(R.raw.country, getFilesDir(), "Country.mmdb", false);
+        copyRawToDir(R.raw.clash, getFilesDir(), "config.yaml", false);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == VPN_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Intent intent = new Intent(this, ProxyService.class);
+            intent.putExtra(ProxyService.CLASH_EXTRA_NAME, clashSwitch.isChecked());
+            startService(intent);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         File file = new File(getFilesDir(), "config.json");
         if (file.exists()) {
             try {
@@ -170,18 +218,27 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        copyRawToDir(R.raw.cacert, getCacheDir(), "cacert.pem", false);
-        copyRawToDir(R.raw.country, getFilesDir(), "Country.mmdb", false);
-        copyRawToDir(R.raw.clash, getFilesDir(),"config.yaml", false);
+
+        ProxyService serviceInstance = ProxyService.getInstance();
+        if (serviceInstance == null) {
+            updateViews(ProxyService.STOPPED);
+        } else {
+            updateViews(serviceInstance.getState());
+            clashSwitch.setChecked(serviceInstance.enable_clash);
+        }
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == VPN_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Intent intent = new Intent(this, TrojanService.class);
-            intent.putExtra("enable_clash", clashSwitch.isChecked());
-            startService(intent);
-        }
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                serviceStateReceiver, new IntentFilter(getString(R.string.bc_service_state))
+        );
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceStateReceiver);
     }
 }
