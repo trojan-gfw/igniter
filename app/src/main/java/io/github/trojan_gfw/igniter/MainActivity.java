@@ -1,22 +1,31 @@
 package io.github.trojan_gfw.igniter;
 
+
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.VpnService;
-import android.provider.ContactsContract;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import org.json.JSONObject;
+import android.widget.Switch;
+import android.widget.TextView;
+
 import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import android.app.Activity;
-import android.widget.Switch;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,22 +36,37 @@ public class MainActivity extends AppCompatActivity {
     private EditText passwordText;
     private Switch ipv6Switch;
     private Switch verifySwitch;
+    private Switch clashSwitch;
+    private TextView clashLink;
     private Button startStopButton;
 
-    private String getConfig(String remoteAddr, int remotePort, String password, boolean enableIpv6, boolean verify) {
+    private BroadcastReceiver serviceStateReceiver;
+
+    private String getConfig(String remoteAddr, int remotePort, String password,
+                             boolean enableIpv6, boolean verify) {
         try {
             return new JSONObject()
                     .put("local_addr", "127.0.0.1")
-                    .put("local_port", 1080)
+                    .put("local_port", 1081)
                     .put("remote_addr", remoteAddr)
                     .put("remote_port", remotePort)
-                    .put("password", new JSONArray()
-                            .put(password))
+                    .put("password", new JSONArray().put(password))
                     .put("log_level", 2) // WARN
                     .put("ssl", new JSONObject()
                             .put("verify", verify)
                             .put("cert", getCacheDir() + "/cacert.pem")
-                            .put("cipher", "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:RSA-AES128-GCM-SHA256:RSA-AES256-GCM-SHA384:RSA-AES128-SHA:RSA-AES256-SHA:RSA-3DES-EDE-SHA")
+                            .put("cipher", "ECDHE-ECDSA-AES128-GCM-SHA256:"
+                                    + "ECDHE-RSA-AES128-GCM-SHA256:"
+                                    + "ECDHE-ECDSA-AES256-GCM-SHA384:"
+                                    + "ECDHE-RSA-AES256-GCM-SHA384:"
+                                    + "ECDHE-ECDSA-CHACHA20-POLY1305:"
+                                    + "ECDHE-RSA-CHACHA20-POLY1305:"
+                                    + "ECDHE-RSA-AES128-SHA:"
+                                    + "ECDHE-RSA-AES256-SHA:"
+                                    + "RSA-AES128-GCM-SHA256:"
+                                    + "RSA-AES256-GCM-SHA384:"
+                                    + "RSA-AES128-SHA:RSA-AES256-SHA:"
+                                    + "RSA-3DES-EDE-SHA")
                             .put("alpn", new JSONArray().put("h2").put("http/1.1")))
                     .put("enable_ipv6", enableIpv6)
                     .toString();
@@ -50,6 +74,61 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private void copyRawToDir(int resFrom, File fileDir, String filenameTo, boolean override) {
+        File file = new File(fileDir, filenameTo);
+        if (override || !file.exists()) {
+            try {
+                try (InputStream is = getResources().openRawResource(resFrom);
+                     FileOutputStream fos = new FileOutputStream(file)) {
+                    byte[] buf = new byte[1024];
+                    int len;
+                    while ((len = is.read(buf)) > 0) {
+                        fos.write(buf, 0, len);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void updateViews(int state) {
+        boolean inputEnabled;
+        switch (state) {
+            case ProxyService.STARTING: {
+                inputEnabled = false;
+                startStopButton.setText(R.string.button_service__starting);
+                startStopButton.setEnabled(false);
+                break;
+            }
+            case ProxyService.STARTED: {
+                inputEnabled = false;
+                startStopButton.setText(R.string.button_service__stop);
+                startStopButton.setEnabled(true);
+                break;
+            }
+            case ProxyService.STOPPING: {
+                inputEnabled = false;
+                startStopButton.setText(R.string.button_service__stopping);
+                startStopButton.setEnabled(false);
+                break;
+            }
+            default: {
+                inputEnabled = true;
+                startStopButton.setText(R.string.button_service__start);
+                startStopButton.setEnabled(true);
+                break;
+            }
+        }
+        remoteAddrText.setEnabled(inputEnabled);
+        remotePortText.setEnabled(inputEnabled);
+        ipv6Switch.setEnabled(inputEnabled);
+        passwordText.setEnabled(inputEnabled);
+        verifySwitch.setEnabled(inputEnabled);
+        clashSwitch.setEnabled(inputEnabled);
+        clashLink.setEnabled(inputEnabled);
     }
 
     @Override
@@ -61,10 +140,14 @@ public class MainActivity extends AppCompatActivity {
         passwordText = findViewById(R.id.passwordText);
         ipv6Switch = findViewById(R.id.ipv6Switch);
         verifySwitch = findViewById(R.id.verifySwitch);
+        clashSwitch = findViewById(R.id.clashSwitch);
+        clashLink = findViewById(R.id.clashLink);
+        clashLink.setMovementMethod(LinkMovementMethod.getInstance());
         startStopButton = findViewById(R.id.startStopButton);
+
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                TrojanService serviceInstance = TrojanService.getInstance();
+                ProxyService serviceInstance = ProxyService.getInstance();
                 if (serviceInstance == null) {
                     String config = getConfig(remoteAddrText.getText().toString(),
                             Integer.parseInt(remotePortText.getText().toString()),
@@ -88,8 +171,36 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     serviceInstance.stop();
                 }
+
             }
         });
+
+        serviceStateReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                int state = intent.getIntExtra(ProxyService.STATUS_EXTRA_NAME, ProxyService.STARTED);
+                updateViews(state);
+            }
+        };
+
+        copyRawToDir(R.raw.cacert, getCacheDir(), "cacert.pem", false);
+        copyRawToDir(R.raw.country, getFilesDir(), "Country.mmdb", false);
+        copyRawToDir(R.raw.clash, getFilesDir(), "config.yaml", false);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == VPN_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            Intent intent = new Intent(this, ProxyService.class);
+            intent.putExtra(ProxyService.CLASH_EXTRA_NAME, clashSwitch.isChecked());
+            startService(intent);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         File file = new File(getFilesDir(), "config.json");
         if (file.exists()) {
             try {
@@ -107,30 +218,29 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        file = new File(getCacheDir(), "cacert.pem");
-        if (!file.exists()) {
-            try {
-                try (InputStream is = getResources().openRawResource(R.raw.cacert);
-                     FileOutputStream fos = new FileOutputStream(file)) {
-                     byte[] buf = new byte[1024];
-                     int len;
-                     while ((len = is.read(buf)) > 0) {
-                         fos.write(buf, 0, len);
-                     }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+
+        ProxyService serviceInstance = ProxyService.getInstance();
+        if (serviceInstance == null) {
+            updateViews(ProxyService.STOPPED);
+        } else {
+            updateViews(serviceInstance.getState());
+            clashSwitch.setChecked(serviceInstance.enable_clash);
         }
 //        ContactsContract.CommonDataKinds.Phone
 
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == VPN_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            startService(new Intent(this, TrojanService.class));
-        }
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                serviceStateReceiver, new IntentFilter(getString(R.string.bc_service_state))
+        );
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceStateReceiver);
     }
 }
