@@ -11,33 +11,9 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
 
 import clash.Clash;
-import tun2socks.PacketFlow;
 import tun2socks.Tun2socks;
-
-
-class Flow implements PacketFlow {
-    private FileOutputStream flowOutputStream;
-
-    Flow(FileOutputStream stream) {
-        flowOutputStream = stream;
-    }
-
-    @Override
-    public void writePacket(byte[] bytes) {
-        try {
-            if (flowOutputStream.getFD().valid())
-                flowOutputStream.write(bytes);
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-        }
-    }
-}
 
 
 public class ProxyService extends VpnService {
@@ -56,9 +32,6 @@ public class ProxyService extends VpnService {
     private static ProxyService instance;
     private int state = STARTED;
     private ParcelFileDescriptor pfd;
-    private InputStream inputStream;
-    private FileOutputStream outputStream;
-    private ByteBuffer packetBuffer = ByteBuffer.allocate(16 * 1024);
     private LocalBroadcastManager broadcastManager;
 
     public boolean enable_clash = false;
@@ -89,8 +62,6 @@ public class ProxyService extends VpnService {
         instance = null;
         broadcastManager = null;
         pfd = null;
-        inputStream = null;
-        outputStream = null;
     }
 
     private void sendStateChangeBroadcast() {
@@ -142,7 +113,6 @@ public class ProxyService extends VpnService {
             b.addDnsServer("2001:4860:4860::8888");
             b.addDnsServer("2001:4860:4860::8844");
         }
-        b.setBlocking(true);
         pfd = b.establish();
         Log.e("VPN", "pfd established");
 
@@ -150,10 +120,7 @@ public class ProxyService extends VpnService {
             shutdown();
             return START_NOT_STICKY;
         }
-        outputStream = new FileOutputStream(pfd.getFileDescriptor());
-        inputStream = new FileInputStream(pfd.getFileDescriptor());
-        Flow flow = new Flow(outputStream);
-
+        int fd = pfd.detachFd();
         JNIHelper.trojan(getFilesDir() + "/config.json");
 
         int tun2socksPort;
@@ -168,8 +135,7 @@ public class ProxyService extends VpnService {
         } else {
             tun2socksPort = 1081;
         }
-        Tun2socks.start(flow, "127.0.0.1:" + tun2socksPort, "255.0.128.1", "255.0.143.254");
-        new PacketThread().start();
+        Tun2socks.start(fd, "127.0.0.1:" + tun2socksPort, "255.0.128.1", "255.0.143.254", VPN_MTU);
 
         setState(STARTED);
 
@@ -185,38 +151,13 @@ public class ProxyService extends VpnService {
             Log.e("Clash", "clash stopped");
         }
         Tun2socks.stop();
+        stopSelf();
+
+        setState(STOPPED);
+        instance = null;
     }
 
     public void stop() {
         shutdown();
-    }
-
-    class PacketThread extends Thread {
-        private static final String TAG = "TunPacketThread";
-
-        public void run() {
-            Log.e(TAG, Thread.currentThread().getName() + " thread start");
-            while (state == STARTING || state == STARTED) {
-                try {
-                    int n = inputStream.read(packetBuffer.array());
-                    if (n > 0) {
-                        packetBuffer.limit(n);
-                        Tun2socks.inputPacket(packetBuffer.array());
-                        packetBuffer.clear();
-                    }
-                } catch (IOException e) {
-                    break;
-                }
-            }
-            Log.e(TAG, Thread.currentThread().getName() + " thread exit");
-            try {
-                Thread.sleep(300);
-                pfd.close();
-                Log.e("VPN", "pfd closed");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            stopSelf();
-        }
     }
 }
