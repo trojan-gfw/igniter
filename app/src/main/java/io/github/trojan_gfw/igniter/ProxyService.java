@@ -71,6 +71,13 @@ public class ProxyService extends VpnService {
     }
 
     @Override
+    public void onRevoke() {
+        // Calls to this method may not happen on the main thread
+        // of the process.
+        stop();
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         setState(STARTING);
 
