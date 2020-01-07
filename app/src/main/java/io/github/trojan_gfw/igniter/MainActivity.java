@@ -70,6 +70,9 @@ public class MainActivity extends AppCompatActivity {
                                     + "AES128-SHA:"
                                     + "AES256-SHA:"
                                     + "DES-CBC3-SHA")
+                            .put("cipher_tls13", "TLS_AES_128_GCM_SHA256:"
+                                    + "TLS_CHACHA20_POLY1305_SHA256:"
+                                    + "TLS_AES_256_GCM_SHA384")
                             .put("alpn", new JSONArray().put("h2").put("http/1.1")))
                     .put("enable_ipv6", enableIpv6)
                     .toString();
