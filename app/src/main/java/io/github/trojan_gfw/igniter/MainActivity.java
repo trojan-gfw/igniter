@@ -18,7 +18,6 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -30,9 +29,6 @@ import java.io.InputStream;
 public class MainActivity extends AppCompatActivity {
 
     private static final int VPN_REQUEST_CODE = 0;
-    private static String caCertPath;
-    private static String countryMmdbPath;
-    private static String clashConfigPath;
 
     private EditText remoteAddrText;
     private EditText remotePortText;
@@ -44,46 +40,6 @@ public class MainActivity extends AppCompatActivity {
     private Button startStopButton;
 
     private BroadcastReceiver serviceStateReceiver;
-
-    private String getConfig(String remoteAddr, int remotePort, String password,
-                             boolean enableIpv6, boolean verify) {
-        try {
-            return new JSONObject()
-                    .put("local_addr", "127.0.0.1")
-                    .put("local_port", 1081)
-                    .put("remote_addr", remoteAddr)
-                    .put("remote_port", remotePort)
-                    .put("password", new JSONArray().put(password))
-                    .put("log_level", 2) // WARN
-                    .put("ssl", new JSONObject()
-                            .put("verify", verify)
-                            .put("cert", caCertPath)
-                            .put("cipher", "ECDHE-ECDSA-AES128-GCM-SHA256:"
-                                    + "ECDHE-RSA-AES128-GCM-SHA256:"
-                                    + "ECDHE-ECDSA-CHACHA20-POLY1305:"
-                                    + "ECDHE-RSA-CHACHA20-POLY1305:"
-                                    + "ECDHE-ECDSA-AES256-GCM-SHA384:"
-                                    + "ECDHE-RSA-AES256-GCM-SHA384:"
-                                    + "ECDHE-ECDSA-AES256-SHA:"
-                                    + "ECDHE-ECDSA-AES128-SHA:"
-                                    + "ECDHE-RSA-AES128-SHA:"
-                                    + "ECDHE-RSA-AES256-SHA:"
-                                    + "DHE-RSA-AES128-SHA:"
-                                    + "DHE-RSA-AES256-SHA:"
-                                    + "AES128-SHA:"
-                                    + "AES256-SHA:"
-                                    + "DES-CBC3-SHA")
-                            .put("cipher_tls13", "TLS_AES_128_GCM_SHA256:"
-                                    + "TLS_CHACHA20_POLY1305_SHA256:"
-                                    + "TLS_AES_256_GCM_SHA384")
-                            .put("alpn", new JSONArray().put("h2").put("http/1.1")))
-                    .put("enable_ipv6", enableIpv6)
-                    .toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
     private void copyRawResourceToDir(int resId, String destPathName, boolean override) {
         File file = new File(destPathName);
@@ -154,27 +110,28 @@ public class MainActivity extends AppCompatActivity {
         clashLink.setMovementMethod(LinkMovementMethod.getInstance());
         startStopButton = findViewById(R.id.startStopButton);
 
-        caCertPath = PathHelper.combine(getCacheDir().getAbsolutePath(), "cacert.pem");
-        countryMmdbPath = PathHelper.combine(getFilesDir().getAbsolutePath(), "Country.mmdb");
-        clashConfigPath = PathHelper.combine(getFilesDir().getAbsolutePath(), "config.yaml");
+        Constants.Init(this);
+
+        copyRawResourceToDir(R.raw.cacert, Constants.getCaCertPath(), true);
+        copyRawResourceToDir(R.raw.country, Constants.getCountryMmdbPath(), true);
+        // copy clash template configuration
+        copyRawResourceToDir(R.raw.clash_config, Constants.getClashTemplatePath(), true);
 
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 ProxyService serviceInstance = ProxyService.getInstance();
                 if (serviceInstance == null) {
-                    String config = getConfig(remoteAddrText.getText().toString(),
+                    TrojanHelper.WriteTrojanConfig(
+                            remoteAddrText.getText().toString(),
                             Integer.parseInt(remotePortText.getText().toString()),
                             passwordText.getText().toString(),
                             ipv6Switch.isChecked(),
-                            verifySwitch.isChecked());
-                    File file = new File(getFilesDir(), "config.json");
-                    try {
-                        try (FileOutputStream fos = new FileOutputStream(file)) {
-                            fos.write(config.getBytes());
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                            verifySwitch.isChecked(),
+                            Constants.getCaCertPath(),
+                            Constants.getTrojanConfigPath()
+                    );
+                    TrojanHelper.ShowConfig(Constants.getTrojanConfigPath());
+
                     Intent i = VpnService.prepare(getApplicationContext());
                     if (i != null) {
                         startActivityForResult(i, VPN_REQUEST_CODE);
@@ -196,10 +153,8 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        copyRawResourceToDir(R.raw.cacert, caCertPath, true);
-        copyRawResourceToDir(R.raw.country, countryMmdbPath, true);
-        copyRawResourceToDir(R.raw.clash_config, clashConfigPath, false);
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -214,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        File file = new File(getFilesDir(), "config.json");
+        File file = new File(Constants.getTrojanConfigPath());
         if (file.exists()) {
             try {
                 try (FileInputStream fis = new FileInputStream(file)) {
