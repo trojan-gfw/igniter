@@ -30,6 +30,9 @@ import java.io.InputStream;
 public class MainActivity extends AppCompatActivity {
 
     private static final int VPN_REQUEST_CODE = 0;
+    private static String caCertPath;
+    private static String countryMmdbPath;
+    private static String clashConfigPath;
 
     private EditText remoteAddrText;
     private EditText remotePortText;
@@ -54,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
                     .put("log_level", 2) // WARN
                     .put("ssl", new JSONObject()
                             .put("verify", verify)
-                            .put("cert", getCacheDir() + "/cacert.pem")
+                            .put("cert", caCertPath)
                             .put("cipher", "ECDHE-ECDSA-AES128-GCM-SHA256:"
                                     + "ECDHE-RSA-AES128-GCM-SHA256:"
                                     + "ECDHE-ECDSA-CHACHA20-POLY1305:"
@@ -82,11 +85,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void copyRawToDir(int resFrom, File fileDir, String filenameTo, boolean override) {
-        File file = new File(fileDir, filenameTo);
+    private void copyRawResourceToDir(int resId, String destPathName, boolean override) {
+        File file = new File(destPathName);
         if (override || !file.exists()) {
             try {
-                try (InputStream is = getResources().openRawResource(resFrom);
+                try (InputStream is = getResources().openRawResource(resId);
                      FileOutputStream fos = new FileOutputStream(file)) {
                     byte[] buf = new byte[1024];
                     int len;
@@ -151,6 +154,10 @@ public class MainActivity extends AppCompatActivity {
         clashLink.setMovementMethod(LinkMovementMethod.getInstance());
         startStopButton = findViewById(R.id.startStopButton);
 
+        caCertPath = PathHelper.combine(getCacheDir().getAbsolutePath(), "cacert.pem");
+        countryMmdbPath = PathHelper.combine(getFilesDir().getAbsolutePath(), "Country.mmdb");
+        clashConfigPath = PathHelper.combine(getFilesDir().getAbsolutePath(), "config.yaml");
+
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 ProxyService serviceInstance = ProxyService.getInstance();
@@ -189,9 +196,9 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        copyRawToDir(R.raw.cacert, getCacheDir(), "cacert.pem", false);
-        copyRawToDir(R.raw.country, getFilesDir(), "Country.mmdb", false);
-        copyRawToDir(R.raw.clash, getFilesDir(), "config.yaml", false);
+        copyRawResourceToDir(R.raw.cacert, caCertPath, true);
+        copyRawResourceToDir(R.raw.country, countryMmdbPath, true);
+        copyRawResourceToDir(R.raw.clash_config, clashConfigPath, false);
     }
 
     @Override
