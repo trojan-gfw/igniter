@@ -2,21 +2,19 @@ package io.github.trojan_gfw.igniter;
 
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.app.AlertDialog;
+import android.content.*;
 import android.net.VpnService;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Switch;
-import android.widget.TextView;
+import android.widget.*;
 
 import org.json.JSONObject;
 
@@ -30,9 +28,13 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int VPN_REQUEST_CODE = 0;
 
+    private static  boolean onBusy;
+
+    private ImageView logoImage;
     private EditText remoteAddrText;
     private EditText remotePortText;
     private EditText passwordText;
+    private EditText shareLinkText;
     private Switch ipv6Switch;
     private Switch verifySwitch;
     private Switch clashSwitch;
@@ -89,8 +91,9 @@ public class MainActivity extends AppCompatActivity {
         }
         remoteAddrText.setEnabled(inputEnabled);
         remotePortText.setEnabled(inputEnabled);
-        ipv6Switch.setEnabled(inputEnabled);
         passwordText.setEnabled(inputEnabled);
+        shareLinkText.setEnabled(inputEnabled);
+        ipv6Switch.setEnabled(inputEnabled);
         verifySwitch.setEnabled(inputEnabled);
         clashSwitch.setEnabled(inputEnabled);
         clashLink.setEnabled(inputEnabled);
@@ -100,9 +103,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        logoImage = findViewById(R.id.imageView);
         remoteAddrText = findViewById(R.id.remoteAddrText);
         remotePortText = findViewById(R.id.remotePortText);
         passwordText = findViewById(R.id.passwordText);
+        shareLinkText = findViewById(R.id.shareLinkText);
         ipv6Switch = findViewById(R.id.ipv6Switch);
         verifySwitch = findViewById(R.id.verifySwitch);
         clashSwitch = findViewById(R.id.clashSwitch);
@@ -116,6 +122,87 @@ public class MainActivity extends AppCompatActivity {
         copyRawResourceToDir(R.raw.country, Constants.getCountryMmdbPath(), true);
         // copy clash template configuration
         copyRawResourceToDir(R.raw.clash_config, Constants.getClashTemplatePath(), true);
+
+        final TrojanShareLink trojanShareLink = new TrojanShareLink();
+
+        shareLinkText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                onBusy = true;
+                try {
+                    String[] shareLink = trojanShareLink.ConvertShareToTrojanConf(shareLinkText.getText().toString());
+                    if (shareLink != null) {
+                        remoteAddrText.setText(shareLink[0]);
+                        remotePortText.setText(shareLink[1]);
+                        passwordText.setText(shareLink[2]);
+                    }
+                    else
+                    {
+                        Log.i("TcsSL", "NullException()");
+                    }
+                }
+                catch (Exception ex) { }
+
+                onBusy = false;
+
+            }
+        });
+
+        remoteAddrText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(!onBusy)
+                    shareLinkText.setText(trojanShareLink.GenerateShareLink(remoteAddrText.getText().toString(), remotePortText.getText().toString(), passwordText.getText().toString()));
+            }
+        });
+
+        remotePortText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(!onBusy)
+                    shareLinkText.setText(trojanShareLink.GenerateShareLink(remoteAddrText.getText().toString(), remotePortText.getText().toString(), passwordText.getText().toString()));
+            }
+        });
+
+        passwordText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(!onBusy)
+                    shareLinkText.setText(trojanShareLink.GenerateShareLink(remoteAddrText.getText().toString(), remotePortText.getText().toString(), passwordText.getText().toString()));
+            }
+        });
+
+        shareLinkText.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                shareLinkText.selectAll();
+                return false;
+            }
+        });
 
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
