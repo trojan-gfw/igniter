@@ -12,4 +12,5 @@
     <string name="label_clash">Bypass China with <a href="https://github.com/Dreamacro/clash">Clash</a></string>
     <string name="enable_ipv6">Enable IPv6</string>
     <string name="bc_service_state">io.github.trojan_gfw.igniter.BC_SERVICE_STATE</string>
+    <string name="test_connection">Test Connection</string>
 </resources>
