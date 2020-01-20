@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int VPN_REQUEST_CODE = 0;
 
-    private static  boolean onBusy;
+    private static boolean onBusy;
 
     private ImageView logoImage;
     private EditText remoteAddrText;
@@ -125,13 +125,14 @@ public class MainActivity extends AppCompatActivity {
 
         final TrojanShareLink trojanShareLink = new TrojanShareLink();
 
-
         shareLinkText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -139,35 +140,41 @@ public class MainActivity extends AppCompatActivity {
                 String[] shareLink = trojanShareLink.ConvertShareToTrojanConf(shareLinkText.getText().toString());
                 if (shareLink != null && shareLink.length > 0) {
                     remoteAddrText.setText(shareLink[0]);
+                    remoteAddrText.setSelection(remoteAddrText.getText().length());
                     remotePortText.setText(shareLink[1]);
+                    remotePortText.setSelection(remotePortText.getText().length());
                     passwordText.setText(shareLink[2]);
+                    passwordText.setSelection(passwordText.getText().length());
+
                 }
 
                 onBusy = false;
-
             }
         });
 
-        TextWatcher configTextWatcher = new TextWatcher() {
+        TextWatcher trojanTextWatcher = new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(!onBusy)
+                if (!onBusy)
                     shareLinkText.setText(trojanShareLink.GenerateShareLink(remoteAddrText.getText().toString(), remotePortText.getText().toString(), passwordText.getText().toString()));
+                shareLinkText.setSelection(shareLinkText.getText().length());
+
             }
         };
 
+        remoteAddrText.addTextChangedListener(trojanTextWatcher);
 
-        remoteAddrText.addTextChangedListener(configTextWatcher);
+        remotePortText.addTextChangedListener(trojanTextWatcher);
 
-        remotePortText.addTextChangedListener(configTextWatcher);
-
-        passwordText.addTextChangedListener(configTextWatcher);
+        passwordText.addTextChangedListener(trojanTextWatcher);
 
         shareLinkText.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -179,8 +186,7 @@ public class MainActivity extends AppCompatActivity {
 
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if(!remoteAddrText.getText().toString().isEmpty() && !remotePortText.getText().toString().isEmpty() &&
-                        !passwordText.getText().toString().isEmpty()) {
+                if (!remoteAddrText.getText().toString().isEmpty() && !remotePortText.getText().toString().isEmpty() && !passwordText.getText().toString().isEmpty()) {
                     ProxyService serviceInstance = ProxyService.getInstance();
                     if (serviceInstance == null) {
                         TrojanHelper.WriteTrojanConfig(
@@ -205,8 +211,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } else {
                     new AlertDialog.Builder(MainActivity.this)
-                            .setTitle("Warning")
-                            .setMessage("Trojan config cannot be empty!")
+                            .setTitle("Alert")
+                            .setMessage("Please enter valid Trojan config.")
                             .setPositiveButton("OK", null)
                             .show();
                 }
