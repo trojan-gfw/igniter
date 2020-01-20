@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
 
         final TrojanShareLink trojanShareLink = new TrojanShareLink();
 
+
         shareLinkText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
@@ -135,26 +136,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 onBusy = true;
-                try {
-                    String[] shareLink = trojanShareLink.ConvertShareToTrojanConf(shareLinkText.getText().toString());
-                    if (shareLink != null) {
-                        remoteAddrText.setText(shareLink[0]);
-                        remotePortText.setText(shareLink[1]);
-                        passwordText.setText(shareLink[2]);
-                    }
-                    else
-                    {
-                        Log.i("TcsSL", "NullException()");
-                    }
+                String[] shareLink = trojanShareLink.ConvertShareToTrojanConf(shareLinkText.getText().toString());
+                if (shareLink != null && shareLink.length > 0) {
+                    remoteAddrText.setText(shareLink[0]);
+                    remotePortText.setText(shareLink[1]);
+                    passwordText.setText(shareLink[2]);
                 }
-                catch (Exception ex) { }
 
                 onBusy = false;
 
             }
         });
 
-        remoteAddrText.addTextChangedListener(new TextWatcher() {
+        TextWatcher configTextWatcher = new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
@@ -166,35 +160,14 @@ public class MainActivity extends AppCompatActivity {
                 if(!onBusy)
                     shareLinkText.setText(trojanShareLink.GenerateShareLink(remoteAddrText.getText().toString(), remotePortText.getText().toString(), passwordText.getText().toString()));
             }
-        });
+        };
 
-        remotePortText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+        remoteAddrText.addTextChangedListener(configTextWatcher);
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                if(!onBusy)
-                    shareLinkText.setText(trojanShareLink.GenerateShareLink(remoteAddrText.getText().toString(), remotePortText.getText().toString(), passwordText.getText().toString()));
-            }
-        });
+        remotePortText.addTextChangedListener(configTextWatcher);
 
-        passwordText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if(!onBusy)
-                    shareLinkText.setText(trojanShareLink.GenerateShareLink(remoteAddrText.getText().toString(), remotePortText.getText().toString(), passwordText.getText().toString()));
-            }
-        });
+        passwordText.addTextChangedListener(configTextWatcher);
 
         shareLinkText.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -206,27 +179,36 @@ public class MainActivity extends AppCompatActivity {
 
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                ProxyService serviceInstance = ProxyService.getInstance();
-                if (serviceInstance == null) {
-                    TrojanHelper.WriteTrojanConfig(
-                            remoteAddrText.getText().toString(),
-                            Integer.parseInt(remotePortText.getText().toString()),
-                            passwordText.getText().toString(),
-                            ipv6Switch.isChecked(),
-                            verifySwitch.isChecked(),
-                            Constants.getCaCertPath(),
-                            Constants.getTrojanConfigPath()
-                    );
-                    TrojanHelper.ShowConfig(Constants.getTrojanConfigPath());
+                if(!remoteAddrText.getText().toString().isEmpty() && !remotePortText.getText().toString().isEmpty() &&
+                        !passwordText.getText().toString().isEmpty()) {
+                    ProxyService serviceInstance = ProxyService.getInstance();
+                    if (serviceInstance == null) {
+                        TrojanHelper.WriteTrojanConfig(
+                                remoteAddrText.getText().toString(),
+                                Integer.parseInt(remotePortText.getText().toString()),
+                                passwordText.getText().toString(),
+                                ipv6Switch.isChecked(),
+                                verifySwitch.isChecked(),
+                                Constants.getCaCertPath(),
+                                Constants.getTrojanConfigPath()
+                        );
+                        TrojanHelper.ShowConfig(Constants.getTrojanConfigPath());
 
-                    Intent i = VpnService.prepare(getApplicationContext());
-                    if (i != null) {
-                        startActivityForResult(i, VPN_REQUEST_CODE);
+                        Intent i = VpnService.prepare(getApplicationContext());
+                        if (i != null) {
+                            startActivityForResult(i, VPN_REQUEST_CODE);
+                        } else {
+                            onActivityResult(VPN_REQUEST_CODE, Activity.RESULT_OK, null);
+                        }
                     } else {
-                        onActivityResult(VPN_REQUEST_CODE, Activity.RESULT_OK, null);
+                        serviceInstance.stop();
                     }
                 } else {
-                    serviceInstance.stop();
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setTitle("Warning")
+                            .setMessage("Trojan config cannot be empty!")
+                            .setPositiveButton("OK", null)
+                            .show();
                 }
 
             }
