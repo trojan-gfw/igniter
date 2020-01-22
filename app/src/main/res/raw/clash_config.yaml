@@ -1,5 +1,5 @@
 port: 0  # HTTP proxy, not used
-socks-port: __CLASH_SOCKS_PORT__
+socks-port: 1080
 udp: true
 allow-lan: false
 mode: Rule
@@ -19,7 +19,7 @@ dns:
 
 
 Proxy:
-- { name: "trojan", type: socks5, server: "127.0.0.1", port: __TROJAN_PORT__, udp: true}
+- { name: "trojan", type: socks5, server: "127.0.0.1", port: 1081, udp: true}
 
 Proxy Group:
 - { name: "Proxy", type: select, proxies: ["trojan"] }
