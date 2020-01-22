@@ -155,8 +155,7 @@ public class ProxyService extends VpnService {
                 while (clashSocksPort == trojanPort);
 
                 Log.i("igniter", "clash port is " + clashSocksPort);
-                ClashHelper.ChangeClashConfig(Constants.getClashTemplatePath(),
-                        Constants.getClashConfigPath(),
+                ClashHelper.ChangeClashConfig(Constants.getClashConfigPath(),
                         trojanPort, clashSocksPort);
                 ClashHelper.ShowConfig(Constants.getClashConfigPath());
                 Clash.start(getFilesDir().toString());

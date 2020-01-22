@@ -114,8 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
         copyRawResourceToDir(R.raw.cacert, Constants.getCaCertPath(), true);
         copyRawResourceToDir(R.raw.country, Constants.getCountryMmdbPath(), true);
-        // copy clash template configuration
-        copyRawResourceToDir(R.raw.clash_config, Constants.getClashTemplatePath(), true);
+        copyRawResourceToDir(R.raw.clash_config, Constants.getClashConfigPath(), false);
 
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

@@ -25,10 +25,6 @@ public class Constants {
         return PathHelper.combine(filesDir, "config.yaml");
     }
 
-    public static String getClashTemplatePath() {
-        return PathHelper.combine(filesDir, "config_template.yaml");
-    }
-
     public static String getTrojanConfigPath() {
         return PathHelper.combine(filesDir, "config.json");
     }
