@@ -114,6 +114,8 @@ public class ProxyService extends VpnService {
                 String[] parts = route.split("/", 2);
                 b.addRoute(parts[0], Integer.parseInt(parts[1]));
             }
+            // fake ip range for clash
+            b.addRoute("255.0.128.0", 20);
         } else {
             b.addRoute("0.0.0.0", 0);
         }
