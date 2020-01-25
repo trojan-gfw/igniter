@@ -9,7 +9,7 @@ log-level: silent
 
 
 dns:
-  enable: true
+  enable: false
   listen: 0.0.0.0:0  # the DNS server in clash is actually not used, turn it off
   enhanced-mode: fake-ip
   fake-ip-range: 255.0.128.1/20 # 255.0.128.1  - 255.0.143.254
@@ -498,14 +498,14 @@ Rule:
 - IP-CIDR,149.154.160.0/20,Proxy
 - IP-CIDR,149.154.164.0/22,Proxy
 
-# Local
-- IP-CIDR,127.0.0.0/8,DIRECT
-- IP-CIDR,172.16.0.0/12,DIRECT
-- IP-CIDR,172.19.0.0/12,DIRECT
-- IP-CIDR,192.168.0.0/16,DIRECT
-- IP-CIDR,10.0.0.0/8,DIRECT
-- IP-CIDR,17.0.0.0/8,DIRECT
-- IP-CIDR,100.64.0.0/10,DIRECT
+# Locals are already bypassed by Android VPN service
+#- IP-CIDR,127.0.0.0/8,DIRECT
+#- IP-CIDR,172.16.0.0/12,DIRECT
+#- IP-CIDR,172.19.0.0/12,DIRECT
+#- IP-CIDR,192.168.0.0/16,DIRECT
+#- IP-CIDR,10.0.0.0/8,DIRECT
+#- IP-CIDR,17.0.0.0/8,DIRECT
+#- IP-CIDR,100.64.0.0/10,DIRECT
 
 - GEOIP,CN,DIRECT
 - MATCH,Proxy
