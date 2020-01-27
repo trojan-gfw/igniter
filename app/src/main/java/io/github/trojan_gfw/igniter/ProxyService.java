@@ -109,7 +109,17 @@ public class ProxyService extends VpnService {
         b.setSession(getString(R.string.app_name));
         b.setMtu(VPN_MTU);
         b.addAddress(PRIVATE_VLAN4_CLIENT, 30);
-        b.addRoute("0.0.0.0", 0);
+        if (enable_clash){
+            for (String route: getResources().getStringArray(R.array.bypass_private_route)){
+                String[] parts = route.split("/", 2);
+                b.addRoute(parts[0], Integer.parseInt(parts[1]));
+            }
+            // fake ip range for clash
+            b.addRoute("255.0.128.0", 20);
+        } else {
+            b.addRoute("0.0.0.0", 0);
+        }
+
         if (enable_ipv6) {
             b.addAddress(PRIVATE_VLAN6_CLIENT, 126);
             b.addRoute("::", 0);
@@ -155,8 +165,7 @@ public class ProxyService extends VpnService {
                 while (clashSocksPort == trojanPort);
 
                 Log.i("igniter", "clash port is " + clashSocksPort);
-                ClashHelper.ChangeClashConfig(Constants.getClashTemplatePath(),
-                        Constants.getClashConfigPath(),
+                ClashHelper.ChangeClashConfig(Constants.getClashConfigPath(),
                         trojanPort, clashSocksPort);
                 ClashHelper.ShowConfig(Constants.getClashConfigPath());
                 Clash.start(getFilesDir().toString());
