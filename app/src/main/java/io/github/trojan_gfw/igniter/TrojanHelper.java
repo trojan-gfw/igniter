@@ -10,6 +10,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 public class TrojanHelper {
+    private static final String TAG = "TrojanConfig";
+
     public static void WriteTrojanConfig(String remoteAddr, int remotePort, String password,
                                          boolean enableIpv6, boolean verify, String caCertPath, String trojanConfigPath) {
         String config = generateTrojanConfigJSON(remoteAddr,
@@ -97,7 +99,7 @@ public class TrojanHelper {
             try (FileInputStream fis = new FileInputStream(file)) {
                 byte[] content = new byte[(int) file.length()];
                 fis.read(content);
-                Log.i("TrojanConfig", new String(content));
+                Log.i(TAG, new String(content));
             }
         } catch (Exception e) {
             e.printStackTrace();
