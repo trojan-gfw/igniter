@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.VpnService;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
@@ -17,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -24,11 +26,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int VPN_REQUEST_CODE = 0;
+    private static final String CONNECTION_TEST_URL = "https://www.google.com";
 
     private EditText remoteAddrText;
     private EditText remotePortText;
@@ -38,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private Switch clashSwitch;
     private TextView clashLink;
     private Button startStopButton;
+    private Button testConnectionButton;
 
     private BroadcastReceiver serviceStateReceiver;
 
@@ -96,6 +102,55 @@ public class MainActivity extends AppCompatActivity {
         clashLink.setEnabled(inputEnabled);
     }
 
+    private class TestConnectionResult {
+        final String url;
+        final boolean isConnected;
+        final Exception error;
+        final long time; // In milliseconds
+
+        TestConnectionResult(String url, boolean isConnected, Exception error, long time) {
+            this.url = url;
+            this.isConnected = isConnected;
+            this.error = error;
+            this.time = time;
+        }
+    }
+
+    private class TestConnection extends AsyncTask<String, Void, TestConnectionResult> {
+        protected void onPreExecute() {
+            super.onPreExecute();
+            testConnectionButton.setText(R.string.testing);
+            testConnectionButton.setEnabled(false);
+        }
+
+        protected TestConnectionResult doInBackground(String... urls) {
+            String url = urls[0];
+            try {
+                long startTime = System.currentTimeMillis();
+                URLConnection connection = new URL(url).openConnection();
+                connection.setConnectTimeout(1000 * 10); //10 seconds
+                connection.connect();
+                return new TestConnectionResult(url, true, null, System.currentTimeMillis() - startTime);
+            } catch (Exception e) {
+                return new TestConnectionResult(url, false, e, 0);
+            }
+        }
+
+        protected void onPostExecute(TestConnectionResult result) {
+            testConnectionButton.setText(R.string.test_connection);
+            testConnectionButton.setEnabled(true);
+            if (result.isConnected) {
+                Toast.makeText(MainActivity.this,
+                        getString(R.string.connected_to__in__ms, result.url, String.valueOf(result.time)),
+                        Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(MainActivity.this,
+                        getString(R.string.failed_to_connect_to__, result.url, result.error.getMessage()),
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,6 +164,7 @@ public class MainActivity extends AppCompatActivity {
         clashLink = findViewById(R.id.clashLink);
         clashLink.setMovementMethod(LinkMovementMethod.getInstance());
         startStopButton = findViewById(R.id.startStopButton);
+        testConnectionButton = findViewById(R.id.testConnectionButton);
 
         Constants.Init(this);
 
@@ -141,6 +197,12 @@ public class MainActivity extends AppCompatActivity {
                     serviceInstance.stop();
                 }
 
+            }
+        });
+
+        testConnectionButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                new TestConnection().execute(CONNECTION_TEST_URL);
             }
         });
 
