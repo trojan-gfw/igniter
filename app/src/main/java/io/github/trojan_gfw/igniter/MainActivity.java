@@ -120,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             testConnectionButton.setText(R.string.testing);
+            testConnectionButton.setEnabled(false);
         }
 
         protected TestConnectionResult doInBackground(String... urls) {
@@ -137,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
         protected void onPostExecute(TestConnectionResult result) {
             testConnectionButton.setText(R.string.test_connection);
+            testConnectionButton.setEnabled(true);
             if (result.isConnected) {
                 Toast.makeText(MainActivity.this,
                         getString(R.string.connected_to__in__ms, result.url, String.valueOf(result.time)),
