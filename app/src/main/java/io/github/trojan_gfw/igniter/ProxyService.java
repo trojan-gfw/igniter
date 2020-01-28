@@ -24,6 +24,11 @@ public class ProxyService extends VpnService {
     public static final int STOPPED = 3;
     public static final String STATUS_EXTRA_NAME = "service_state";
     public static final String CLASH_EXTRA_NAME = "enable_clash";
+    public long tun2socksPort;
+    public boolean enable_clash = false;
+    public static ProxyService getInstance() {
+        return instance;
+    }
 
     private static final int VPN_MTU = 1500;
     private static final String PRIVATE_VLAN4_CLIENT = "172.19.0.1";
@@ -34,12 +39,6 @@ public class ProxyService extends VpnService {
     private int state = STARTED;
     private ParcelFileDescriptor pfd;
     private LocalBroadcastManager broadcastManager;
-
-    public boolean enable_clash = false;
-
-    public static ProxyService getInstance() {
-        return instance;
-    }
 
     private void setState(int state) {
         this.state = state;
@@ -109,8 +108,8 @@ public class ProxyService extends VpnService {
         b.setSession(getString(R.string.app_name));
         b.setMtu(VPN_MTU);
         b.addAddress(PRIVATE_VLAN4_CLIENT, 30);
-        if (enable_clash){
-            for (String route: getResources().getStringArray(R.array.bypass_private_route)){
+        if (enable_clash) {
+            for (String route : getResources().getStringArray(R.array.bypass_private_route)) {
                 String[] parts = route.split("/", 2);
                 b.addRoute(parts[0], Integer.parseInt(parts[1]));
             }
@@ -153,7 +152,6 @@ public class ProxyService extends VpnService {
 
         JNIHelper.trojan(Constants.getTrojanConfigPath());
 
-        long tun2socksPort;
         long clashSocksPort = 1080; // default value in case fail to get free port
         if (enable_clash) {
             try {
