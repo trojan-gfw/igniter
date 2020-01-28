@@ -24,6 +24,7 @@ public class ProxyService extends VpnService {
     public static final int STOPPED = 3;
     public static final String STATUS_EXTRA_NAME = "service_state";
     public static final String CLASH_EXTRA_NAME = "enable_clash";
+    public long tun2socksPort;
 
     private static final int VPN_MTU = 1500;
     private static final String PRIVATE_VLAN4_CLIENT = "172.19.0.1";
@@ -153,7 +154,6 @@ public class ProxyService extends VpnService {
 
         JNIHelper.trojan(Constants.getTrojanConfigPath());
 
-        long tun2socksPort;
         long clashSocksPort = 1080; // default value in case fail to get free port
         if (enable_clash) {
             try {

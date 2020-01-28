@@ -26,6 +26,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -43,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private Switch clashSwitch;
     private TextView clashLink;
     private Button startStopButton;
-    private Button testConnectionButton;
+    protected Button testConnectionButton;
 
     private BroadcastReceiver serviceStateReceiver;
 
@@ -102,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         clashLink.setEnabled(inputEnabled);
     }
 
-    private class TestConnectionResult {
+    private static class TestConnectionResult {
         final String url;
         final boolean isConnected;
         final Exception error;
@@ -116,37 +119,54 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class TestConnection extends AsyncTask<String, Void, TestConnectionResult> {
+    private static class TestConnection extends AsyncTask<String, Void, TestConnectionResult> {
+        private WeakReference<MainActivity> activityReference;
+        TestConnection(MainActivity context) {
+            activityReference = new WeakReference<>(context);
+        }
         protected void onPreExecute() {
             super.onPreExecute();
-            testConnectionButton.setText(R.string.testing);
-            testConnectionButton.setEnabled(false);
+            MainActivity activity = activityReference.get();
+            if (activity != null) {
+                activity.testConnectionButton.setText(R.string.testing);
+                activity.testConnectionButton.setEnabled(false);
+            }
         }
 
         protected TestConnectionResult doInBackground(String... urls) {
             String url = urls[0];
             try {
                 long startTime = System.currentTimeMillis();
-                URLConnection connection = new URL(url).openConnection();
+                ProxyService serviceInstance = ProxyService.getInstance();
+                InetSocketAddress proxy_address = new InetSocketAddress("127.0.0.1",
+                        (int)serviceInstance.tun2socksPort);
+                Proxy proxy = new Proxy(Proxy.Type.SOCKS, proxy_address);
+                URLConnection connection = new URL(url).openConnection(proxy);
                 connection.setConnectTimeout(1000 * 10); //10 seconds
                 connection.connect();
-                return new TestConnectionResult(url, true, null, System.currentTimeMillis() - startTime);
+                return new TestConnectionResult(url, true, null,
+                        System.currentTimeMillis() - startTime);
             } catch (Exception e) {
                 return new TestConnectionResult(url, false, e, 0);
             }
         }
 
         protected void onPostExecute(TestConnectionResult result) {
-            testConnectionButton.setText(R.string.test_connection);
-            testConnectionButton.setEnabled(true);
-            if (result.isConnected) {
-                Toast.makeText(MainActivity.this,
-                        getString(R.string.connected_to__in__ms, result.url, String.valueOf(result.time)),
-                        Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(MainActivity.this,
-                        getString(R.string.failed_to_connect_to__, result.url, result.error.getMessage()),
-                        Toast.LENGTH_LONG).show();
+            MainActivity activity = activityReference.get();
+            if (activity != null) {
+                activity.testConnectionButton.setText(R.string.test_connection);
+                activity.testConnectionButton.setEnabled(true);
+                if (result.isConnected) {
+                    Toast.makeText(activity,
+                            activity.getString(R.string.connected_to__in__ms,
+                                    result.url, String.valueOf(result.time)),
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(activity,
+                            activity.getString(R.string.failed_to_connect_to__,
+                                    result.url, result.error.getMessage()),
+                            Toast.LENGTH_LONG).show();
+                }
             }
         }
     }
@@ -202,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
 
         testConnectionButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                new TestConnection().execute(CONNECTION_TEST_URL);
+                new TestConnection(MainActivity.this).execute(CONNECTION_TEST_URL);
             }
         });
 
