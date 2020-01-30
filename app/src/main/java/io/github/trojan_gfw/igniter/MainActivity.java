@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.*;
 import android.net.VpnService;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
@@ -16,6 +15,10 @@ import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Switch;
+import android.widget.TextView;
 
 import org.json.JSONObject;
 
@@ -23,8 +26,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private Switch clashSwitch;
     private TextView clashLink;
     private Button startStopButton;
-    private Button testConnectionButton;
+    protected Button testConnectionButton;
 
     private BroadcastReceiver serviceStateReceiver;
 
@@ -102,55 +103,6 @@ public class MainActivity extends AppCompatActivity {
         verifySwitch.setEnabled(inputEnabled);
         clashSwitch.setEnabled(inputEnabled);
         clashLink.setEnabled(inputEnabled);
-    }
-
-    private class TestConnectionResult {
-        final String url;
-        final boolean isConnected;
-        final Exception error;
-        final long time; // In milliseconds
-
-        TestConnectionResult(String url, boolean isConnected, Exception error, long time) {
-            this.url = url;
-            this.isConnected = isConnected;
-            this.error = error;
-            this.time = time;
-        }
-    }
-
-    private class TestConnection extends AsyncTask<String, Void, TestConnectionResult> {
-        protected void onPreExecute() {
-            super.onPreExecute();
-            testConnectionButton.setText(R.string.testing);
-            testConnectionButton.setEnabled(false);
-        }
-
-        protected TestConnectionResult doInBackground(String... urls) {
-            String url = urls[0];
-            try {
-                long startTime = System.currentTimeMillis();
-                URLConnection connection = new URL(url).openConnection();
-                connection.setConnectTimeout(1000 * 10); //10 seconds
-                connection.connect();
-                return new TestConnectionResult(url, true, null, System.currentTimeMillis() - startTime);
-            } catch (Exception e) {
-                return new TestConnectionResult(url, false, e, 0);
-            }
-        }
-
-        protected void onPostExecute(TestConnectionResult result) {
-            testConnectionButton.setText(R.string.test_connection);
-            testConnectionButton.setEnabled(true);
-            if (result.isConnected) {
-                Toast.makeText(MainActivity.this,
-                        getString(R.string.connected_to__in__ms, result.url, String.valueOf(result.time)),
-                        Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(MainActivity.this,
-                        getString(R.string.failed_to_connect_to__, result.url, result.error.getMessage()),
-                        Toast.LENGTH_LONG).show();
-            }
-        }
     }
 
     @Override
@@ -276,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
 
         testConnectionButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                new TestConnection().execute(CONNECTION_TEST_URL);
+                new TestConnection(MainActivity.this).execute(CONNECTION_TEST_URL);
             }
         });
 
@@ -289,7 +241,6 @@ public class MainActivity extends AppCompatActivity {
         };
 
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
