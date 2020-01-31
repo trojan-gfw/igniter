@@ -11,6 +11,9 @@ jobs:
       - run:
           name: Pull Submodules
           command: git submodule update --init --recursive --remote
+      - run:
+          name: Download Go Libs
+          command: curl -L https://github.com/trojan-gfw/igniter-go-libs/releases/download/0.9/golibs.aar > app/src/libs/golibs.aar
       - restore_cache:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - run:
