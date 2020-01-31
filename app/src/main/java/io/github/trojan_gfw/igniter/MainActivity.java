@@ -15,6 +15,10 @@ import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Switch;
+import android.widget.TextView;
 
 import org.json.JSONObject;
 
@@ -27,6 +31,7 @@ import java.io.InputStream;
 public class MainActivity extends AppCompatActivity {
 
     private static final int VPN_REQUEST_CODE = 0;
+    private static final String CONNECTION_TEST_URL = "https://www.google.com";
 
     private static boolean onBusy;
 
@@ -40,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private Switch clashSwitch;
     private TextView clashLink;
     private Button startStopButton;
+    protected Button testConnectionButton;
 
     private BroadcastReceiver serviceStateReceiver;
 
@@ -115,13 +121,13 @@ public class MainActivity extends AppCompatActivity {
         clashLink = findViewById(R.id.clashLink);
         clashLink.setMovementMethod(LinkMovementMethod.getInstance());
         startStopButton = findViewById(R.id.startStopButton);
+        testConnectionButton = findViewById(R.id.testConnectionButton);
 
         Constants.Init(this);
 
         copyRawResourceToDir(R.raw.cacert, Constants.getCaCertPath(), true);
         copyRawResourceToDir(R.raw.country, Constants.getCountryMmdbPath(), true);
-        // copy clash template configuration
-        copyRawResourceToDir(R.raw.clash_config, Constants.getClashTemplatePath(), true);
+        copyRawResourceToDir(R.raw.clash_config, Constants.getClashConfigPath(), false);
 
         final TrojanShareLink trojanShareLink = new TrojanShareLink();
 
@@ -220,6 +226,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        testConnectionButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                new TestConnection(MainActivity.this).execute(CONNECTION_TEST_URL);
+            }
+        });
+
         serviceStateReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -229,7 +241,6 @@ public class MainActivity extends AppCompatActivity {
         };
 
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
