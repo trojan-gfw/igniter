@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 onBusy = true;
                 String[] shareLink = trojanShareLink.ConvertShareToTrojanConf(shareLinkText.getText().toString());
-                if (shareLink != null  && shareLink.length > 0) {
+                if (shareLink != null && shareLink.length > 0) {
                     remoteAddrText.setText(shareLink[0]);
                     remoteAddrText.setSelection(remoteAddrText.getText().length());
                     remotePortText.setText(shareLink[1]);
