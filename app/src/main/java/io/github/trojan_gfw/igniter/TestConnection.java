@@ -26,6 +26,8 @@ class TestConnectionResult {
 
 
 class TestConnection extends AsyncTask<String, Void, TestConnectionResult> {
+    private static final int DEFAULT_TIMEOUT = 10 * 1000; // 10 seconds
+
     private WeakReference<MainActivity> activityReference;
     TestConnection(MainActivity context) {
         activityReference = new WeakReference<>(context);
@@ -48,7 +50,8 @@ class TestConnection extends AsyncTask<String, Void, TestConnectionResult> {
                     (int)serviceInstance.tun2socksPort);
             Proxy proxy = new Proxy(Proxy.Type.SOCKS, proxy_address);
             URLConnection connection = new URL(url).openConnection(proxy);
-            connection.setConnectTimeout(1000 * 10); //10 seconds
+            connection.setConnectTimeout(DEFAULT_TIMEOUT);
+            connection.setReadTimeout(DEFAULT_TIMEOUT);
             connection.connect();
             return new TestConnectionResult(url, true, null,
                     System.currentTimeMillis() - startTime);
