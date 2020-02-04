@@ -147,10 +147,10 @@ public class ProxyService extends VpnService {
             trojanPort = 1081;
         }
         Log.i("igniter", "trojan port is " + trojanPort);
-        TrojanHelper.ChangeListenPort(Constants.getTrojanConfigPath(), trojanPort);
-        TrojanHelper.ShowConfig(Constants.getTrojanConfigPath());
+        TrojanHelper.ChangeListenPort(Globals.getTrojanConfigPath(), trojanPort);
+        TrojanHelper.ShowConfig(Globals.getTrojanConfigPath());
 
-        JNIHelper.trojan(Constants.getTrojanConfigPath());
+        JNIHelper.trojan(Globals.getTrojanConfigPath());
 
         long clashSocksPort = 1080; // default value in case fail to get free port
         if (enable_clash) {
@@ -163,9 +163,9 @@ public class ProxyService extends VpnService {
                 while (clashSocksPort == trojanPort);
 
                 Log.i("igniter", "clash port is " + clashSocksPort);
-                ClashHelper.ChangeClashConfig(Constants.getClashConfigPath(),
+                ClashHelper.ChangeClashConfig(Globals.getClashConfigPath(),
                         trojanPort, clashSocksPort);
-                ClashHelper.ShowConfig(Constants.getClashConfigPath());
+                ClashHelper.ShowConfig(Globals.getClashConfigPath());
                 Clash.start(getFilesDir().toString());
                 Log.e("Clash", "clash started");
             } catch (Exception e) {

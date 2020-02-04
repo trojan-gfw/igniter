@@ -4,6 +4,7 @@
     <string name="remote_port">Remote Port</string>
     <string name="default_port">443</string>
     <string name="password">Password</string>
+    <string name="trojan_url">Trojan URL</string>
     <string name="button_service__start">Start</string>
     <string name="button_service__starting">Starting</string>
     <string name="button_service__stop">Stop</string>
@@ -16,4 +17,5 @@
     <string name="testing">Testing...</string>
     <string name="connected_to__in__ms">Connected to %1$s in %2$sms.</string>
     <string name="failed_to_connect_to__">Failed to connect to %1$s: %2$s</string>
+    <string name="invalid_configuration">Invalid Configuration</string>
 </resources>

@@ -14,9 +14,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private Switch clashSwitch;
     private TextView clashLink;
     private Button startStopButton;
+    private EditText trojanURLText;
     protected Button testConnectionButton;
 
     private BroadcastReceiver serviceStateReceiver;
@@ -93,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         remotePortText.setEnabled(inputEnabled);
         ipv6Switch.setEnabled(inputEnabled);
         passwordText.setEnabled(inputEnabled);
+        trojanURLText.setEnabled(inputEnabled);
         verifySwitch.setEnabled(inputEnabled);
         clashSwitch.setEnabled(inputEnabled);
         clashLink.setEnabled(inputEnabled);
@@ -105,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         remoteAddrText = findViewById(R.id.remoteAddrText);
         remotePortText = findViewById(R.id.remotePortText);
         passwordText = findViewById(R.id.passwordText);
+        trojanURLText = findViewById(R.id.trojanURLText);
         ipv6Switch = findViewById(R.id.ipv6Switch);
         verifySwitch = findViewById(R.id.verifySwitch);
         clashSwitch = findViewById(R.id.clashSwitch);
@@ -113,26 +118,130 @@ public class MainActivity extends AppCompatActivity {
         startStopButton = findViewById(R.id.startStopButton);
         testConnectionButton = findViewById(R.id.testConnectionButton);
 
-        Constants.Init(this);
+        Globals.Init(this);
 
-        copyRawResourceToDir(R.raw.cacert, Constants.getCaCertPath(), true);
-        copyRawResourceToDir(R.raw.country, Constants.getCountryMmdbPath(), true);
-        copyRawResourceToDir(R.raw.clash_config, Constants.getClashConfigPath(), false);
+        copyRawResourceToDir(R.raw.cacert, Globals.getCaCertPath(), true);
+        copyRawResourceToDir(R.raw.country, Globals.getCountryMmdbPath(), true);
+        copyRawResourceToDir(R.raw.clash_config, Globals.getClashConfigPath(), false);
+
+        remoteAddrText.addTextChangedListener(new TextViewListener() {
+            @Override
+            protected void onTextChanged(String before, String old, String aNew, String after) {
+                // update TextView
+                startUpdates(); // to prevent infinite loop.
+                TrojanConfig ins = Globals.getTrojanConfigInstance();
+                ins.setRemoteAddr(remoteAddrText.getText().toString());
+                endUpdates();
+            }
+        });
+
+        remotePortText.addTextChangedListener(new TextViewListener() {
+            @Override
+            protected void onTextChanged(String before, String old, String aNew, String after) {
+                // update TextView
+                startUpdates(); // to prevent infinite loop.
+                TrojanConfig ins = Globals.getTrojanConfigInstance();
+                String portStr = remotePortText.getText().toString();
+                try {
+                    int port = Integer.parseInt(portStr);
+                    ins.setRemotePort(port);
+                } catch (NumberFormatException e) {
+                    // Ignore when we get invalid number
+                    e.printStackTrace();
+                }
+                endUpdates();
+            }
+        });
+
+        passwordText.addTextChangedListener(new TextViewListener() {
+            @Override
+            protected void onTextChanged(String before, String old, String aNew, String after) {
+                // update TextView
+                startUpdates(); // to prevent infinite loop.
+                TrojanConfig ins = Globals.getTrojanConfigInstance();
+                ins.setPassword(passwordText.getText().toString());
+                endUpdates();
+            }
+        });
+
+
+        ipv6Switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                TrojanConfig ins = Globals.getTrojanConfigInstance();
+                ins.setEnableIpv6(isChecked);
+            }
+        });
+
+        verifySwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                TrojanConfig ins = Globals.getTrojanConfigInstance();
+                ins.setVerifyCert(isChecked);
+            }
+        });
+
+        trojanURLText.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                trojanURLText.selectAll();
+                return false;
+            }
+        });
+
+        trojanURLText.addTextChangedListener(new TextViewListener() {
+            @Override
+            protected void onTextChanged(String before, String old, String aNew, String after) {
+                // update TextView
+                startUpdates(); // to prevent infinite loop.
+                TrojanConfig ins = Globals.getTrojanConfigInstance();
+                TrojanConfig parsedConfig = TrojanURLHelper.ParseTrojanURL(before + aNew + after);
+                if (parsedConfig != null) {
+                    String remoteAddress = parsedConfig.getRemoteAddr();
+                    int remotePort = parsedConfig.getRemotePort();
+                    String password = parsedConfig.getPassword();
+
+                    ins.setRemoteAddr(remoteAddress);
+                    ins.setRemotePort(remotePort);
+                    ins.setPassword(password);
+                }
+                endUpdates();
+            }
+        });
+
+        TextViewListener trojanConfigChangedTextViewListener = new TextViewListener() {
+            @Override
+            protected void onTextChanged(String before, String old, String aNew, String after) {
+                startUpdates();
+                String str = TrojanURLHelper.GenerateTrojanURL(Globals.getTrojanConfigInstance());
+                if (str != null) {
+                    trojanURLText.setText(str);
+                }
+                endUpdates();
+            }
+        };
+
+        remoteAddrText.addTextChangedListener(trojanConfigChangedTextViewListener);
+        remotePortText.addTextChangedListener(trojanConfigChangedTextViewListener);
+        passwordText.addTextChangedListener(trojanConfigChangedTextViewListener);
 
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
+                if (!Globals.getTrojanConfigInstance().isValidRunningConfig()) {
+                    Toast.makeText(MainActivity.this,
+                            R.string.invalid_configuration,
+                            Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 ProxyService serviceInstance = ProxyService.getInstance();
                 if (serviceInstance == null) {
                     TrojanHelper.WriteTrojanConfig(
-                            remoteAddrText.getText().toString(),
-                            Integer.parseInt(remotePortText.getText().toString()),
-                            passwordText.getText().toString(),
-                            ipv6Switch.isChecked(),
-                            verifySwitch.isChecked(),
-                            Constants.getCaCertPath(),
-                            Constants.getTrojanConfigPath()
+                            Globals.getTrojanConfigInstance(),
+                            Globals.getTrojanConfigPath()
                     );
-                    TrojanHelper.ShowConfig(Constants.getTrojanConfigPath());
+                    TrojanHelper.ShowConfig(Globals.getTrojanConfigPath());
 
                     Intent i = VpnService.prepare(getApplicationContext());
                     if (i != null) {
@@ -176,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        File file = new File(Constants.getTrojanConfigPath());
+        File file = new File(Globals.getTrojanConfigPath());
         if (file.exists()) {
             try {
                 try (FileInputStream fis = new FileInputStream(file)) {
