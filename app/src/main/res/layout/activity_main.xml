@@ -170,18 +170,5 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/columnContainer" />
 
-        <Button
-            android:id="@+id/testConnectionButton"
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_margin="16dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/test_connection"
-            android:textSize="@dimen/text_size"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/startStopButton" />
-
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
