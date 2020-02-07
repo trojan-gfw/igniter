@@ -24,6 +24,7 @@ public class TrojanConfig {
         this.localAddr = "127.0.0.1";
         this.localPort = 1081;
         this.remotePort = 443;
+        this.verifyCert = true;
         this.cipherList = "ECDHE-ECDSA-AES128-GCM-SHA256:"
                 + "ECDHE-RSA-AES128-GCM-SHA256:"
                 + "ECDHE-ECDSA-CHACHA20-POLY1305:"
