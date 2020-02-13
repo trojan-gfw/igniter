@@ -12,6 +12,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -42,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView clashLink;
     private Button startStopButton;
     private EditText trojanURLText;
-    protected Button testConnectionButton;
 
     private BroadcastReceiver serviceStateReceiver;
 
@@ -116,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
         clashLink = findViewById(R.id.clashLink);
         clashLink.setMovementMethod(LinkMovementMethod.getInstance());
         startStopButton = findViewById(R.id.startStopButton);
-        testConnectionButton = findViewById(R.id.testConnectionButton);
 
         Globals.Init(this);
 
@@ -256,12 +257,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        testConnectionButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                new TestConnection(MainActivity.this).execute(CONNECTION_TEST_URL);
-            }
-        });
-
         serviceStateReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -279,6 +274,27 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, ProxyService.class);
             intent.putExtra(ProxyService.CLASH_EXTRA_NAME, clashSwitch.isChecked());
             startService(intent);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Bind menu items to their relative actions
+        switch (item.getItemId()) {
+            case R.id.action_test_connection:
+                new TestConnection(MainActivity.this).execute(CONNECTION_TEST_URL);
+                return true;
+
+            default:
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
         }
     }
 
