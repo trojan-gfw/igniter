@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView clashLink;
     private Button startStopButton;
     private EditText trojanURLText;
-//    protected Button testConnectionButton;
 
     private BroadcastReceiver serviceStateReceiver;
 
@@ -119,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
         clashLink = findViewById(R.id.clashLink);
         clashLink.setMovementMethod(LinkMovementMethod.getInstance());
         startStopButton = findViewById(R.id.startStopButton);
-//        testConnectionButton = findViewById(R.id.testConnectionButton);
 
         Globals.Init(this);
 
@@ -258,12 +256,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-//        testConnectionButton.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View view) {
-//                new TestConnection(MainActivity.this).execute(CONNECTION_TEST_URL);
-//            }
-//        });
 
         serviceStateReceiver = new BroadcastReceiver() {
             @Override
