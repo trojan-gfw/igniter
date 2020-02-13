@@ -13,8 +13,6 @@
     <string name="label_clash">Bypass China with <a href="https://github.com/Dreamacro/clash">Clash</a></string>
     <string name="enable_ipv6">Enable IPv6</string>
     <string name="bc_service_state">io.github.trojan_gfw.igniter.BC_SERVICE_STATE</string>
-<!--    <string name="test_connection">Test Connection</string>-->
-<!--    <string name="testing">Testing...</string>-->
     <string name="connected_to__in__ms">Connected to %1$s in %2$sms.</string>
     <string name="failed_to_connect_to__">Failed to connect to %1$s: %2$s</string>
     <string name="invalid_configuration">Invalid Configuration</string>
