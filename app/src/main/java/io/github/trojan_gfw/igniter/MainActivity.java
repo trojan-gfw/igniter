@@ -337,12 +337,15 @@ public class MainActivity extends AppCompatActivity {
                 try (FileInputStream fis = new FileInputStream(file)) {
                     byte[] content = new byte[(int) file.length()];
                     fis.read(content);
-                    JSONObject json = new JSONObject(new String(content));
-                    remoteAddrText.setText(json.getString("remote_addr"));
-                    remotePortText.setText(String.valueOf(json.getInt("remote_port")));
-                    passwordText.setText(json.getJSONArray("password").getString(0));
-                    ipv6Switch.setChecked(json.getBoolean("enable_ipv6"));
-                    verifySwitch.setChecked(json.getJSONObject("ssl").getBoolean("verify"));
+                    String contentStr = new String(content);
+                    TrojanConfig ins = Globals.getTrojanConfigInstance();
+                    ins.fromJSON(contentStr);
+
+                    remoteAddrText.setText(ins.getRemoteAddr());
+                    remotePortText.setText(String.valueOf(ins.getRemotePort()));
+                    passwordText.setText(ins.getPassword());
+                    ipv6Switch.setChecked(ins.getEnableIpv6());
+                    verifySwitch.setChecked(ins.getVerifyCert());
                 }
             } catch (Exception e) {
                 e.printStackTrace();

@@ -68,6 +68,22 @@ public class TrojanConfig {
         }
     }
 
+    public void fromJSON(String jsonStr) {
+        try {
+            JSONObject json = new JSONObject(jsonStr);
+            this.setLocalAddr(json.getString("local_addr"))
+                    .setLocalPort(json.getInt("local_port"))
+                    .setRemoteAddr(json.getString("remote_addr"))
+                    .setRemotePort(json.getInt("remote_port"))
+                    .setPassword(json.getJSONArray("password").getString(0))
+                    .setEnableIpv6(json.getBoolean("enable_ipv6"))
+                    .setVerifyCert(json.getJSONObject("ssl").getBoolean("verify"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public boolean isValidRunningConfig() {
         return !TextUtils.isEmpty(this.caCertPath)
                 && !TextUtils.isEmpty(this.remoteAddr)
@@ -119,7 +135,7 @@ public class TrojanConfig {
         return this;
     }
 
-    public boolean isVerifyCert() {
+    public boolean getVerifyCert() {
         return verifyCert;
     }
 
@@ -137,7 +153,7 @@ public class TrojanConfig {
         return this;
     }
 
-    public boolean isEnableIpv6() {
+    public boolean getEnableIpv6() {
         return enableIpv6;
     }
 
