@@ -1,9 +1,12 @@
 package io.github.trojan_gfw.igniter;
 
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.VpnService;
 import android.os.ParcelFileDescriptor;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -24,8 +27,10 @@ public class ProxyService extends VpnService {
     public static final int STOPPED = 3;
     public static final String STATUS_EXTRA_NAME = "service_state";
     public static final String CLASH_EXTRA_NAME = "enable_clash";
+    public static final int IGNITER_STATUS_NOTIFY_MSG_ID = 0;
     public long tun2socksPort;
     public boolean enable_clash = false;
+
     public static ProxyService getInstance() {
         return instance;
     }
@@ -147,10 +152,10 @@ public class ProxyService extends VpnService {
             trojanPort = 1081;
         }
         Log.i("igniter", "trojan port is " + trojanPort);
-        TrojanHelper.ChangeListenPort(Constants.getTrojanConfigPath(), trojanPort);
-        TrojanHelper.ShowConfig(Constants.getTrojanConfigPath());
+        TrojanHelper.ChangeListenPort(Globals.getTrojanConfigPath(), trojanPort);
+        TrojanHelper.ShowConfig(Globals.getTrojanConfigPath());
 
-        JNIHelper.trojan(Constants.getTrojanConfigPath());
+        JNIHelper.trojan(Globals.getTrojanConfigPath());
 
         long clashSocksPort = 1080; // default value in case fail to get free port
         if (enable_clash) {
@@ -163,9 +168,9 @@ public class ProxyService extends VpnService {
                 while (clashSocksPort == trojanPort);
 
                 Log.i("igniter", "clash port is " + clashSocksPort);
-                ClashHelper.ChangeClashConfig(Constants.getClashConfigPath(),
+                ClashHelper.ChangeClashConfig(Globals.getClashConfigPath(),
                         trojanPort, clashSocksPort);
-                ClashHelper.ShowConfig(Constants.getClashConfigPath());
+                ClashHelper.ShowConfig(Globals.getClashConfigPath());
                 Clash.start(getFilesDir().toString());
                 Log.e("Clash", "clash started");
             } catch (Exception e) {
@@ -178,7 +183,38 @@ public class ProxyService extends VpnService {
         Log.i("igniter", "tun2socks port is " + tun2socksPort);
         Tun2socks.start(fd, "127.0.0.1:" + tun2socksPort, "255.0.128.1", "255.0.143.254", VPN_MTU);
 
+        StringBuilder runningStatusStringBuilder = new StringBuilder();
+        runningStatusStringBuilder.append("Trojan SOCKS5 port: ")
+                .append(trojanPort)
+                .append("\n")
+                .append("Tun2socks port: ")
+                .append(tun2socksPort)
+                .append("\n");
+        if (enable_clash) {
+            runningStatusStringBuilder.append("Clash SOCKS listen port: ")
+                    .append(clashSocksPort)
+                    .append("\n");
+        }
+
         setState(STARTED);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        Intent openMainActivityIntent = new Intent(this, MainActivity.class);
+        openMainActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingOpenMainActivityIntent = PendingIntent.getActivity(this, 0, openMainActivityIntent, 0);
+        String igniterRunningStatusStr = runningStatusStringBuilder.toString();
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, getString(R.string.notification_channel_id))
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle("Igniter is running")
+                .setContentText(igniterRunningStatusStr)
+                .setStyle(new NotificationCompat.BigTextStyle()
+                        .bigText(igniterRunningStatusStr))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                // Set the intent that will fire when the user taps the notification
+                .setContentIntent(pendingOpenMainActivityIntent)
+                .setAutoCancel(false)
+                .setOngoing(true);
+        notificationManager.notify(IGNITER_STATUS_NOTIFY_MSG_ID, builder.build());
 
         return START_STICKY;
     }
@@ -192,6 +228,10 @@ public class ProxyService extends VpnService {
             Log.e("Clash", "clash stopped");
         }
         Tun2socks.stop();
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.cancel(IGNITER_STATUS_NOTIFY_MSG_ID);
+
         stopSelf();
 
         setState(STOPPED);

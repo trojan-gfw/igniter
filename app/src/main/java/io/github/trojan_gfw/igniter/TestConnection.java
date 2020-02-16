@@ -26,17 +26,12 @@ class TestConnectionResult {
 
 
 class TestConnection extends AsyncTask<String, Void, TestConnectionResult> {
+    private static final int DEFAULT_TIMEOUT = 10 * 1000; // 10 seconds
+
     private WeakReference<MainActivity> activityReference;
+
     TestConnection(MainActivity context) {
         activityReference = new WeakReference<>(context);
-    }
-    protected void onPreExecute() {
-        super.onPreExecute();
-        MainActivity activity = activityReference.get();
-        if (activity != null) {
-            activity.testConnectionButton.setText(R.string.testing);
-            activity.testConnectionButton.setEnabled(false);
-        }
     }
 
     protected TestConnectionResult doInBackground(String... urls) {
@@ -48,7 +43,8 @@ class TestConnection extends AsyncTask<String, Void, TestConnectionResult> {
                     (int)serviceInstance.tun2socksPort);
             Proxy proxy = new Proxy(Proxy.Type.SOCKS, proxy_address);
             URLConnection connection = new URL(url).openConnection(proxy);
-            connection.setConnectTimeout(1000 * 10); //10 seconds
+            connection.setConnectTimeout(DEFAULT_TIMEOUT);
+            connection.setReadTimeout(DEFAULT_TIMEOUT);
             connection.connect();
             return new TestConnectionResult(url, true, null,
                     System.currentTimeMillis() - startTime);
@@ -60,8 +56,6 @@ class TestConnection extends AsyncTask<String, Void, TestConnectionResult> {
     protected void onPostExecute(TestConnectionResult result) {
         MainActivity activity = activityReference.get();
         if (activity != null) {
-            activity.testConnectionButton.setText(R.string.test_connection);
-            activity.testConnectionButton.setEnabled(true);
             if (result.isConnected) {
                 Toast.makeText(activity,
                         activity.getString(R.string.connected_to__in__ms,

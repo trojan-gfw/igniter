@@ -2,15 +2,18 @@ package io.github.trojan_gfw.igniter;
 
 import android.content.Context;
 
-public class Constants {
+public class Globals {
 
     private static String cacheDir;
     private static String filesDir;
 
+    private static TrojanConfig trojanConfigInstance;
+
     public static void Init(Context ctx) {
         cacheDir = ctx.getCacheDir().getAbsolutePath();
         filesDir = ctx.getFilesDir().getAbsolutePath();
-
+        trojanConfigInstance = new TrojanConfig();
+        trojanConfigInstance.setCaCertPath(Globals.getCaCertPath());
     }
 
     public static String getCaCertPath() {
@@ -27,5 +30,13 @@ public class Constants {
 
     public static String getTrojanConfigPath() {
         return PathHelper.combine(filesDir, "config.json");
+    }
+
+    public static void setTrojanConfigInstance(TrojanConfig config) {
+        trojanConfigInstance = config;
+    }
+
+    public static TrojanConfig getTrojanConfigInstance() {
+        return trojanConfigInstance;
     }
 }
