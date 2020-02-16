@@ -16,6 +16,9 @@
     <string name="connected_to__in__ms">Connected to %1$s in %2$sms.</string>
     <string name="failed_to_connect_to__">Failed to connect to %1$s: %2$s</string>
     <string name="invalid_configuration">Invalid Configuration</string>
+    <string name="notification_channel_id">igniter_notify_chan</string>
+    <string name="notification_channel_name">igniter_notify_channel</string>
+    <string name="notification_channel_description">Igniter notifications channel</string>
 
     <!-- App Bar Menu -->
     <string name="action_test_connection">Test Connection</string>
