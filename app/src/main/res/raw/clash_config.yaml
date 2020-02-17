@@ -3,7 +3,7 @@ socks-port: 1080
 udp: true
 allow-lan: false
 mode: Rule
-log-level: silent
+log-level: debug
 #experimental:
 #  ignore-resolve-fail: true
 
