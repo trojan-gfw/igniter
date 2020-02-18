@@ -91,7 +91,7 @@
             android:layout_marginBottom="12dp"
             android:ems="10"
             android:hint="@string/trojan_url"
-            android:inputType="text"
+            android:inputType="textPassword"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

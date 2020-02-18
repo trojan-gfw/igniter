@@ -18,14 +18,13 @@ import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -195,7 +194,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         ipv6Switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -217,6 +215,17 @@ public class MainActivity extends AppCompatActivity {
             public boolean onLongClick(View v) {
                 trojanURLText.selectAll();
                 return false;
+            }
+        });
+
+        trojanURLText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    trojanURLText.setInputType(EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD);
+                } else {
+                    trojanURLText.setInputType(EditorInfo.TYPE_CLASS_TEXT);
+                }
             }
         });
 
