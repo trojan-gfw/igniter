@@ -183,6 +183,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        passwordText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    passwordText.setInputType(EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD);
+                } else {
+                    // place cursor on the end
+                    passwordText.setInputType(EditorInfo.TYPE_CLASS_TEXT);
+                    passwordText.setSelection(passwordText.getText().length());
+                }
+            }
+        });
+
         passwordText.addTextChangedListener(new TextViewListener() {
             @Override
             protected void onTextChanged(String before, String old, String aNew, String after) {
@@ -224,6 +237,7 @@ public class MainActivity extends AppCompatActivity {
                 if (!hasFocus) {
                     trojanURLText.setInputType(EditorInfo.TYPE_CLASS_TEXT | EditorInfo.TYPE_TEXT_VARIATION_PASSWORD);
                 } else {
+                    // it seems we don't have to place cursor on the end for Trojan URL
                     trojanURLText.setInputType(EditorInfo.TYPE_CLASS_TEXT);
                 }
             }
