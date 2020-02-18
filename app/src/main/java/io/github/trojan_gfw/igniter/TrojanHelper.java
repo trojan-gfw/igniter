@@ -1,7 +1,5 @@
 package io.github.trojan_gfw.igniter;
 
-import android.util.Log;
-
 import org.json.JSONObject;
 
 import java.io.File;
@@ -53,7 +51,7 @@ public class TrojanHelper {
             try (FileInputStream fis = new FileInputStream(file)) {
                 byte[] content = new byte[(int) file.length()];
                 fis.read(content);
-                Log.i(TAG, new String(content));
+                LogHelper.i(TAG, new String(content));
             }
         } catch (Exception e) {
             e.printStackTrace();

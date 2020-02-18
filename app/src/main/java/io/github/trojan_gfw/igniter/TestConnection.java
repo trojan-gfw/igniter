@@ -1,7 +1,6 @@
 package io.github.trojan_gfw.igniter;
 
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.lang.ref.WeakReference;

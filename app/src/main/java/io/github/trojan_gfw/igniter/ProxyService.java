@@ -8,8 +8,6 @@ import android.os.ParcelFileDescriptor;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
-
 import org.json.JSONObject;
 
 import java.io.File;
@@ -137,7 +135,7 @@ public class ProxyService extends VpnService {
             b.addDnsServer("2001:4860:4860::8844");
         }
         pfd = b.establish();
-        Log.e("VPN", "pfd established");
+        LogHelper.e("VPN", "pfd established");
 
         if (pfd == null) {
             shutdown();
@@ -151,7 +149,7 @@ public class ProxyService extends VpnService {
             e.printStackTrace();
             trojanPort = 1081;
         }
-        Log.i("igniter", "trojan port is " + trojanPort);
+        LogHelper.i("igniter", "trojan port is " + trojanPort);
         TrojanHelper.ChangeListenPort(Globals.getTrojanConfigPath(), trojanPort);
         TrojanHelper.ShowConfig(Globals.getTrojanConfigPath());
 
@@ -167,12 +165,12 @@ public class ProxyService extends VpnService {
                 }
                 while (clashSocksPort == trojanPort);
 
-                Log.i("igniter", "clash port is " + clashSocksPort);
+                LogHelper.i("igniter", "clash port is " + clashSocksPort);
                 ClashHelper.ChangeClashConfig(Globals.getClashConfigPath(),
                         trojanPort, clashSocksPort);
                 ClashHelper.ShowConfig(Globals.getClashConfigPath());
                 Clash.start(getFilesDir().toString());
-                Log.e("Clash", "clash started");
+                LogHelper.e("Clash", "clash started");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -180,7 +178,7 @@ public class ProxyService extends VpnService {
         } else {
             tun2socksPort = trojanPort;
         }
-        Log.i("igniter", "tun2socks port is " + tun2socksPort);
+        LogHelper.i("igniter", "tun2socks port is " + tun2socksPort);
         Tun2socks.start(fd, "127.0.0.1:" + tun2socksPort, "255.0.128.1", "255.0.143.254", VPN_MTU);
 
         StringBuilder runningStatusStringBuilder = new StringBuilder();
@@ -225,7 +223,7 @@ public class ProxyService extends VpnService {
         JNIHelper.stop();
         if (Clash.isRunning()) {
             Clash.stop();
-            Log.e("Clash", "clash stopped");
+            LogHelper.e("Clash", "clash stopped");
         }
         Tun2socks.stop();
 

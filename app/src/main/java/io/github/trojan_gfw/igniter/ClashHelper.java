@@ -1,7 +1,5 @@
 package io.github.trojan_gfw.igniter;
 
-import android.util.Log;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -27,7 +25,7 @@ public class ClashHelper {
                 long origClashConfigLen = clashConfigFile.length();
                 byte[] content = new byte[(int) origClashConfigLen];
                 if (fis.read(content) != origClashConfigLen) {
-                    Log.e(TAG, "fail to read full content of clash config file");
+                    LogHelper.e(TAG, "fail to read full content of clash config file");
                 }
                 str = new String(content);
             }
@@ -42,10 +40,10 @@ public class ClashHelper {
             }
 
             if (!clashConfigFile.delete()) {
-                Log.e(TAG, "fail to delete old clash config file");
+                LogHelper.e(TAG, "fail to delete old clash config file");
             }
             if (!tmpClashConfigFile.renameTo(clashConfigFile)) {
-                Log.e(TAG, "fail to rename tmp clash config file");
+                LogHelper.e(TAG, "fail to rename tmp clash config file");
             }
 
         } catch (Exception e) {
@@ -63,7 +61,7 @@ public class ClashHelper {
                 fis.read(content);
                 sb.append("\r\n");
                 sb.append(new String(content));
-                Log.i(TAG, sb.toString());
+                LogHelper.i(TAG, sb.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();
