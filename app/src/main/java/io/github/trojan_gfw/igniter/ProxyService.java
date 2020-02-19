@@ -179,6 +179,9 @@ public class ProxyService extends VpnService {
             tun2socksPort = trojanPort;
         }
         LogHelper.i("igniter", "tun2socks port is " + tun2socksPort);
+
+        // debug/info/warn/error/none
+        Tun2socks.setLoglevel("warn");
         Tun2socks.start(fd, "127.0.0.1:" + tun2socksPort, "255.0.128.1", "255.0.143.254", VPN_MTU);
 
         StringBuilder runningStatusStringBuilder = new StringBuilder();
