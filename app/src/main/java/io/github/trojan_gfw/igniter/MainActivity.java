@@ -344,7 +344,10 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_test_connection:
                 new TestConnection(MainActivity.this).execute(CONNECTION_TEST_URL);
                 return true;
-
+            case R.id.action_show_develop_info_logcat:
+                util.Util.logGoRoutineCount();
+                util.Util.logGoroutineStackTrace();
+                return true;
             default:
                 // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
