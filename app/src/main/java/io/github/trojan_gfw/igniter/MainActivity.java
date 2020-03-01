@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private Switch verifySwitch;
     private Switch clashSwitch;
     private TextView clashLink;
-    private Button startStopButton, saveSeverIb;
+    private Button startStopButton, saveServerIb;
     private EditText trojanURLText;
 //    private ServerListDialog serverListDialog;
 
@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        saveSeverIb = findViewById(R.id.saveConfigBtn);
+        saveServerIb = findViewById(R.id.saveConfigBtn);
         remoteAddrText = findViewById(R.id.remoteAddrText);
         remotePortText = findViewById(R.id.remotePortText);
         passwordText = findViewById(R.id.passwordText);
@@ -341,9 +341,13 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        saveSeverIb.setOnClickListener(new View.OnClickListener() {
+        saveServerIb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!Globals.getTrojanConfigInstance().isValidRunningConfig()) {
+                    Toast.makeText(MainActivity.this, R.string.invalid_configuration, Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
