@@ -22,7 +22,7 @@ public class TrojanConfig implements Parcelable {
     private String tls13CipherList;
 
 
-    TrojanConfig() {
+    public TrojanConfig() {
         // defaults
         this.localAddr = "127.0.0.1";
         this.localPort = 1081;

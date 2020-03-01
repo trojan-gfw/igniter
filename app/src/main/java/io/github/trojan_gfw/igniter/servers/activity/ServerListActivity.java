@@ -34,6 +34,9 @@ public class ServerListActivity extends AppCompatActivity {
         if (R.id.action_scan_qr_code == item.getItemId()) {
             mPresenter.gotoScanQRCode();
             return true;
+        } else if (R.id.action_import_from_file == item.getItemId()) {
+            mPresenter.importConfigFromFile();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

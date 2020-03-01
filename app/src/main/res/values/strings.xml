@@ -24,8 +24,11 @@
     <string name="action_test_connection">Test Connection</string>
     <string name="action_show_develop_info_logcat">Show develop info in logcat</string>
 
+    <string name="server_list_file_chooser_msg">Select a TXT file</string>
+    <string name="server_list_menu_import_from_file">Import from file</string>
     <string name="server_list_delete_btn">Delete</string>
     <string name="server_list_lack_of_camera_permission">Lack of camera permission!</string>
+    <string name="server_list_lack_of_read_permission">Lack of read permission!</string>
     <string name="main_save_config_btn">Save</string>
     <string name="main_save_success">Save success</string>
     <string name="main_save_failed">Save failed</string>
