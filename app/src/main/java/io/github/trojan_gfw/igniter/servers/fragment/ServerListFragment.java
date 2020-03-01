@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -30,6 +31,8 @@ import io.github.trojan_gfw.igniter.servers.activity.ServerListActivity;
 import io.github.trojan_gfw.igniter.servers.contract.ServerListContract;
 
 public class ServerListFragment extends Fragment implements ServerListContract.View {
+    private static final int REQUEST_READ_PERMISSION_CODE = 115;
+    private static final int FILE_IMPORT_REQUEST_CODE = 120;
     private static final int SCAN_QR_CODE_REQUEST_CODE = 110;
     private static final int REQUEST_CAMERA_CODE = 114;
     public static final String TAG = "ServerListFragment";
@@ -137,6 +140,11 @@ public class ServerListFragment extends Fragment implements ServerListContract.V
         super.onActivityResult(requestCode, resultCode, data);
         if (SCAN_QR_CODE_REQUEST_CODE == requestCode && resultCode == Activity.RESULT_OK && data != null) {
             mPresenter.addServerConfig(data.getStringExtra(ScanQRCodeActivity.KEY_SCAN_CONTENT));
+        } else if (FILE_IMPORT_REQUEST_CODE == requestCode && resultCode == Activity.RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            if (uri != null) {
+                mPresenter.parseConfigsInFileStream(getContext(), uri);
+            }
         }
     }
 
@@ -149,6 +157,12 @@ public class ServerListFragment extends Fragment implements ServerListContract.V
             } else {
                 Toast.makeText(getContext(), R.string.server_list_lack_of_camera_permission, Toast.LENGTH_SHORT).show();
             }
+        } else if (REQUEST_READ_PERMISSION_CODE == requestCode) {
+            if (PackageManager.PERMISSION_GRANTED == grantResults[0]) {
+                openFileChooser();
+            } else {
+                Toast.makeText(getContext(), R.string.server_list_lack_of_read_permission, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -160,6 +174,22 @@ public class ServerListFragment extends Fragment implements ServerListContract.V
             intent.putExtra(KEY_TROJAN_CONFIG, config);
             activity.setResult(Activity.RESULT_OK, intent);
             activity.finish();
+        }
+    }
+
+    private void openFileChooser() {
+        Intent intent = new Intent()
+                .setType("text/plain")
+                .setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.server_list_file_chooser_msg)), FILE_IMPORT_REQUEST_CODE);
+    }
+
+    @Override
+    public void importConfigFromFile() {
+        if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            openFileChooser();
+        } else {
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_PERMISSION_CODE);
         }
     }
 

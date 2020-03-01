@@ -1,6 +1,20 @@
 package io.github.trojan_gfw.igniter.servers.presenter;
 
+import android.content.Context;
+import android.net.Uri;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.TrojanURLHelper;
@@ -15,6 +29,75 @@ public class ServerListPresenter implements ServerListContract.Presenter {
         mView = view;
         mDataManager = dataManager;
         view.setPresenter(this);
+    }
+
+    @Override
+    public void importConfigFromFile() {
+        mView.importConfigFromFile();
+    }
+
+    @Override
+    public void parseConfigsInFileStream(final Context context, final Uri fileUri) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                StringBuilder sb = new StringBuilder();
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(context.getContentResolver().openInputStream(fileUri)))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                List<TrojanConfig> trojanConfigs = parseTrojanConfigsFromFileContent(sb.toString());
+                List<TrojanConfig> currentConfigs = mDataManager.loadServerConfigList();
+                currentConfigs.addAll(trojanConfigs);
+                // remove repeated configurations
+                Set<String> newTrojanConfigRemoteAddrSet = new HashSet<>();
+                for (TrojanConfig config : trojanConfigs) {
+                    newTrojanConfigRemoteAddrSet.add(config.getRemoteAddr());
+                }
+                for (int i = currentConfigs.size() - 1; i >= 0; i--) {
+                    if (newTrojanConfigRemoteAddrSet.contains(currentConfigs.get(i).getRemoteAddr())) {
+                        currentConfigs.remove(i);
+                    }
+                }
+                currentConfigs.addAll(trojanConfigs);
+                mDataManager.replaceServerConfigs(currentConfigs);
+                loadConfigs();
+                mView.showAddTrojanConfigSuccess();
+            }
+        }).start();
+    }
+
+    private List<TrojanConfig> parseTrojanConfigsFromFileContent(String fileContent) {
+        try {
+            JSONObject jsonObject = new JSONObject(fileContent);
+            JSONArray configs = jsonObject.optJSONArray("configs");
+            if (configs == null) {
+                return Collections.emptyList();
+            }
+            final int len = configs.length();
+            List<TrojanConfig> list = new ArrayList<>(len);
+            for (int i = 0; i < len; i++) {
+                JSONObject config = configs.getJSONObject(i);
+                String remoteAddr = config.optString("server", null);
+                if (remoteAddr == null) {
+                    continue;
+                }
+                TrojanConfig tmp = new TrojanConfig();
+                tmp.setRemoteAddr(remoteAddr);
+                tmp.setRemotePort(config.optInt("server_port"));
+                tmp.setPassword(config.optString("password"));
+                tmp.setVerifyCert(config.optBoolean("verify"));
+                list.add(tmp);
+            }
+            return list;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
     }
 
     @Override

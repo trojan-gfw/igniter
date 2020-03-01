@@ -1,5 +1,9 @@
 package io.github.trojan_gfw.igniter.servers.contract;
 
+import android.content.Context;
+import android.net.Uri;
+
+import java.io.InputStream;
 import java.util.List;
 
 import io.github.trojan_gfw.igniter.TrojanConfig;
@@ -12,6 +16,8 @@ public interface ServerListContract {
         void handleServerSelection(TrojanConfig config);
         void deleteServerConfig(TrojanConfig config, int pos);
         void gotoScanQRCode();
+        void importConfigFromFile();
+        void parseConfigsInFileStream(Context context, Uri fileUri);
     }
 
     interface View extends BaseView<Presenter> {
@@ -21,5 +27,6 @@ public interface ServerListContract {
         void showServerConfigList(List<TrojanConfig> configs);
         void removeServerConfig(TrojanConfig config, int pos);
         void gotoScanQRCode();
+        void importConfigFromFile();
     }
 }
