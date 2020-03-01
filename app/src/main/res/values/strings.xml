@@ -25,11 +25,17 @@
     <string name="action_show_develop_info_logcat">Show develop info in logcat</string>
 
     <string name="server_list_delete_btn">Delete</string>
+    <string name="server_list_lack_of_camera_permission">Lack of camera permission!</string>
     <string name="main_save_config_btn">Save</string>
     <string name="main_save_success">Save success</string>
     <string name="main_save_failed">Save failed</string>
 
     <string name="main_menu_server_list">Server List</string>
+
+    <string name="scan_qr_code_success">Add server success</string>
+    <string name="scan_qr_code_failed">Cannot recognize trojanURL: %s</string>
+    <string name="scan_qr_code">Scan QR</string>
+    <string name="scan_qr_code_camera_error">Camera Error</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
