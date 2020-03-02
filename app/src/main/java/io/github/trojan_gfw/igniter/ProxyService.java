@@ -8,6 +8,7 @@ import android.os.ParcelFileDescriptor;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
+
 import org.json.JSONObject;
 
 import java.io.File;
@@ -181,8 +182,13 @@ public class ProxyService extends VpnService {
         LogHelper.i("igniter", "tun2socks port is " + tun2socksPort);
 
         // debug/info/warn/error/none
-        Tun2socks.setLoglevel("warn");
-        Tun2socks.start(fd, "127.0.0.1:" + tun2socksPort, "255.0.128.1", "255.0.143.254", VPN_MTU);
+        Tun2socks.setLoglevel("info");
+        if (enable_clash) {
+            Tun2socks.start(fd, "127.0.0.1:" + tun2socksPort, "255.0.128.1", "255.0.143.254", VPN_MTU);
+        } else {
+            // Disable go-tun2socks fake ip
+            Tun2socks.start(fd, "127.0.0.1:" + tun2socksPort, "", "", VPN_MTU);
+        }
 
         StringBuilder runningStatusStringBuilder = new StringBuilder();
         runningStatusStringBuilder.append("Trojan SOCKS5 port: ")
