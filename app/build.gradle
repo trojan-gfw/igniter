@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
+    ndkVersion "21.0.6113669"
     compileSdkVersion 28
     defaultConfig {
         applicationId "io.github.trojan_gfw.igniter"
