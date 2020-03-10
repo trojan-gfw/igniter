@@ -15,7 +15,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int SERVER_LIST_CHOOSE_REQUEST_CODE = 1024;
     private static final int VPN_REQUEST_CODE = 0;
     private static final String CONNECTION_TEST_URL = "https://www.google.com";
-    private static final String TROJAN_CONFIG_LIST_FILE_NAME = "config_list.txt";
 
     private EditText remoteAddrText;
     private EditText remotePortText;
@@ -51,9 +49,8 @@ public class MainActivity extends AppCompatActivity {
     private Switch verifySwitch;
     private Switch clashSwitch;
     private TextView clashLink;
-    private Button startStopButton, saveServerIb;
+    private Button startStopButton;
     private EditText trojanURLText;
-//    private ServerListDialog serverListDialog;
 
     private BroadcastReceiver serviceStateReceiver;
     private ServerListDataSource serverListDataManager;
@@ -64,8 +61,6 @@ public class MainActivity extends AppCompatActivity {
             startUpdates(); // to prevent infinite loop.
             if (remoteAddrText.hasFocus()) {
                 TrojanConfig ins = Globals.getTrojanConfigInstance();
-                Log.i(TAG, "before: " + before + " old: " + old + " aNew: " + aNew + " after: " + after);
-                Log.i(TAG, "set instance remote addr text: " + remoteAddrText.getText().toString());
                 ins.setRemoteAddr(remoteAddrText.getText().toString());
             }
             endUpdates();
@@ -78,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
             startUpdates(); // to prevent infinite loop.
             if (remotePortText.hasFocus()) {
                 TrojanConfig ins = Globals.getTrojanConfigInstance();
-                Log.i(TAG, "set instance remote port text: " + remotePortText.getText().toString());
                 String portStr = remotePortText.getText().toString();
                 try {
                     int port = Integer.parseInt(portStr);
@@ -98,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
             startUpdates(); // to prevent infinite loop.
             if (passwordText.hasFocus()) {
                 TrojanConfig ins = Globals.getTrojanConfigInstance();
-                Log.i(TAG, "set instance password text: " + passwordText.getText().toString());
                 ins.setPassword(passwordText.getText().toString());
             }
             endUpdates();
@@ -192,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        saveServerIb = findViewById(R.id.saveConfigBtn);
+        Button saveServerIb = findViewById(R.id.saveConfigBtn);
         remoteAddrText = findViewById(R.id.remoteAddrText);
         remotePortText = findViewById(R.id.remotePortText);
         passwordText = findViewById(R.id.passwordText);
