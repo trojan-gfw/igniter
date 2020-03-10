@@ -26,10 +26,10 @@ public class ServerListDataManager implements ServerListDataSource {
         for (int i = trojanConfigs.size() - 1; i >= 0; i--) {
             if (trojanConfigs.get(i).getRemoteAddr().equals(config.getRemoteAddr())) {
                 trojanConfigs.remove(i);
+                replaceServerConfigs(trojanConfigs);
                 break;
             }
         }
-
     }
 
     @Override
