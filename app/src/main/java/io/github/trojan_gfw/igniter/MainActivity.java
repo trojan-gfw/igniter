@@ -31,6 +31,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
+import io.github.trojan_gfw.igniter.common.os.Task;
+import io.github.trojan_gfw.igniter.common.os.Threads;
 import io.github.trojan_gfw.igniter.servers.activity.ServerListActivity;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataManager;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataSource;
@@ -341,13 +343,13 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, R.string.invalid_configuration, Toast.LENGTH_SHORT).show();
                     return;
                 }
-                new Thread(new Runnable() {
+                Threads.instance().runOnWorkThread(new Task() {
                     @Override
-                    public void run() {
+                    public void onRun() {
                         serverListDataManager.saveServerConfig(Globals.getTrojanConfigInstance());
                         showSaveConfigResult(true);
                     }
-                }).start();
+                });
             }
         });
         serverListDataManager = new ServerListDataManager(getCacheDir().getAbsolutePath());
