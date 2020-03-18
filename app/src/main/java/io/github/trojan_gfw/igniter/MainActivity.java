@@ -352,7 +352,7 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
-        serverListDataManager = new ServerListDataManager(getCacheDir().getAbsolutePath());
+        serverListDataManager = new ServerListDataManager(Globals.getTrojanConfigListPath());
     }
 
     private void clearEditTextFocus() {

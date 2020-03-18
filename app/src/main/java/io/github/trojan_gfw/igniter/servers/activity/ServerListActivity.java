@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import io.github.trojan_gfw.igniter.Globals;
 import io.github.trojan_gfw.igniter.R;
 import io.github.trojan_gfw.igniter.servers.contract.ServerListContract;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataManager;
@@ -51,7 +52,7 @@ public class ServerListActivity extends AppCompatActivity {
         if (fragment == null) {
             fragment = ServerListFragment.newInstance();
         }
-        mPresenter = new ServerListPresenter(fragment, new ServerListDataManager(getCacheDir().getAbsolutePath()));
+        mPresenter = new ServerListPresenter(fragment, new ServerListDataManager(Globals.getTrojanConfigListPath()));
         fm.beginTransaction()
                 .replace(R.id.parent_fl, fragment, ServerListFragment.TAG).commitAllowingStateLoss();
     }

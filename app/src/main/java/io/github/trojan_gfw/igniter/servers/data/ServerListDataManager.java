@@ -8,11 +8,10 @@ import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.TrojanHelper;
 
 public class ServerListDataManager implements ServerListDataSource {
-    private static final String SERVER_CONFIG_LIST_FILE_NAME = "config_list.txt";
     private final String mConfigFilePath;
 
-    public ServerListDataManager(String configFileDir) {
-        mConfigFilePath = configFileDir + File.separator + SERVER_CONFIG_LIST_FILE_NAME;
+    public ServerListDataManager(String configFilePath) {
+        mConfigFilePath = configFilePath;
     }
 
     @Override
@@ -52,5 +51,6 @@ public class ServerListDataManager implements ServerListDataSource {
     @Override
     public void replaceServerConfigs(List<TrojanConfig> list) {
         TrojanHelper.writeTrojanServerConfigList(list, mConfigFilePath);
+        TrojanHelper.ShowTrojanConfigList(mConfigFilePath);
     }
 }

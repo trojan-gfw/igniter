@@ -1,13 +1,11 @@
 package io.github.trojan_gfw.igniter;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,7 +17,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class TrojanHelper {
-    private static final String TAG = "TrojanConfig";
+    private static final String SINGLE_CONFIG_TAG = "TrojanConfig";
+    private static final String CONFIG_LIST_TAG = "TrojanConfigList";
 
     public static boolean writeTrojanServerConfigList(List<TrojanConfig> configList, String trojanConfigListPath) {
         JSONArray jsonArray = new JSONArray();
@@ -68,6 +67,20 @@ public class TrojanHelper {
             e.printStackTrace();
         }
         return Collections.emptyList();
+    }
+
+    public static void ShowTrojanConfigList(String trojanConfigListPath) {
+        File file = new File(trojanConfigListPath);
+
+        try {
+            try (FileInputStream fis = new FileInputStream(file)) {
+                byte[] content = new byte[(int) file.length()];
+                fis.read(content);
+                LogHelper.i(CONFIG_LIST_TAG, new String(content));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private static String parseTrojanConfigToJSON(TrojanConfig config) {
@@ -139,7 +152,7 @@ public class TrojanHelper {
             try (FileInputStream fis = new FileInputStream(file)) {
                 byte[] content = new byte[(int) file.length()];
                 fis.read(content);
-                LogHelper.i(TAG, new String(content));
+                LogHelper.i(SINGLE_CONFIG_TAG, new String(content));
             }
         } catch (Exception e) {
             e.printStackTrace();
