@@ -62,9 +62,10 @@ class TestConnection extends AsyncTask<String, Void, TestConnectionResult> {
                                 result.url, String.valueOf(result.time)),
                         Toast.LENGTH_LONG).show();
             } else {
+                result.error.printStackTrace();
                 Toast.makeText(activity,
                         activity.getString(R.string.failed_to_connect_to__,
-                                result.url, result.error.getMessage()),
+                                result.url, "Please start igniter before testing"),
                         Toast.LENGTH_LONG).show();
             }
         }

@@ -91,7 +91,7 @@
             android:layout_marginBottom="12dp"
             android:ems="10"
             android:hint="@string/trojan_url"
-            android:inputType="text"
+            android:inputType="textPassword"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -159,16 +159,27 @@
         </LinearLayout>
 
         <Button
+            android:id="@+id/saveConfigBtn"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/main_btn_height"
+            android:layout_margin="@dimen/main_btn_margin"
+            android:text="@string/main_save_config_btn"
+            android:textSize="@dimen/text_size"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/columnContainer" />
+
+        <Button
             android:id="@+id/startStopButton"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:layout_margin="16dp"
+            android:layout_height="@dimen/main_btn_height"
+            android:layout_margin="@dimen/main_btn_margin"
             android:text="@string/button_service__start"
             android:textSize="@dimen/text_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/columnContainer" />
+            app:layout_constraintTop_toBottomOf="@+id/saveConfigBtn" />
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
