@@ -13,9 +13,12 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Set;
 
 import clash.Clash;
 import freeport.Freeport;
+import io.github.trojan_gfw.igniter.exempt.data.ExemptAppDataManager;
+import io.github.trojan_gfw.igniter.exempt.data.ExemptAppDataSource;
 import tun2socks.Tun2socks;
 import tun2socks.Tun2socksStartOptions;
 
@@ -44,6 +47,7 @@ public class ProxyService extends VpnService {
     private int state = STARTED;
     private ParcelFileDescriptor pfd;
     private LocalBroadcastManager broadcastManager;
+    private Set<String> exemptAppPackageNames;
 
     private void setState(int state) {
         this.state = state;
@@ -59,6 +63,8 @@ public class ProxyService extends VpnService {
         super.onCreate();
         instance = this;
         broadcastManager = LocalBroadcastManager.getInstance(this);
+        ExemptAppDataSource dataManager = new ExemptAppDataManager(getPackageManager());
+        exemptAppPackageNames = dataManager.loadExemptAppPackageNameSet();
     }
 
     @Override
@@ -93,6 +99,13 @@ public class ProxyService extends VpnService {
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
             setState(STOPPED);
+        }
+        for (String packageName : exemptAppPackageNames) {
+            try {
+                b.addDisallowedApplication(packageName);
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
         }
         enable_clash = intent.getBooleanExtra(CLASH_EXTRA_NAME, true);
         boolean enable_ipv6 = false;

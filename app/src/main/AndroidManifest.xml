@@ -7,13 +7,15 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
+        android:name=".IgniterApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".qrcode.ScanQRCodeActivity"></activity>
+        <activity android:name=".exempt.activity.ExemptAppActivity" android:theme="@style/AppThemeNoTitle"></activity>
+        <activity android:name=".qrcode.ScanQRCodeActivity" />
         <activity android:name=".servers.activity.ServerListActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>

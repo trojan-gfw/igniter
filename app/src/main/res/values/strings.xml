@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">Igniter</string>
+
+    <string name="common_delete">Delete</string>
+    <string name="common_alert">Alert</string>
+    <string name="common_confirm">Confirm</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_save_success">Save success</string>
+
     <string name="remote_addr">Remote Address</string>
     <string name="remote_port">Remote Port</string>
     <string name="default_port">443</string>
@@ -19,6 +26,7 @@
     <string name="notification_channel_id">igniter_notify_chan</string>
     <string name="notification_channel_name">igniter_notify_channel</string>
     <string name="notification_channel_description">Igniter notifications channel</string>
+    <string name="main_restart_proxy_service_tip">Restart proxy yourself to apply new exempt apps configuration.</string>
 
     <!-- App Bar Menu -->
     <string name="action_test_connection">Test Connection</string>
@@ -26,11 +34,11 @@
 
     <string name="server_list_file_chooser_msg">Select a TXT file</string>
     <string name="server_list_menu_import_from_file">Import from file</string>
-    <string name="server_list_delete_btn">Delete</string>
+    <string name="server_list_delete_btn">@string/common_delete</string>
     <string name="server_list_lack_of_camera_permission">Lack of camera permission!</string>
     <string name="server_list_lack_of_read_permission">Lack of read permission!</string>
     <string name="main_save_config_btn">Save</string>
-    <string name="main_save_success">Save success</string>
+    <string name="main_save_success">@string/common_save_success</string>
     <string name="main_save_failed">Save failed</string>
 
     <string name="main_menu_server_list">Server List</string>
@@ -39,6 +47,11 @@
     <string name="scan_qr_code_failed">Cannot recognize trojanURL: %s</string>
     <string name="scan_qr_code">Scan QR</string>
     <string name="scan_qr_code_camera_error">Camera Error</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="menu_action_exempt_app_save">Save</string>
+    <string name="menu_action_exempt_app">Exempt Apps</string>
+    <string name="exempt_app_exit">Exit</string>
+    <string name="exempt_app_exit_confirm">Are you sure to exit without save?</string>
+    <string name="exempt_app_loading_tip">Loading…</string>
+    <string name="exempt_app_exit_without_saving_confirm">Exit without saving exempt app list?</string>
 </resources>
