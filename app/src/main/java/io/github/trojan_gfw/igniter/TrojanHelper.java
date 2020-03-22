@@ -76,7 +76,7 @@ public class TrojanHelper {
             try (FileInputStream fis = new FileInputStream(file)) {
                 byte[] content = new byte[(int) file.length()];
                 fis.read(content);
-                LogHelper.i(CONFIG_LIST_TAG, new String(content));
+                LogHelper.v(CONFIG_LIST_TAG, new String(content));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -152,7 +152,7 @@ public class TrojanHelper {
             try (FileInputStream fis = new FileInputStream(file)) {
                 byte[] content = new byte[(int) file.length()];
                 fis.read(content);
-                LogHelper.i(SINGLE_CONFIG_TAG, new String(content));
+                LogHelper.v(SINGLE_CONFIG_TAG, new String(content));
             }
         } catch (Exception e) {
             e.printStackTrace();
