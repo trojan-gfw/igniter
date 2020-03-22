@@ -3,19 +3,19 @@ package io.github.trojan_gfw.igniter.servers.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import io.github.trojan_gfw.igniter.Globals;
 import io.github.trojan_gfw.igniter.R;
+import io.github.trojan_gfw.igniter.common.app.BaseAppCompatActivity;
 import io.github.trojan_gfw.igniter.servers.contract.ServerListContract;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataManager;
 import io.github.trojan_gfw.igniter.servers.fragment.ServerListFragment;
 import io.github.trojan_gfw.igniter.servers.presenter.ServerListPresenter;
 
-public class ServerListActivity extends AppCompatActivity {
+public class ServerListActivity extends BaseAppCompatActivity {
     public static final String KEY_TROJAN_CONFIG = "trojan_config";
     private ServerListContract.Presenter mPresenter;
 
@@ -54,6 +54,7 @@ public class ServerListActivity extends AppCompatActivity {
         }
         mPresenter = new ServerListPresenter(fragment, new ServerListDataManager(Globals.getTrojanConfigListPath()));
         fm.beginTransaction()
-                .replace(R.id.parent_fl, fragment, ServerListFragment.TAG).commitAllowingStateLoss();
+                .replace(R.id.parent_fl, fragment, ServerListFragment.TAG)
+                .commitAllowingStateLoss();
     }
 }
