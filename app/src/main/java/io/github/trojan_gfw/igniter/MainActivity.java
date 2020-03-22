@@ -18,6 +18,7 @@ import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -33,6 +34,8 @@ import java.io.InputStream;
 
 import io.github.trojan_gfw.igniter.common.os.Task;
 import io.github.trojan_gfw.igniter.common.os.Threads;
+import io.github.trojan_gfw.igniter.common.utils.SnackbarUtils;
+import io.github.trojan_gfw.igniter.exempt.activity.ExemptAppActivity;
 import io.github.trojan_gfw.igniter.servers.activity.ServerListActivity;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataManager;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataSource;
@@ -41,9 +44,11 @@ import io.github.trojan_gfw.igniter.servers.data.ServerListDataSource;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final int SERVER_LIST_CHOOSE_REQUEST_CODE = 1024;
+    private static final int EXEMPT_APP_CONFIGURE_REQUEST_CODE = 2077;
     private static final int VPN_REQUEST_CODE = 0;
     private static final String CONNECTION_TEST_URL = "https://www.google.com";
 
+    private ViewGroup rootViewGroup;
     private EditText remoteAddrText;
     private EditText remotePortText;
     private EditText passwordText;
@@ -187,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        rootViewGroup = findViewById(R.id.rootScrollView);
         Button saveServerIb = findViewById(R.id.saveConfigBtn);
         remoteAddrText = findViewById(R.id.remoteAddrText);
         remotePortText = findViewById(R.id.remotePortText);
@@ -398,7 +404,15 @@ public class MainActivity extends AppCompatActivity {
                 ipv6Switch.setChecked(config.getEnableIpv6());
                 verifySwitch.setChecked(config.getVerifyCert());
             }
+        } else if (EXEMPT_APP_CONFIGURE_REQUEST_CODE == requestCode && Activity.RESULT_OK == resultCode) {
+            if (isProxyRunning()) {
+                SnackbarUtils.showTextLong(rootViewGroup, R.string.main_restart_proxy_service_tip);
+            }
         }
+    }
+
+    private boolean isProxyRunning() {
+        return ProxyService.getInstance() != null;
     }
 
     @Override
@@ -422,6 +436,9 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_view_server_list:
                 clearEditTextFocus();
                 startActivityForResult(ServerListActivity.create(MainActivity.this), SERVER_LIST_CHOOSE_REQUEST_CODE);
+                return true;
+            case R.id.action_exempt_app:
+                startActivityForResult(ExemptAppActivity.create(this), EXEMPT_APP_CONFIGURE_REQUEST_CODE);
                 return true;
             default:
                 // Invoke the superclass to handle it.

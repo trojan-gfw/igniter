@@ -7,6 +7,11 @@
         android:title="@string/main_menu_server_list"
         app:showAsAction="never" />
 
+    <item android:id="@+id/action_exempt_app"
+        android:title="@string/menu_action_exempt_app"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
     <item
         android:id="@+id/action_test_connection"
         android:orderInCategory="100"
