@@ -7,10 +7,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,18 +23,18 @@ import java.util.List;
 
 import io.github.trojan_gfw.igniter.R;
 import io.github.trojan_gfw.igniter.TrojanConfig;
+import io.github.trojan_gfw.igniter.common.app.BaseFragment;
 import io.github.trojan_gfw.igniter.qrcode.ScanQRCodeActivity;
 import io.github.trojan_gfw.igniter.servers.activity.ServerListActivity;
 import io.github.trojan_gfw.igniter.servers.contract.ServerListContract;
 
-public class ServerListFragment extends Fragment implements ServerListContract.View {
+public class ServerListFragment extends BaseFragment implements ServerListContract.View {
     private static final int REQUEST_READ_PERMISSION_CODE = 115;
     private static final int FILE_IMPORT_REQUEST_CODE = 120;
     private static final int SCAN_QR_CODE_REQUEST_CODE = 110;
     private static final int REQUEST_CAMERA_CODE = 114;
     public static final String TAG = "ServerListFragment";
     public static final String KEY_TROJAN_CONFIG = ServerListActivity.KEY_TROJAN_CONFIG;
-    private View mRootView;
     private ServerListContract.Presenter mPresenter;
     private RecyclerView mServerListRv;
     private ServerListAdapter mServerListAdapter;
@@ -59,15 +57,10 @@ public class ServerListFragment extends Fragment implements ServerListContract.V
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mRootView = view;
         findViews();
         initViews();
         initListeners();
         mPresenter.start();
-    }
-
-    protected <T extends View> T findViewById(@IdRes int id) {
-        return mRootView.findViewById(id);
     }
 
     private void findViews() {
@@ -75,7 +68,7 @@ public class ServerListFragment extends Fragment implements ServerListContract.V
     }
 
     private void initViews() {
-        mServerListRv.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        mServerListRv.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
         mServerListAdapter = new ServerListAdapter(getContext(), new ArrayList<TrojanConfig>());
         mServerListRv.setAdapter(mServerListAdapter);
     }
@@ -123,15 +116,15 @@ public class ServerListFragment extends Fragment implements ServerListContract.V
 
     @Override
     public void gotoScanQRCode() {
-        if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)) {
+        if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA)) {
             gotoScanQRCodeInner();
         } else {
-            requestPermissions(new String[] {Manifest.permission.CAMERA}, REQUEST_CAMERA_CODE);
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_CODE);
         }
     }
 
     private void gotoScanQRCodeInner() {
-        startActivityForResult(ScanQRCodeActivity.create(getContext()), SCAN_QR_CODE_REQUEST_CODE);
+        startActivityForResult(ScanQRCodeActivity.create(mContext), SCAN_QR_CODE_REQUEST_CODE);
     }
 
     @Override
@@ -185,7 +178,7 @@ public class ServerListFragment extends Fragment implements ServerListContract.V
 
     @Override
     public void importConfigFromFile() {
-        if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
+        if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE)) {
             openFileChooser();
         } else {
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_PERMISSION_CODE);
