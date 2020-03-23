@@ -1,8 +1,8 @@
 package io.github.trojan_gfw.igniter.exempt.data;
 
-import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
+import android.os.Build;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,10 +48,10 @@ public class ExemptAppDataManager implements ExemptAppDataSource {
             e.printStackTrace();
         }
         // filter uninstalled apps
-        List<ResolveInfo> resolveInfoList = queryCurrentInstalledApps();
+        List<ApplicationInfo> applicationInfoList = queryCurrentInstalledApps();
         Set<String> installedAppPackageNames = new HashSet<>();
-        for (ResolveInfo resolveInfo : resolveInfoList) {
-            installedAppPackageNames.add(resolveInfo.activityInfo.packageName);
+        for (ApplicationInfo applicationInfo : applicationInfoList) {
+            installedAppPackageNames.add(applicationInfo.packageName);
         }
         Set<String> ret = new HashSet<>();
         for (String packageName : exemptAppPackageNames) {
@@ -62,21 +62,25 @@ public class ExemptAppDataManager implements ExemptAppDataSource {
         return ret;
     }
 
-    private List<ResolveInfo> queryCurrentInstalledApps() {
-        Intent intent = new Intent(Intent.ACTION_MAIN, null);
-        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        return mPackageManager.queryIntentActivities(intent, 0);
+    private List<ApplicationInfo> queryCurrentInstalledApps() {
+        int flags = 0;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            flags |= PackageManager.MATCH_UNINSTALLED_PACKAGES | PackageManager.MATCH_DISABLED_COMPONENTS;
+        } else {
+            flags |= PackageManager.GET_UNINSTALLED_PACKAGES | PackageManager.GET_DISABLED_COMPONENTS;
+        }
+        return mPackageManager.getInstalledApplications(flags);
     }
 
     @Override
     public List<AppInfo> getAllAppInfoList() {
-        List<ResolveInfo> resolveInfoList = queryCurrentInstalledApps();
-        List<AppInfo> appInfoList = new ArrayList<>(resolveInfoList.size());
-        for (ResolveInfo resolveInfo : resolveInfoList) {
+        List<ApplicationInfo> applicationInfoList = queryCurrentInstalledApps();
+        List<AppInfo> appInfoList = new ArrayList<>(applicationInfoList.size());
+        for (ApplicationInfo applicationInfo : applicationInfoList) {
             AppInfo appInfo = new AppInfo();
-            appInfo.setAppName(resolveInfo.loadLabel(mPackageManager).toString());
-            appInfo.setPackageName(resolveInfo.activityInfo.packageName);
-            appInfo.setIcon(resolveInfo.activityInfo.loadIcon(mPackageManager));
+            appInfo.setAppName(mPackageManager.getApplicationLabel(applicationInfo).toString());
+            appInfo.setPackageName(applicationInfo.packageName);
+            appInfo.setIcon(mPackageManager.getApplicationIcon(applicationInfo));
             appInfoList.add(appInfo);
         }
         return appInfoList;
