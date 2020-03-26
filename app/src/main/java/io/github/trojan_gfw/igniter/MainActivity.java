@@ -2,17 +2,11 @@ package io.github.trojan_gfw.igniter;
 
 
 import android.app.Activity;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.VpnService;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
 import android.view.Menu;
@@ -32,20 +26,23 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
+import io.github.trojan_gfw.igniter.common.os.MultiProcessSP;
 import io.github.trojan_gfw.igniter.common.os.Task;
 import io.github.trojan_gfw.igniter.common.os.Threads;
 import io.github.trojan_gfw.igniter.common.utils.SnackbarUtils;
+import io.github.trojan_gfw.igniter.connection.TrojanConnection;
 import io.github.trojan_gfw.igniter.exempt.activity.ExemptAppActivity;
+import io.github.trojan_gfw.igniter.proxy.aidl.ITrojanService;
 import io.github.trojan_gfw.igniter.servers.activity.ServerListActivity;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataManager;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataSource;
+import io.github.trojan_gfw.igniter.tile.ProxyControlActivity;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements TrojanConnection.Callback {
     private static final String TAG = "MainActivity";
     private static final int SERVER_LIST_CHOOSE_REQUEST_CODE = 1024;
     private static final int EXEMPT_APP_CONFIGURE_REQUEST_CODE = 2077;
-    private static final int VPN_REQUEST_CODE = 0;
     private static final String CONNECTION_TEST_URL = "https://www.google.com";
 
     private ViewGroup rootViewGroup;
@@ -58,8 +55,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView clashLink;
     private Button startStopButton;
     private EditText trojanURLText;
-
-    private BroadcastReceiver serviceStateReceiver;
+    private @ProxyService.ProxyState
+    int proxyState = ProxyService.STATE_NONE;
+    private final TrojanConnection connection = new TrojanConnection(false);
+    private ITrojanService trojanService;
     private ServerListDataSource serverListDataManager;
     private TextViewListener remoteAddrTextListener = new TextViewListener() {
         @Override
@@ -105,33 +104,6 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private void createNotificationChannel(String channelId) {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.notification_channel_name);
-            String description = getString(R.string.notification_channel_description);
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel channel = new NotificationChannel(channelId, name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-    private void destoryNotificationChannel(String channelId) {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.deleteNotificationChannel(channelId);
-        }
-    }
-
     private void copyRawResourceToDir(int resId, String destPathName, boolean override) {
         File file = new File(destPathName);
         if (override || !file.exists()) {
@@ -151,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateViews(int state) {
+        proxyState = state;
         boolean inputEnabled;
         switch (state) {
             case ProxyService.STARTING: {
@@ -205,9 +178,6 @@ public class MainActivity extends AppCompatActivity {
         clashLink.setMovementMethod(LinkMovementMethod.getInstance());
         startStopButton = findViewById(R.id.startStopButton);
 
-        Globals.Init(this);
-        createNotificationChannel(getString(R.string.notification_channel_id));
-
         copyRawResourceToDir(R.raw.cacert, Globals.getCaCertPath(), true);
         copyRawResourceToDir(R.raw.country, Globals.getCountryMmdbPath(), true);
         copyRawResourceToDir(R.raw.clash_config, Globals.getClashConfigPath(), false);
@@ -226,6 +196,14 @@ public class MainActivity extends AppCompatActivity {
                     passwordText.setInputType(EditorInfo.TYPE_CLASS_TEXT);
                     passwordText.setSelection(passwordText.getText().length());
                 }
+            }
+        });
+
+        clashSwitch.setChecked(MultiProcessSP.getEnableClash(true));
+        clashSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                MultiProcessSP.setEnableClash(isChecked);
             }
         });
 
@@ -305,43 +283,26 @@ public class MainActivity extends AppCompatActivity {
 
         startStopButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
                 if (!Globals.getTrojanConfigInstance().isValidRunningConfig()) {
                     Toast.makeText(MainActivity.this,
                             R.string.invalid_configuration,
                             Toast.LENGTH_LONG).show();
                     return;
                 }
-
-                ProxyService serviceInstance = ProxyService.getInstance();
-                if (serviceInstance == null) {
+                if (proxyState == ProxyService.STATE_NONE || proxyState == ProxyService.STOPPED) {
                     TrojanHelper.WriteTrojanConfig(
                             Globals.getTrojanConfigInstance(),
                             Globals.getTrojanConfigPath()
                     );
                     TrojanHelper.ShowConfig(Globals.getTrojanConfigPath());
-
-                    Intent i = VpnService.prepare(getApplicationContext());
-                    if (i != null) {
-                        startActivityForResult(i, VPN_REQUEST_CODE);
-                    } else {
-                        onActivityResult(VPN_REQUEST_CODE, Activity.RESULT_OK, null);
-                    }
-                } else {
-                    serviceInstance.stop();
+                    // start ProxyService
+                    startActivity(ProxyControlActivity.startOrStopProxy(MainActivity.this, true, true));
+                } else if (proxyState == ProxyService.STARTED) {
+                    // stop ProxyService
+                    startActivity(ProxyControlActivity.startOrStopProxy(MainActivity.this, false, true));
                 }
-
             }
         });
-
-        serviceStateReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                int state = intent.getIntExtra(ProxyService.STATUS_EXTRA_NAME, ProxyService.STARTED);
-                updateViews(state);
-            }
-        };
-
         saveServerIb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -352,13 +313,100 @@ public class MainActivity extends AppCompatActivity {
                 Threads.instance().runOnWorkThread(new Task() {
                     @Override
                     public void onRun() {
-                        serverListDataManager.saveServerConfig(Globals.getTrojanConfigInstance());
+                        TrojanConfig config = Globals.getTrojanConfigInstance();
+                        TrojanHelper.WriteTrojanConfig(config, Globals.getTrojanConfigPath());
+                        serverListDataManager.saveServerConfig(config);
                         showSaveConfigResult(true);
                     }
                 });
             }
         });
         serverListDataManager = new ServerListDataManager(Globals.getTrojanConfigListPath());
+        connection.connect(this, this);
+    }
+
+    @Override
+    public void onServiceConnected(final ITrojanService service) {
+        LogHelper.i(TAG, "onServiceConnected");
+        trojanService = service;
+        Threads.instance().runOnWorkThread(new Task() {
+            @Override
+            public void onRun() {
+                try {
+                    final int state = service.getState();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateViews(state);
+                        }
+                    });
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onServiceDisconnected() {
+        LogHelper.i(TAG, "onServiceConnected");
+        trojanService = null;
+    }
+
+    @Override
+    public void onStateChanged(int state, String msg) {
+        LogHelper.i(TAG, "onStateChanged# state: " + state + " msg: " + msg);
+        updateViews(state);
+    }
+
+    @Override
+    public void onTestResult(final String testUrl, final boolean connected, final long delay, @NonNull final String error) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                showTestConnectionResult(testUrl, connected, delay, error);
+            }
+        });
+    }
+
+    private void showTestConnectionResult(String testUrl, boolean connected, long delay, @NonNull String error) {
+        if (connected) {
+            Toast.makeText(getApplicationContext(), getString(R.string.connected_to__in__ms,
+                    testUrl, String.valueOf(delay)), Toast.LENGTH_LONG).show();
+        } else {
+            LogHelper.e(TAG, "TestError: " + error);
+            Toast.makeText(getApplicationContext(),
+                    getString(R.string.failed_to_connect_to__,
+                            testUrl, "Please start igniter before testing"),
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onBinderDied() {
+        LogHelper.i(TAG, "onBinderDied");
+        connection.disconnect(this);
+        // connect the new binder
+        connection.connect(this, this);
+    }
+
+    /**
+     * Test connection by invoking {@link ITrojanService#testConnection(String)}. Since {@link ITrojanService}
+     * is from remote process, a {@link RemoteException} might be thrown. Test result will be delivered
+     * to {@link #onTestResult(String, boolean, long, String)} by {@link TrojanConnection}.
+     */
+    private void testConnection() {
+        ITrojanService service = trojanService;
+        if (service == null) {
+            showTestConnectionResult(CONNECTION_TEST_URL, false, 0L, "Trojan service is not available.");
+        } else {
+            try {
+                service.testConnection(CONNECTION_TEST_URL);
+            } catch (RemoteException e) {
+                showTestConnectionResult(CONNECTION_TEST_URL, false, 0L, "Trojan service throws RemoteException.");
+                e.printStackTrace();
+            }
+        }
     }
 
     private void clearEditTextFocus() {
@@ -382,11 +430,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == VPN_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Intent intent = new Intent(this, ProxyService.class);
-            intent.putExtra(ProxyService.CLASH_EXTRA_NAME, clashSwitch.isChecked());
-            startService(intent);
-        } else if (SERVER_LIST_CHOOSE_REQUEST_CODE == requestCode && resultCode == Activity.RESULT_OK && data != null) {
+        if (SERVER_LIST_CHOOSE_REQUEST_CODE == requestCode && resultCode == Activity.RESULT_OK && data != null) {
             trojanURLText.setText("");
             final TrojanConfig config = data.getParcelableExtra(ServerListActivity.KEY_TROJAN_CONFIG);
             if (config != null) {
@@ -405,14 +449,10 @@ public class MainActivity extends AppCompatActivity {
                 verifySwitch.setChecked(config.getVerifyCert());
             }
         } else if (EXEMPT_APP_CONFIGURE_REQUEST_CODE == requestCode && Activity.RESULT_OK == resultCode) {
-            if (isProxyRunning()) {
+            if (ProxyService.STARTED == proxyState) {
                 SnackbarUtils.showTextLong(rootViewGroup, R.string.main_restart_proxy_service_tip);
             }
         }
-    }
-
-    private boolean isProxyRunning() {
-        return ProxyService.getInstance() != null;
     }
 
     @Override
@@ -427,7 +467,7 @@ public class MainActivity extends AppCompatActivity {
         // Bind menu items to their relative actions
         switch (item.getItemId()) {
             case R.id.action_test_connection:
-                new TestConnection(MainActivity.this).execute(CONNECTION_TEST_URL);
+                testConnection();
                 return true;
             case R.id.action_show_develop_info_logcat:
                 util.Util.logGoRoutineCount();
@@ -472,28 +512,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        ProxyService serviceInstance = ProxyService.getInstance();
-        if (serviceInstance == null) {
-            updateViews(ProxyService.STOPPED);
-        } else {
-            updateViews(serviceInstance.getState());
-            clashSwitch.setChecked(serviceInstance.enable_clash);
-        }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                serviceStateReceiver, new IntentFilter(getString(R.string.bc_service_state))
-        );
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceStateReceiver);
+    protected void onDestroy() {
+        super.onDestroy();
+        connection.disconnect(this);
     }
 }

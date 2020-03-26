@@ -1,17 +1,21 @@
 package io.github.trojan_gfw.igniter;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -102,6 +106,27 @@ public class TrojanHelper {
             e.printStackTrace();
         }
         return "";
+    }
+
+    @Nullable
+    public static TrojanConfig readTrojanConfig(String trojanConfigPath) {
+        File file = new File(trojanConfigPath);
+        if (!file.exists()) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+            TrojanConfig trojanConfig = new TrojanConfig();
+            trojanConfig.fromJSON(sb.toString());
+            return trojanConfig;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private static TrojanConfig parseTrojanConfigFromJSON(String json) {
