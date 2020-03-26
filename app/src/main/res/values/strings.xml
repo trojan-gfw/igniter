@@ -20,14 +20,21 @@
     <string name="label_clash">Bypass China with <a href="https://github.com/Dreamacro/clash">Clash</a></string>
     <string name="enable_ipv6">Enable IPv6</string>
     <string name="bc_service_state">io.github.trojan_gfw.igniter.BC_SERVICE_STATE</string>
+    <string name="stop_service">io.github.trojan_gfw.igniter.STOP_SERVICE</string>
+    <string name="bind_service">io.github.trojan_gfw.igniter.BIND_SERVICE</string>
     <string name="connected_to__in__ms">Connected to %1$s in %2$sms.</string>
     <string name="failed_to_connect_to__">Failed to connect to %1$s: %2$s</string>
     <string name="invalid_configuration">Invalid Configuration</string>
     <string name="notification_channel_id">igniter_notify_chan</string>
     <string name="notification_channel_name">igniter_notify_channel</string>
     <string name="notification_channel_description">Igniter notifications channel</string>
+    <string name="notification_starting_service">Starting service</string>
     <string name="main_restart_proxy_service_tip">Restart proxy yourself to apply new exempt apps configuration.</string>
 
+    <string name="tile_on">Igniter ON</string>
+    <string name="tile_starting">Igniter STARTING</string>
+    <string name="tile_stopping">Igniter STOPPING</string>
+    <string name="tile_off">Igniter OFF</string>
     <!-- App Bar Menu -->
     <string name="action_test_connection">Test Connection</string>
     <string name="action_show_develop_info_logcat">Show develop info in logcat</string>

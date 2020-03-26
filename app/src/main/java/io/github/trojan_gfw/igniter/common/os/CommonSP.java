@@ -12,7 +12,7 @@ public class CommonSP {
     private static Context sContext;
 
     public static void init(Context context) {
-        sContext = context;
+        sContext = context.getApplicationContext();
     }
 
     private static SharedPreferences sp() {
