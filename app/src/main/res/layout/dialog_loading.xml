@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="200dp"
+    android:background="@drawable/common_round_rect_white_bg"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="200dp">
+
+    <android.support.v4.widget.ContentLoadingProgressBar
+        android:id="@+id/dialogLoadingPb"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_centerInParent="true"
+        android:layout_width="50dp"
+        android:layout_height="50dp" />
+
+    <TextView
+        android:id="@+id/dialogLoadingMsgTv"
+        android:layout_below="@id/dialogLoadingPb"
+        android:layout_marginTop="15dp"
+        tools:text="Saving..."
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>
