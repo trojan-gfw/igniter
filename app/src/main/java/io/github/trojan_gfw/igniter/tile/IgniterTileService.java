@@ -113,6 +113,7 @@ public class IgniterTileService extends TileService implements TrojanConnection.
                 tile.setLabel(getString(R.string.tile_stopping));
                 break;
             default:
+                LogHelper.e(TAG, "Unknown state: " + state);
                 break;
         }
         tile.updateTile();
@@ -142,13 +143,15 @@ public class IgniterTileService extends TileService implements TrojanConnection.
                         break;
                     }
                     case ProxyService.STARTING:
+                    case ProxyService.STOPPING:
                         break;
                     case ProxyService.STATE_NONE:
                     case ProxyService.STOPPED: {
                         startActivity(ProxyControlActivity.startOrStopProxy(this, true, false));
                         break;
                     }
-                    case ProxyService.STOPPING:
+                    default:
+                        LogHelper.e(TAG, "Unknown state: " + state);
                         break;
                 }
             } catch (RemoteException e) {
