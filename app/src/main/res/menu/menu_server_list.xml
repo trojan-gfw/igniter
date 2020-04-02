@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_scan_qr_code"
+        android:title="@string/scan_qr_code"
+        android:icon="@drawable/qr_code"
+        app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_import_from_file"
+        android:title="@string/server_list_menu_import_from_file"
+        app:showAsAction="never" />
+</menu>

@@ -32,6 +32,10 @@ public class Globals {
         return PathHelper.combine(filesDir, "config.json");
     }
 
+    public static String getTrojanConfigListPath() {
+        return PathHelper.combine(filesDir, "config_list.json");
+    }
+
     public static void setTrojanConfigInstance(TrojanConfig config) {
         trojanConfigInstance = config;
     }

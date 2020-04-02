@@ -61,7 +61,7 @@ public class ClashHelper {
                 fis.read(content);
                 sb.append("\r\n");
                 sb.append(new String(content));
-                LogHelper.i(TAG, sb.toString());
+                LogHelper.v(TAG, sb.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();

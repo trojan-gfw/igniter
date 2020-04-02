@@ -1,11 +1,14 @@
 package io.github.trojan_gfw.igniter;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class TrojanConfig {
+public class TrojanConfig implements Parcelable {
 
     private String localAddr;
     private int localPort;
@@ -19,7 +22,7 @@ public class TrojanConfig {
     private String tls13CipherList;
 
 
-    TrojanConfig() {
+    public TrojanConfig() {
         // defaults
         this.localAddr = "127.0.0.1";
         this.localPort = 1081;
@@ -44,6 +47,31 @@ public class TrojanConfig {
                 + "TLS_CHACHA20_POLY1305_SHA256:"
                 + "TLS_AES_256_GCM_SHA384";
     }
+
+    protected TrojanConfig(Parcel in) {
+        localAddr = in.readString();
+        localPort = in.readInt();
+        remoteAddr = in.readString();
+        remotePort = in.readInt();
+        password = in.readString();
+        verifyCert = in.readByte() != 0;
+        caCertPath = in.readString();
+        enableIpv6 = in.readByte() != 0;
+        cipherList = in.readString();
+        tls13CipherList = in.readString();
+    }
+
+    public static final Creator<TrojanConfig> CREATOR = new Creator<TrojanConfig>() {
+        @Override
+        public TrojanConfig createFromParcel(Parcel in) {
+            return new TrojanConfig(in);
+        }
+
+        @Override
+        public TrojanConfig[] newArray(int size) {
+            return new TrojanConfig[size];
+        }
+    };
 
     public String generateTrojanConfigJSON() {
         try {
@@ -82,6 +110,21 @@ public class TrojanConfig {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void copyFrom(TrojanConfig that) {
+        this
+                .setLocalAddr(that.localAddr)
+                .setLocalPort(that.localPort)
+                .setRemoteAddr(that.remoteAddr)
+                .setRemotePort(that.remotePort)
+                .setPassword(that.password)
+                .setEnableIpv6(that.enableIpv6)
+                .setVerifyCert(that.verifyCert)
+                .setCaCertPath(that.caCertPath)
+                .setCipherList(that.cipherList)
+                .setTls13CipherList(that.tls13CipherList);
+
     }
 
     public boolean isValidRunningConfig() {
@@ -178,5 +221,47 @@ public class TrojanConfig {
     public TrojanConfig setTls13CipherList(String tls13CipherList) {
         this.tls13CipherList = tls13CipherList;
         return this;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof TrojanConfig)) {
+            return false;
+        }
+        TrojanConfig that = (TrojanConfig) obj;
+        return (paramEquals(remoteAddr, that.remoteAddr) && paramEquals(remotePort, that.remotePort)
+                && paramEquals(localAddr, that.localAddr) && paramEquals(localPort, that.localPort))
+                && paramEquals(password, that.password) && paramEquals(verifyCert, that.verifyCert)
+                && paramEquals(caCertPath, that.caCertPath) && paramEquals(enableIpv6, that.enableIpv6)
+                && paramEquals(cipherList, that.cipherList) && paramEquals(tls13CipherList, that.tls13CipherList);
+    }
+
+    private static boolean paramEquals(Object a, Object b) {
+        if (a == b) {
+            return true;
+        }
+        if (a == null || b == null) {
+            return false;
+        }
+        return a.equals(b);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(localAddr);
+        dest.writeInt(localPort);
+        dest.writeString(remoteAddr);
+        dest.writeInt(remotePort);
+        dest.writeString(password);
+        dest.writeByte((byte) (verifyCert ? 1 : 0));
+        dest.writeString(caCertPath);
+        dest.writeByte((byte) (enableIpv6 ? 1 : 0));
+        dest.writeString(cipherList);
+        dest.writeString(tls13CipherList);
     }
 }
