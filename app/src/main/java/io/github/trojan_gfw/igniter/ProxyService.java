@@ -219,7 +219,6 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         openMainActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingOpenMainActivityIntent = PendingIntent.getActivity(this, 0, openMainActivityIntent, 0);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
-                .setWhen(0L)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setContentTitle(getString(R.string.app_name))
@@ -227,7 +226,13 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 // Set the intent that will fire when the user taps the notification
                 .setContentIntent(pendingOpenMainActivityIntent)
-                .setAutoCancel(false);
+                .setAutoCancel(false)
+                .setOngoing(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            builder.setShowWhen(true);
+        }
+        builder.setWhen(0L);
+
         // it's required to create a notification channel before startForeground on SDK >= Android O
         createNotificationChannel(channelId);
         LogHelper.i(TAG, "start foreground notification");
