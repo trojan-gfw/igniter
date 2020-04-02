@@ -312,7 +312,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         LogHelper.i("VPN", "pfd established");
 
         if (pfd == null) {
-            shutdown();
+            stop();
             return START_NOT_STICKY;
         }
         int fd = pfd.detachFd();
@@ -443,5 +443,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
 
     public void stop() {
         shutdown();
+        // this is essential for gomobile aar
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
 }
