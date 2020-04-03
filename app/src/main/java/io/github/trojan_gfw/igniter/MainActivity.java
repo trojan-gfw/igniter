@@ -377,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
             LogHelper.e(TAG, "TestError: " + error);
             Toast.makeText(getApplicationContext(),
                     getString(R.string.failed_to_connect_to__,
-                            testUrl, "Please start igniter before testing"),
+                            testUrl, error),
                     Toast.LENGTH_LONG).show();
         }
     }
