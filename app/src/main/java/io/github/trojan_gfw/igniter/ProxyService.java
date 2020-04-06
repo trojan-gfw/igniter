@@ -363,12 +363,10 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
 
         Tun2socks.setLoglevel("info");
         if (enable_clash) {
-            tun2socksStartOptions.setFakeIPStart("255.0.128.1");
-            tun2socksStartOptions.setFakeIPStop("255.0.143.254");
+            tun2socksStartOptions.setFakeIPRange("255.0.128.1/20");
         } else {
             // Disable go-tun2socks fake ip
-            tun2socksStartOptions.setFakeIPStart("");
-            tun2socksStartOptions.setFakeIPStop("");
+            tun2socksStartOptions.setFakeIPRange("");
         }
         Tun2socks.start(tun2socksStartOptions);
         LogHelper.i(TAG, tun2socksStartOptions.toString());
