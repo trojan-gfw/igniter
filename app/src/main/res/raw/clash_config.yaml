@@ -35,9 +35,11 @@ rules:
   - DOMAIN-SUFFIX,entrust.net,Proxy
   - DOMAIN,ocsp.verisign.net,Proxy
   - DOMAIN-SUFFIX,apps.apple.com,Proxy
-  - DOMAIN-SUFFIX,itunes.apple.com,Proxy
+  - DOMAIN,itunes.apple.com,Proxy
   - DOMAIN-SUFFIX,blobstore.apple.com,Proxy
   - DOMAIN-SUFFIX,music.apple.com,DIRECT
+  - DOMAIN-SUFFIX,mzstatic.com,DIRECT
+  - DOMAIN-SUFFIX,itunes.apple.com,DIRECT
   - DOMAIN-SUFFIX,icloud.com,DIRECT
   - DOMAIN-SUFFIX,icloud-content.com,DIRECT
   - DOMAIN-SUFFIX,me.com,DIRECT
@@ -52,10 +54,10 @@ rules:
 
 # 自定义规则
   ## 您可以在此处插入您补充的自定义规则（请注意保持缩进）
+  # Chinese ROM uses googleapis.cn, which is broken
+  - DOMAIN-KEYWORD,googleapis,Proxy
 
 # 国内网站
-  - DOMAIN-SUFFIX,cn,DIRECT
-  - DOMAIN-KEYWORD,-cn,DIRECT
 
   - DOMAIN-SUFFIX,126.com,DIRECT
   - DOMAIN-SUFFIX,126.net,DIRECT
@@ -76,6 +78,7 @@ rules:
   - DOMAIN-SUFFIX,bdimg.com,DIRECT
   - DOMAIN-SUFFIX,bdstatic.com,DIRECT
   - DOMAIN-SUFFIX,bilibili.com,DIRECT
+  - DOMAIN-SUFFIX,bilivideo.com,DIRECT
   - DOMAIN-SUFFIX,caiyunapp.com,DIRECT
   - DOMAIN-SUFFIX,clouddn.com,DIRECT
   - DOMAIN-SUFFIX,cnbeta.com,DIRECT
@@ -487,6 +490,10 @@ rules:
 
 # LAN
   - DOMAIN-SUFFIX,local,DIRECT
+
+# Move CN to last
+  - DOMAIN-SUFFIX,cn,DIRECT
+  - DOMAIN-KEYWORD,-cn,DIRECT
 
 # 最终规则
   - GEOIP,CN,DIRECT
