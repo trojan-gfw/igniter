@@ -13,7 +13,6 @@ public class ToolInitializer extends Initializer {
 
     @Override
     public void init(Context context) {
-        CommonSP.init(context);
         MultiProcessSP.init(context);
         Globals.Init(context);
     }

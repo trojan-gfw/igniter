@@ -3,6 +3,7 @@ package io.github.trojan_gfw.igniter;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.VpnService;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
@@ -36,11 +37,12 @@ import io.github.trojan_gfw.igniter.proxy.aidl.ITrojanService;
 import io.github.trojan_gfw.igniter.servers.activity.ServerListActivity;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataManager;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataSource;
-import io.github.trojan_gfw.igniter.tile.ProxyControlActivity;
+import io.github.trojan_gfw.igniter.tile.ProxyHelper;
 
 
 public class MainActivity extends AppCompatActivity implements TrojanConnection.Callback {
     private static final String TAG = "MainActivity";
+    private static final int VPN_REQUEST_CODE = 233;
     private static final int SERVER_LIST_CHOOSE_REQUEST_CODE = 1024;
     private static final int EXEMPT_APP_CONFIGURE_REQUEST_CODE = 2077;
     private static final String CONNECTION_TEST_URL = "https://www.google.com";
@@ -296,10 +298,15 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                     );
                     TrojanHelper.ShowConfig(Globals.getTrojanConfigPath());
                     // start ProxyService
-                    startActivity(ProxyControlActivity.startOrStopProxy(MainActivity.this, true, true));
+                    Intent i = VpnService.prepare(getApplicationContext());
+                    if (i != null) {
+                        startActivityForResult(i, VPN_REQUEST_CODE);
+                    } else {
+                        ProxyHelper.startProxyService(getApplicationContext());
+                    }
                 } else if (proxyState == ProxyService.STARTED) {
                     // stop ProxyService
-                    startActivity(ProxyControlActivity.startOrStopProxy(MainActivity.this, false, true));
+                    ProxyHelper.stopProxyService(getApplicationContext());
                 }
             }
         });
@@ -387,6 +394,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         LogHelper.i(TAG, "onBinderDied");
         connection.disconnect(this);
         // connect the new binder
+        // todo is it necessary to re-connect?
         connection.connect(this, this);
     }
 
@@ -452,6 +460,8 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
             if (ProxyService.STARTED == proxyState) {
                 SnackbarUtils.showTextLong(rootViewGroup, R.string.main_restart_proxy_service_tip);
             }
+        } else if (VPN_REQUEST_CODE == requestCode && RESULT_OK == resultCode) {
+            ProxyHelper.startProxyService(getApplicationContext());
         }
     }
 

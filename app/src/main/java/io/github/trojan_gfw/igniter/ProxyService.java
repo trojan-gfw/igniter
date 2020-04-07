@@ -41,7 +41,7 @@ import tun2socks.Tun2socksStartOptions;
  * test connection and state change. You should call {@link #startForegroundService(Intent)} to start
  * this service and send broadcast with action {@link R.string#stop_service} to shutdown the service.
  * It's recommended to start this service by the help
- * of {@link io.github.trojan_gfw.igniter.tile.ProxyControlActivity}.
+ * of {@link io.github.trojan_gfw.igniter.tile.ProxyHelper}.
  * <br/>
  * If you want to interact withthe service, you should call {@link #bindService(Intent, ServiceConnection, int)}
  * with the action {@link R.string#bind_service}. Then {@link ProxyService} will return a binder
@@ -363,10 +363,14 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
 
         Tun2socks.setLoglevel("info");
         if (enable_clash) {
-            tun2socksStartOptions.setFakeIPRange("255.0.128.1/20");
+            tun2socksStartOptions.setFakeIPStart("255.0.128.1");
+            tun2socksStartOptions.setFakeIPStop("255.0.143.254");
+//            tun2socksStartOptions.setFakeIPRange("255.0.128.1/20");
         } else {
             // Disable go-tun2socks fake ip
-            tun2socksStartOptions.setFakeIPRange("");
+            tun2socksStartOptions.setFakeIPStart("");
+            tun2socksStartOptions.setFakeIPStop("");
+//            tun2socksStartOptions.setFakeIPRange("");
         }
         Tun2socks.start(tun2socksStartOptions);
         LogHelper.i(TAG, tun2socksStartOptions.toString());
