@@ -37,7 +37,7 @@
             android:directBootAware="true"
             android:exported="false"
             tools:targetApi="N"
-            android:process=":tools">
+            android:process=":proxy">
             <intent-filter>
                 <action android:name="android.net.VpnService" />
                 <action android:name="io.github.trojan_gfw.igniter.STOP_SERVICE" />
@@ -57,16 +57,6 @@
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
         </service>
-
-        <activity
-            android:name=".tile.ProxyControlActivity"
-            android:launchMode="singleInstance"
-            android:process=":tools"
-            android:theme="@style/Theme.AppCompat.Translucent">
-            <intent-filter>
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>
