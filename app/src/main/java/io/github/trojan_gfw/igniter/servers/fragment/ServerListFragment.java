@@ -2,18 +2,28 @@ package io.github.trojan_gfw.igniter.servers.fragment;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -29,7 +39,6 @@ import io.github.trojan_gfw.igniter.servers.activity.ServerListActivity;
 import io.github.trojan_gfw.igniter.servers.contract.ServerListContract;
 
 public class ServerListFragment extends BaseFragment implements ServerListContract.View {
-    private static final int REQUEST_READ_PERMISSION_CODE = 115;
     private static final int FILE_IMPORT_REQUEST_CODE = 120;
     private static final int SCAN_QR_CODE_REQUEST_CODE = 110;
     private static final int REQUEST_CAMERA_CODE = 114;
@@ -38,6 +47,7 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
     private ServerListContract.Presenter mPresenter;
     private RecyclerView mServerListRv;
     private ServerListAdapter mServerListAdapter;
+    private Dialog mImportConfigDialog;
 
     public ServerListFragment() {
         // Required empty public constructor
@@ -68,6 +78,11 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
     }
 
     private void initViews() {
+        FragmentActivity activity = getActivity();
+        if (activity instanceof AppCompatActivity) {
+            ((AppCompatActivity) activity).setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
+            setHasOptionsMenu(true);
+        }
         mServerListRv.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
         mServerListAdapter = new ServerListAdapter(getContext(), new ArrayList<TrojanConfig>());
         mServerListRv.setAdapter(mServerListAdapter);
@@ -149,12 +164,6 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
             } else {
                 Toast.makeText(getContext(), R.string.server_list_lack_of_camera_permission, Toast.LENGTH_SHORT).show();
             }
-        } else if (REQUEST_READ_PERMISSION_CODE == requestCode) {
-            if (PackageManager.PERMISSION_GRANTED == grantResults[0]) {
-                openFileChooser();
-            } else {
-                Toast.makeText(getContext(), R.string.server_list_lack_of_read_permission, Toast.LENGTH_SHORT).show();
-            }
         }
     }
 
@@ -169,20 +178,70 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
         }
     }
 
-    private void openFileChooser() {
+
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.clear();
+        inflater.inflate(R.menu.menu_server_list, menu);
+        MenuItem item = menu.getItem(0);
+        // Tint scan QRCode icon to white.
+        if (item.getIcon() != null) {
+            Drawable drawable = item.getIcon();
+            Drawable wrapper = DrawableCompat.wrap(drawable);
+            drawable.mutate();
+            DrawableCompat.setTint(wrapper, ContextCompat.getColor(mContext, android.R.color.white));
+            item.setIcon(drawable);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_scan_qr_code:
+                mPresenter.gotoScanQRCode();
+                return true;
+            case R.id.action_import_from_file:
+                mPresenter.displayImportFileDescription();
+                return true;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void showImportFileDescription() {
+        mImportConfigDialog = new AlertDialog.Builder(mContext).setTitle(R.string.common_alert)
+                .setMessage(R.string.server_list_import_file_desc)
+                .setPositiveButton(R.string.common_confirm, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mPresenter.importConfigFromFile();
+                    }
+                }).setNegativeButton(R.string.common_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mPresenter.hideImportFileDescription();
+                    }
+                }).create();
+        mImportConfigDialog.show();
+    }
+
+    @Override
+    public void dismissImportFileDescription() {
+        if (mImportConfigDialog != null && mImportConfigDialog.isShowing()) {
+            mImportConfigDialog.dismiss();
+            mImportConfigDialog = null;
+        }
+    }
+
+    @Override
+    public void openFileChooser() {
         Intent intent = new Intent()
                 .setType("text/plain")
                 .setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, getString(R.string.server_list_file_chooser_msg)), FILE_IMPORT_REQUEST_CODE);
-    }
-
-    @Override
-    public void importConfigFromFile() {
-        if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            openFileChooser();
-        } else {
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_PERMISSION_CODE);
-        }
     }
 
     @Override

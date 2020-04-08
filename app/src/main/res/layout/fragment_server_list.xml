@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".servers.fragment.ServerListFragment">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="@style/CommonToolBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/top_bar_height"
+        tools:ignore="MissingConstraints"  />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/serverListRv"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
 
-</FrameLayout>
+</android.support.constraint.ConstraintLayout>
