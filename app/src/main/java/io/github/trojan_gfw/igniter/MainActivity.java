@@ -514,6 +514,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                     passwordText.setText(ins.getPassword());
                     ipv6Switch.setChecked(ins.getEnableIpv6());
                     verifySwitch.setChecked(ins.getVerifyCert());
+                    remoteAddrText.setSelection(remoteAddrText.length());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
