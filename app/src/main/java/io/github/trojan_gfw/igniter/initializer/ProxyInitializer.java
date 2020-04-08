@@ -6,14 +6,12 @@ import io.github.trojan_gfw.igniter.Globals;
 import io.github.trojan_gfw.igniter.LogHelper;
 import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.TrojanHelper;
-import io.github.trojan_gfw.igniter.common.os.CommonSP;
 
 public class ProxyInitializer extends Initializer {
     private static final String TAG = "ProxyInitializer";
 
     @Override
     public void init(Context context) {
-        CommonSP.init(context);
         Globals.Init(context);
         TrojanConfig cacheConfig = TrojanHelper.readTrojanConfig(Globals.getTrojanConfigPath());
         if (cacheConfig == null) {

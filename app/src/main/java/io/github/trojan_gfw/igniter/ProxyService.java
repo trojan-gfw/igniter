@@ -203,7 +203,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
 
     private Set<String> getExemptAppPackageNames() {
         if (mExemptAppDataSource == null) {
-            mExemptAppDataSource = new ExemptAppDataManager(getPackageManager());
+            mExemptAppDataSource = new ExemptAppDataManager(getApplicationContext());
         }
         // ensures that new exempted app list can be applied on proxy after modification.
         return mExemptAppDataSource.loadExemptAppPackageNameSet();

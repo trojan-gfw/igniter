@@ -1,52 +1,100 @@
 package io.github.trojan_gfw.igniter.exempt.data;
 
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import io.github.trojan_gfw.igniter.common.os.CommonSP;
-
+/**
+ * Implementation of {@link ExemptAppDataSource}. This class reads and writes exempted app list in a
+ * file named {@link #EXEMPT_APP_LIST_FILE_NAME} under {@link Context#getFilesDir()}. The exempted app
+ * package names will be written line by line in the file.
+ * <br/>
+ * Example:
+ * <br/>
+ * com.google.playstore
+ * <br/>
+ * io.github.trojan_gfw.igniter
+ * <br/>
+ * com.android.something
+ */
 public class ExemptAppDataManager implements ExemptAppDataSource {
+    private static final String EXEMPT_APP_LIST_FILE_NAME = "exempt_list";
     private final PackageManager mPackageManager;
+    private final String mExemptAppListFilePath;
 
-    public ExemptAppDataManager(PackageManager packageManager) {
+    public ExemptAppDataManager(Context context) {
         super();
-        mPackageManager = packageManager;
+        mPackageManager = context.getPackageManager();
+        String dir = context.getFilesDir().getAbsolutePath();
+        if (dir.endsWith(File.separator)) {
+            mExemptAppListFilePath = dir + EXEMPT_APP_LIST_FILE_NAME;
+        } else {
+            mExemptAppListFilePath = dir + File.separator + EXEMPT_APP_LIST_FILE_NAME;
+        }
     }
 
     @Override
     public void saveExemptAppInfoSet(Set<String> exemptAppPackageNames) {
-        JSONArray jsonArray = new JSONArray();
-        for (String name : exemptAppPackageNames) {
-            jsonArray.put(name);
+        File file = new File(mExemptAppListFilePath);
+        if (file.exists()) {
+            file.delete();
         }
-        CommonSP.setExemptAppListConfig(jsonArray.toString());
+        if (exemptAppPackageNames == null || exemptAppPackageNames.isEmpty()) {
+            return;
+        }
+        try (FileOutputStream fos = new FileOutputStream(file);
+             OutputStreamWriter osw = new OutputStreamWriter(fos);
+             BufferedWriter bw = new BufferedWriter(osw)) {
+            for (String name : exemptAppPackageNames) {
+                bw.write(name);
+                bw.write('\n');
+            }
+            bw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @NonNull
+    private Set<String> readExemptAppListConfig() {
+        File file = new File(mExemptAppListFilePath);
+        Set<String> exemptAppSet = new HashSet<>();
+        if (!file.exists()) {
+            return exemptAppSet;
+        }
+        try (FileInputStream fis = new FileInputStream(file);
+             InputStreamReader isr = new InputStreamReader(fis);
+             BufferedReader reader = new BufferedReader(isr)) {
+            String tmp = reader.readLine();
+            while (!TextUtils.isEmpty(tmp)) {
+                exemptAppSet.add(tmp);
+                tmp = reader.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return exemptAppSet;
     }
 
     @Override
     public Set<String> loadExemptAppPackageNameSet() {
-        String config = CommonSP.getExemptAppListConfig(null);
-        Set<String> exemptAppPackageNames = new HashSet<>();
-        if (null == config) {
-            return exemptAppPackageNames;
-        }
-        try {
-            JSONArray jsonArray = new JSONArray(config);
-            for (int i = jsonArray.length() - 1; i >= 0; i--) {
-                String packageName = jsonArray.optString(i);
-                exemptAppPackageNames.add(packageName);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        Set<String> exemptAppPackageNames = readExemptAppListConfig();
         // filter uninstalled apps
         List<ApplicationInfo> applicationInfoList = queryCurrentInstalledApps();
         Set<String> installedAppPackageNames = new HashSet<>();
