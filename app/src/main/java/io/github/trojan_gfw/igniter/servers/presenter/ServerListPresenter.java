@@ -34,8 +34,18 @@ public class ServerListPresenter implements ServerListContract.Presenter {
     }
 
     @Override
+    public void hideImportFileDescription() {
+        mView.dismissImportFileDescription();
+    }
+
+    @Override
+    public void displayImportFileDescription() {
+        mView.showImportFileDescription();
+    }
+
+    @Override
     public void importConfigFromFile() {
-        mView.importConfigFromFile();
+        mView.openFileChooser();
     }
 
     @Override

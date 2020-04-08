@@ -8,14 +8,10 @@
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/exemptAppTopBar"
-        app:titleTextColor="@android:color/white"
-        android:background="@color/colorPrimary"
-        app:subtitleTextColor="@android:color/white"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        style="@style/CommonToolBar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/top_bar_height" />
+        android:layout_height="@dimen/top_bar_height"
+        tools:ignore="MissingConstraints" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/exemptAppRv"
