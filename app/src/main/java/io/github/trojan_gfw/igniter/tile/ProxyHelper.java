@@ -36,7 +36,7 @@ public abstract class ProxyHelper {
     }
 
     public static boolean isVPNServiceConsented(Context context) {
-        return VpnService.prepare(context.getApplicationContext()) != null;
+        return VpnService.prepare(context.getApplicationContext()) == null;
     }
 
     public static void startProxyService(Context context) {
