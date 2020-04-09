@@ -12,7 +12,7 @@ dns:
   enable: false
   listen: 0.0.0.0:0  # the DNS server in clash is actually not used, turn it off
   enhanced-mode: fake-ip
-  fake-ip-range: 255.0.128.1/20 # 255.0.128.1  - 255.0.143.254
+  fake-ip-range: 198.18.0.1/16
   nameserver:
     - 114.114.114.114  # not used, just a placeholder
 

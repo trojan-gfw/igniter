@@ -296,8 +296,9 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
                 String[] parts = route.split("/", 2);
                 b.addRoute(parts[0], Integer.parseInt(parts[1]));
             }
-            // fake ip range for clash
-            b.addRoute("255.0.128.0", 20);
+            // fake ip range for go-tun2socks
+            // should match clash configuration
+            b.addRoute("198.18.0.0", 16);
         } else {
             b.addRoute("0.0.0.0", 0);
         }
@@ -369,7 +370,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
 
         Tun2socks.setLoglevel("info");
         if (enable_clash) {
-            tun2socksStartOptions.setFakeIPRange("255.0.128.1/20");
+            tun2socksStartOptions.setFakeIPRange("198.18.0.1/16");
         } else {
             // Disable go-tun2socks fake ip
             tun2socksStartOptions.setFakeIPRange("");
