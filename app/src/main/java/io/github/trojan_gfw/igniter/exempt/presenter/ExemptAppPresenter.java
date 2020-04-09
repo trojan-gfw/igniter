@@ -1,5 +1,8 @@
 package io.github.trojan_gfw.igniter.exempt.presenter;
 
+import android.text.TextUtils;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -16,6 +19,7 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
     private final ExemptAppDataSource mDataSource;
     private boolean mDirty;
     private boolean mConfigurationChanged;
+    private List<AppInfo> mAllAppInfoList;
     private Set<String> mExemptAppPackageNameSet;
 
     public ExemptAppPresenter(ExemptAppContract.View view, ExemptAppDataSource dataSource) {
@@ -37,6 +41,31 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
             mExemptAppPackageNameSet.add(packageName);
         }
         appInfo.setExempt(exempt);
+    }
+
+    @Override
+    public void filterAppsByName(final String name) {
+        if (TextUtils.isEmpty(name)) {
+            mView.showAppList(mAllAppInfoList);
+            return;
+        }
+        Threads.instance().runOnWorkThread(new Task() {
+            @Override
+            public void onRun() {
+                final List<AppInfo> tmpInfoList = new ArrayList<>();
+                for (AppInfo appInfo : mAllAppInfoList) {
+                    if (appInfo.getAppName().contains(name)) {
+                        tmpInfoList.add(appInfo);
+                    }
+                }
+                Threads.instance().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mView.showAppList(tmpInfoList);
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -99,6 +128,7 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
                         return o1.getAppName().compareTo(o2.getAppName());
                     }
                 });
+                mAllAppInfoList = allAppInfoList;
                 Threads.instance().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

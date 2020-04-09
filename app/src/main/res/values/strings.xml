@@ -66,6 +66,7 @@
 
     <string name="menu_action_exempt_app_save">Save</string>
     <string name="menu_action_exempt_app">Exempt Apps</string>
+    <string name="exempt_app_search_title">Search Apps</string>
     <string name="exempt_app_exit">Exit</string>
     <string name="exempt_app_exit_confirm">Are you sure to exit without save?</string>
     <string name="exempt_app_loading_tip">Loading…</string>

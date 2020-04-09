@@ -20,6 +20,8 @@ public interface ExemptAppContract {
          */
         boolean handleBackPressed();
 
+        void filterAppsByName(String name);
+
         void exit();
     }
 
