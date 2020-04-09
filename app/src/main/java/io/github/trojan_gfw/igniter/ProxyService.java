@@ -122,6 +122,11 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         }
 
         @Override
+        public void showDevelopInfoInLogcat() {
+            LogHelper.showDevelopInfoInLogcat();
+        }
+
+        @Override
         public void registerCallback(ITrojanServiceCallback callback) {
             LogHelper.i(TAG, "IBinder registerCallback#");
             mCallbackList.register(callback);

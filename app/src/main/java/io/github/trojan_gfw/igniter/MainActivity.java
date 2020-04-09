@@ -448,6 +448,21 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         }
     }
 
+    /**
+     * Show develop info in Logcat by invoking {@link ITrojanService#showDevelopInfoInLogcat}. Since {@link ITrojanService}
+     * is from remote process, a {@link RemoteException} might be thrown.
+     */
+    private void showDevelopInfoInLogcat() {
+        ITrojanService service = trojanService;
+        if (service != null) {
+            try {
+                service.showDevelopInfoInLogcat();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void clearEditTextFocus() {
         remoteAddrText.clearFocus();
         remotePortText.clearFocus();
@@ -511,8 +526,10 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 testConnection();
                 return true;
             case R.id.action_show_develop_info_logcat:
-                util.Util.logGoRoutineCount();
-                util.Util.logGoroutineStackTrace();
+                // log of this process
+                LogHelper.showDevelopInfoInLogcat();
+                // log of other processes
+                showDevelopInfoInLogcat();
                 return true;
             case R.id.action_view_server_list:
                 clearEditTextFocus();
