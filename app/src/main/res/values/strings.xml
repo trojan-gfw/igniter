@@ -49,6 +49,14 @@
     <string name="main_save_success">@string/common_save_success</string>
     <string name="main_save_failed">Save failed</string>
 
+    <string name="main_write_external_storage_permission_requirement">
+        Igniter needs to read and write external storage for reading or writing exempted app
+        list, which is recoverable even when Igniter is uninstalled. Denying the permission
+        will deactivate exempted app feature.
+    </string>
+    <string name="main_exempt_feature_permission_requirement">
+        Please grant read and write external storage permission in Igniter application settings first.
+    </string>
     <string name="main_menu_server_list">Server List</string>
 
     <string name="scan_qr_code_success">Add server success</string>
