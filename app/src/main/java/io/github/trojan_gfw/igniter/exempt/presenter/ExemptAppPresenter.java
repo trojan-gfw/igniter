@@ -96,7 +96,7 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
                         if (o1.isExempt() != o2.isExempt()) {
                             return o1.isExempt() ? -1 : 1;
                         }
-                        return 0;
+                        return o1.getAppName().compareTo(o2.getAppName());
                     }
                 });
                 Threads.instance().runOnUiThread(new Runnable() {
