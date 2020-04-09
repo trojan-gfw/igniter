@@ -22,8 +22,7 @@ import java.util.Set;
 
 /**
  * Implementation of {@link ExemptAppDataSource}. This class reads and writes exempted app list in a
- * file named {@link #EXEMPT_APP_LIST_FILE_NAME} under {@link Context#getFilesDir()}. The exempted app
- * package names will be written line by line in the file.
+ * file. The exempted app package names will be written line by line in the file.
  * <br/>
  * Example:
  * <br/>
@@ -34,19 +33,13 @@ import java.util.Set;
  * com.android.something
  */
 public class ExemptAppDataManager implements ExemptAppDataSource {
-    private static final String EXEMPT_APP_LIST_FILE_NAME = "exempt_list";
     private final PackageManager mPackageManager;
     private final String mExemptAppListFilePath;
 
-    public ExemptAppDataManager(Context context) {
+    public ExemptAppDataManager(Context context, String exemptAppListFilePath) {
         super();
         mPackageManager = context.getPackageManager();
-        String dir = context.getFilesDir().getAbsolutePath();
-        if (dir.endsWith(File.separator)) {
-            mExemptAppListFilePath = dir + EXEMPT_APP_LIST_FILE_NAME;
-        } else {
-            mExemptAppListFilePath = dir + File.separator + EXEMPT_APP_LIST_FILE_NAME;
-        }
+        mExemptAppListFilePath = exemptAppListFilePath;
     }
 
     @Override
@@ -57,6 +50,10 @@ public class ExemptAppDataManager implements ExemptAppDataSource {
         }
         if (exemptAppPackageNames == null || exemptAppPackageNames.isEmpty()) {
             return;
+        }
+        File dir = file.getParentFile();
+        if (!dir.exists()) {
+            dir.mkdirs();
         }
         try (FileOutputStream fos = new FileOutputStream(file);
              OutputStreamWriter osw = new OutputStreamWriter(fos);

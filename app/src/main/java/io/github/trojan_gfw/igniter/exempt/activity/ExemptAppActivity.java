@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.view.Window;
 
+import io.github.trojan_gfw.igniter.Globals;
 import io.github.trojan_gfw.igniter.R;
 import io.github.trojan_gfw.igniter.common.app.BaseAppCompatActivity;
 import io.github.trojan_gfw.igniter.exempt.contract.ExemptAppContract;
@@ -30,7 +31,8 @@ public class ExemptAppActivity extends BaseAppCompatActivity {
         if (fragment == null) {
             fragment = ExemptAppFragment.newInstance();
         }
-        mPresenter = new ExemptAppPresenter(fragment, new ExemptAppDataManager(getApplicationContext()));
+        mPresenter = new ExemptAppPresenter(fragment, new ExemptAppDataManager(getApplicationContext(),
+                Globals.getExemptedAppListPath()));
         fm.beginTransaction()
                 .replace(R.id.parent_fl, fragment, ExemptAppFragment.TAG)
                 .commitAllowingStateLoss();
