@@ -3,7 +3,7 @@ package io.github.trojan_gfw.igniter.servers.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
+import androidx.fragment.app.FragmentManager;
 
 import io.github.trojan_gfw.igniter.Globals;
 import io.github.trojan_gfw.igniter.R;

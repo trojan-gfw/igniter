@@ -17,15 +17,14 @@ import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
-import android.support.annotation.IntDef;
-import android.support.v4.app.NotificationCompat;
+import androidx.annotation.IntDef;
+import androidx.core.app.NotificationCompat;
 
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 import clash.Clash;

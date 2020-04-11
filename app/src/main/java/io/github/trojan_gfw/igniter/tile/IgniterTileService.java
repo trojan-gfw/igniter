@@ -5,8 +5,8 @@ import android.os.Build;
 import android.os.RemoteException;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import io.github.trojan_gfw.igniter.LogHelper;
 import io.github.trojan_gfw.igniter.MainActivity;

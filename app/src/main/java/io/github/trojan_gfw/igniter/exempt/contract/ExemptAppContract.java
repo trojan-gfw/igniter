@@ -1,7 +1,7 @@
 package io.github.trojan_gfw.igniter.exempt.contract;
 
-import android.support.annotation.AnyThread;
-import android.support.annotation.UiThread;
+import androidx.annotation.AnyThread;
+import androidx.annotation.UiThread;
 
 import java.util.List;
 

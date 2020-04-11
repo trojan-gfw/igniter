@@ -22,7 +22,7 @@
     </style>
 
     <style name="ToolBarTheme" parent="AppTheme">
-        <item name="colorControlNormal">@android:color/white</item>
+        <item name="android:colorControlNormal">@android:color/white</item>
     </style>
 
     <style name="CommonToolBar">
@@ -43,8 +43,8 @@
 
     <style name="PrimaryFlatButton" parent="Theme.AppCompat.Light">
         <item name="android:buttonStyle">@style/Widget.AppCompat.Button.Borderless.Colored</item>
-        <item name="colorControlHighlight">@color/colorAccent</item>
-        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="android:colorControlHighlight">@color/colorAccent</item>
+        <item name="android:colorAccent">@color/colorPrimary</item>
     </style>
 
     <style name="CommonListItemLayout">

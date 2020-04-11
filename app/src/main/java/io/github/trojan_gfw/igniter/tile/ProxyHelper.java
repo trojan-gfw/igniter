@@ -3,7 +3,7 @@ package io.github.trojan_gfw.igniter.tile;
 import android.content.Context;
 import android.content.Intent;
 import android.net.VpnService;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 
 import io.github.trojan_gfw.igniter.BuildConfig;
 import io.github.trojan_gfw.igniter.Globals;

@@ -6,7 +6,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="200dp">
 
-    <android.support.v4.widget.ContentLoadingProgressBar
+    <androidx.core.widget.ContentLoadingProgressBar
         android:id="@+id/dialogLoadingPb"
         style="?android:attr/progressBarStyleLarge"
         android:layout_centerInParent="true"

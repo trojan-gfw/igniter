@@ -1,7 +1,7 @@
 package io.github.trojan_gfw.igniter.connection;
 
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.lang.ref.WeakReference;
 import java.net.InetSocketAddress;
