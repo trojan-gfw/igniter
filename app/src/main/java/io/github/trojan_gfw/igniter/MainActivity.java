@@ -368,9 +368,11 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
 
                 final CharSequence clipboardText = mClipboardManager.getPrimaryClip().getItemAt(0).getText();
                 // check scheme
-                if (!"trojan".equals(Uri.parse(clipboardText.toString()).getScheme())) {
+                TrojanConfig config = TrojanURLHelper.ParseTrojanURL(clipboardText.toString());
+                if (config == null) {
                     return;
                 }
+
                 // show once if trojan url
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     mClipboardManager.clearPrimaryClip();
