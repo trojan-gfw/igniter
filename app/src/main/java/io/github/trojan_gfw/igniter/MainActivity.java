@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.RemoteException;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -67,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     private TextView clashLink;
     private Button startStopButton;
     private EditText trojanURLText;
-    private Handler mHandler = new Handler();
     private @ProxyService.ProxyState
     int proxyState = ProxyService.STATE_NONE;
     private final TrojanConnection connection = new TrojanConnection(false);
@@ -355,8 +353,11 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     protected void onResume() {
         super.onResume();
 
-        // use handler to getPrimaryClip
-        mHandler.post(new Runnable() {
+        detectClipboard();
+    }
+
+    private void detectClipboard() {
+        Threads.instance().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 ClipboardManager mClipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
