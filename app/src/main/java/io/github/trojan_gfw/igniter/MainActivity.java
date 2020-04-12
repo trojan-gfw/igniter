@@ -353,10 +353,10 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     protected void onResume() {
         super.onResume();
 
-        detectClipboard();
+        checkTrojanURLFromClipboard();
     }
 
-    private void detectClipboard() {
+    private void checkTrojanURLFromClipboard() {
         Threads.instance().runOnUiThread(new Runnable() {
             @Override
             public void run() {
