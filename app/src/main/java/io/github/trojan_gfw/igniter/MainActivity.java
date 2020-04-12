@@ -273,6 +273,10 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                     ins.setRemoteAddr(remoteAddress);
                     ins.setRemotePort(remotePort);
                     ins.setPassword(password);
+
+                    passwordText.setText(password);
+                    remotePortText.setText(String.valueOf(remotePort));
+                    remoteAddrText.setText(remoteAddress);
                 }
                 endUpdates();
             }
