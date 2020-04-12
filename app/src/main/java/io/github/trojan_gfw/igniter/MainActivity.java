@@ -3,10 +3,14 @@ package io.github.trojan_gfw.igniter;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ClipboardManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.net.VpnService;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.RemoteException;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -63,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     private TextView clashLink;
     private Button startStopButton;
     private EditText trojanURLText;
+    private Handler mHandler = new Handler();
     private @ProxyService.ProxyState
     int proxyState = ProxyService.STATE_NONE;
     private final TrojanConnection connection = new TrojanConnection(false);
@@ -340,6 +345,44 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 .shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             requestReadWriteExternalStoragePermission();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // use handler to getPrimaryClip
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                ClipboardManager mClipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                // check clipboard
+                if (!mClipboardManager.hasPrimaryClip() || mClipboardManager.getPrimaryClip().getItemCount() == 0) {
+                    return;
+                }
+
+                final CharSequence clipboardText = mClipboardManager.getPrimaryClip().getItemAt(0).getText();
+                // check scheme
+                if (!"trojan".equals(Uri.parse(clipboardText.toString()).getScheme())) {
+                    return;
+                }
+                // show once if trojan url
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    mClipboardManager.clearPrimaryClip();
+                }
+                new AlertDialog.Builder(MainActivity.this)
+                        .setMessage(R.string.clipboard_import_tip)
+                        .setPositiveButton(R.string.common_confirm, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                trojanURLText.setText(clipboardText);
+                            }
+                        })
+                        .setNegativeButton(R.string.common_cancel, null)
+                        .create()
+                        .show();
+            }
+        });
     }
 
     private void requestReadWriteExternalStoragePermission() {

@@ -30,6 +30,7 @@
     <string name="notification_channel_description">Igniter notifications channel</string>
     <string name="notification_starting_service">Starting service</string>
     <string name="main_restart_proxy_service_tip">Restart proxy yourself to apply new exempt apps configuration.</string>
+    <string name="clipboard_import_tip">Do you want to import the Trojan URL you just copied?</string>
 
     <string name="tile_on">Igniter ON</string>
     <string name="tile_starting">Igniter STARTING</string>
