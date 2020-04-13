@@ -53,8 +53,9 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
             @Override
             public void onRun() {
                 final List<AppInfo> tmpInfoList = new ArrayList<>();
+                final String lowercaseName = name.toLowerCase();
                 for (AppInfo appInfo : mAllAppInfoList) {
-                    if (appInfo.getAppName().contains(name)) {
+                    if (appInfo.getAppNameInLowercase().contains(lowercaseName)) {
                         tmpInfoList.add(appInfo);
                     }
                 }

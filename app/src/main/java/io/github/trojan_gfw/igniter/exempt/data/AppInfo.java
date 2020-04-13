@@ -4,12 +4,21 @@ import android.graphics.drawable.Drawable;
 
 public class AppInfo implements Cloneable {
     private String appName;
+    private String appNameInLowercase;
     private Drawable icon;
     private String packageName;
     private boolean exempt;
 
     public String getAppName() {
         return appName;
+    }
+
+    public String getAppNameInLowercase() {
+        if (appNameInLowercase == null) {
+            // lazy loading.
+            appNameInLowercase = appName.toLowerCase();
+        }
+        return appNameInLowercase;
     }
 
     public void setAppName(String appName) {
