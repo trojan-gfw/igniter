@@ -6,16 +6,10 @@ import android.app.Activity;
 import android.content.ClipboardManager;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +22,12 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -360,13 +360,16 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         Threads.instance().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                ClipboardManager mClipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
                 // check clipboard
-                if (!mClipboardManager.hasPrimaryClip() || mClipboardManager.getPrimaryClip().getItemCount() == 0) {
+                if (!clipboardManager.hasPrimaryClip() || clipboardManager.getPrimaryClip().getItemCount() == 0) {
                     return;
                 }
 
-                final CharSequence clipboardText = mClipboardManager.getPrimaryClip().getItemAt(0).getText();
+                final CharSequence clipboardText = clipboardManager.getPrimaryClip().getItemAt(0).getText();
+                if (clipboardText == null) {
+                    return;
+                }
                 // check scheme
                 TrojanConfig config = TrojanURLHelper.ParseTrojanURL(clipboardText.toString());
                 if (config == null) {
@@ -375,7 +378,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
 
                 // show once if trojan url
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    mClipboardManager.clearPrimaryClip();
+                    clipboardManager.clearPrimaryClip();
                 }
                 new AlertDialog.Builder(MainActivity.this)
                         .setMessage(R.string.clipboard_import_tip)
