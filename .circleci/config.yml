@@ -35,15 +35,3 @@ jobs:
       - store_artifacts:
           path: app/build/outputs/apk/
           destination: apks/
-      - deploy:
-          name: "Deploy Igniter🐎"
-          command: |
-            echo "Branch: ${CIRCLE_BRANCH} , PR: ${CIRCLE_PULL_REQUEST}"
-            if [ "${CIRCLE_BRANCH}" == "develop" -o "${CIRCLE_PULL_REQUEST}" != "" ]; then
-              ./gradlew crashlyticsUploadDistributionDevelopmentRelease --stacktrace --debug --no-daemon
-            fi
-
-            release=$(cut -c-7 <<< "${CIRCLE_BRANCH}")
-            if [ "$release" == "release"]; then
-              ./gradlew crashlyticsUploadDistributionProductionRelease --stacktrace --debug --no-daemon
-            fi
