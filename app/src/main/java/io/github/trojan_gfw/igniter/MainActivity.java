@@ -3,6 +3,7 @@ package io.github.trojan_gfw.igniter;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -361,15 +362,12 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
             @Override
             public void run() {
                 ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipData clipData = clipboardManager.getPrimaryClip();
                 // check clipboard
-                if (!clipboardManager.hasPrimaryClip() || clipboardManager.getPrimaryClip().getItemCount() == 0) {
+                if (clipData == null || clipData.getItemCount() == 0) {
                     return;
                 }
-
-                final CharSequence clipboardText = clipboardManager.getPrimaryClip().getItemAt(0).getText();
-                if (clipboardText == null) {
-                    return;
-                }
+                final CharSequence clipboardText = clipData.getItemAt(0).coerceToText(MainActivity.this);
                 // check scheme
                 TrojanConfig config = TrojanURLHelper.ParseTrojanURL(clipboardText.toString());
                 if (config == null) {
