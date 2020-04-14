@@ -28,4 +28,9 @@
         android:orderInCategory="100"
         android:title="@string/action_show_develop_info_logcat"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_share_link"
+        android:icon="@drawable/ic_action_link"
+        android:title="@string/action_sharelink"
+        app:showAsAction="ifRoom" />
 </menu>

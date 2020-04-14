@@ -73,4 +73,5 @@
     <string name="exempt_app_loading_tip">Loading…</string>
     <string name="exempt_app_exit_without_saving_confirm">Exit without saving exempt app list?</string>
     <string name="action_save_profile">Save Server</string>
+    <string name="action_sharelink">Share Link</string>
 </resources>
