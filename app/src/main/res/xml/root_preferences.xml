@@ -1,0 +1,31 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/about_header">
+
+        <Preference
+            app:summary="https://github.com/trojan-gfw/igniter"
+            app:title="Project Page" />
+        <Preference
+            app:summary="Trojan-GFW"
+            app:title="@string/author_title" />
+        <Preference
+            app:summary="@string/versionName"
+            app:title="@string/version_title" />
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/credits_header">
+
+        <Preference
+            app:summary="https://github.com/Dreamacro/clash"
+            app:title="@string/credit_item1_title" />
+
+        <Preference
+            app:summary="https://github.com/eycorsican/go-tun2socks"
+            app:title="@string/credit_item2_title" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

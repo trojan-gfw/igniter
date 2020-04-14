@@ -21,6 +21,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -259,10 +260,18 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         builder.setTitle("Trojan URL");
 
         trojanURLText = new EditText(this);
+
         trojanURLText.setInputType(InputType.TYPE_CLASS_TEXT);
+        trojanURLText.setSingleLine(false);
         trojanURLText.setSelectAllOnFocus(true);
 
-        builder.setView(trojanURLText);
+        FrameLayout container = new FrameLayout(this);
+        FrameLayout.LayoutParams params = new  FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        trojanURLText.setLayoutParams(params);
+        container.addView(trojanURLText);
+        builder.setView(container);
 
         builder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
             @Override
@@ -579,6 +588,10 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
             case R.id.action_view_server_list:
                 clearEditTextFocus();
                 startActivityForResult(ServerListActivity.create(MainActivity.this), SERVER_LIST_CHOOSE_REQUEST_CODE);
+                return true;
+            case R.id.action_about:
+                clearEditTextFocus();
+                startActivity(AboutActivity.create(MainActivity.this));
                 return true;
             case R.id.action_share_link:
                 trojanURLText.setText(shareLink);

@@ -9,4 +9,5 @@
     <dimen name="main_btn_margin">16dp</dimen>
 
     <dimen name="exempt_app_icon_size">40dp</dimen>
+    <dimen name="dialog_margin">20dp</dimen>
 </resources>

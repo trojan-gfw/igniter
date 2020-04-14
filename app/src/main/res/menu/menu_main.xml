@@ -33,4 +33,8 @@
         android:icon="@drawable/ic_action_link"
         android:title="@string/action_sharelink"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_about"
+        android:orderInCategory="100"
+        android:title="@string/action_about" />
 </menu>
