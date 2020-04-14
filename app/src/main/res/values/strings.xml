@@ -58,7 +58,7 @@
     <string name="main_exempt_feature_permission_requirement">
         Please grant read and write external storage permission in Igniter application settings first.
     </string>
-    <string name="main_menu_server_list">Server List</string>
+    <string name="main_menu_server_list">Load Server</string>
 
     <string name="scan_qr_code_success">Add server success</string>
     <string name="scan_qr_code_failed">Cannot recognize trojanURL: %s</string>
@@ -72,4 +72,5 @@
     <string name="exempt_app_exit_confirm">Are you sure to exit without save?</string>
     <string name="exempt_app_loading_tip">Loading…</string>
     <string name="exempt_app_exit_without_saving_confirm">Exit without saving exempt app list?</string>
+    <string name="action_save_profile">Save Server</string>
 </resources>

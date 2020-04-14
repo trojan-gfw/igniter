@@ -178,7 +178,6 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rootViewGroup = findViewById(R.id.rootScrollView);
-        Button saveServerIb = findViewById(R.id.saveConfigBtn);
         remoteAddrText = findViewById(R.id.remoteAddrText);
         remotePortText = findViewById(R.id.remotePortText);
         passwordText = findViewById(R.id.passwordText);
@@ -322,24 +321,6 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                     // stop ProxyService
                     ProxyHelper.stopProxyService(getApplicationContext());
                 }
-            }
-        });
-        saveServerIb.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!Globals.getTrojanConfigInstance().isValidRunningConfig()) {
-                    Toast.makeText(MainActivity.this, R.string.invalid_configuration, Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                Threads.instance().runOnWorkThread(new Task() {
-                    @Override
-                    public void onRun() {
-                        TrojanConfig config = Globals.getTrojanConfigInstance();
-                        TrojanHelper.WriteTrojanConfig(config, Globals.getTrojanConfigPath());
-                        serverListDataManager.saveServerConfig(config);
-                        showSaveConfigResult(true);
-                    }
-                });
             }
         });
         serverListDataManager = new ServerListDataManager(Globals.getTrojanConfigListPath());
@@ -581,6 +562,21 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 LogHelper.showDevelopInfoInLogcat();
                 // log of other processes
                 showDevelopInfoInLogcat();
+                return true;
+            case R.id.action_save_profile:
+                if (!Globals.getTrojanConfigInstance().isValidRunningConfig()) {
+                    Toast.makeText(MainActivity.this, R.string.invalid_configuration, Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                Threads.instance().runOnWorkThread(new Task() {
+                    @Override
+                    public void onRun() {
+                        TrojanConfig config = Globals.getTrojanConfigInstance();
+                        TrojanHelper.WriteTrojanConfig(config, Globals.getTrojanConfigPath());
+                        serverListDataManager.saveServerConfig(config);
+                        showSaveConfigResult(true);
+                    }
+                });
                 return true;
             case R.id.action_view_server_list:
                 clearEditTextFocus();
