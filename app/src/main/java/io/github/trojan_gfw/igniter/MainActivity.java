@@ -273,9 +273,12 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                     ins.setRemotePort(remotePort);
                     ins.setPassword(password);
 
-                    passwordText.setText(password);
-                    remotePortText.setText(String.valueOf(remotePort));
-                    remoteAddrText.setText(remoteAddress);
+                    if (!passwordText.hasFocus())
+                        passwordText.setText(password);
+                    if (!remotePortText.hasFocus())
+                        remotePortText.setText(String.valueOf(remotePort));
+                    if (!remoteAddrText.hasFocus())
+                        remoteAddrText.setText(remoteAddress);
                 }
                 endUpdates();
             }
@@ -287,7 +290,8 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 startUpdates();
                 String str = TrojanURLHelper.GenerateTrojanURL(Globals.getTrojanConfigInstance());
                 if (str != null) {
-                    trojanURLText.setText(str);
+                    if (!trojanURLText.hasFocus())
+                        trojanURLText.setText(str);
                 }
                 endUpdates();
             }
