@@ -55,7 +55,7 @@
             android:name=".tile.IgniterTileService"
             android:directBootAware="true"
             android:enabled="true"
-            android:icon="@drawable/ic_launcher_foreground"
+            android:icon="@drawable/ic_tile"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
             android:process=":tools"
