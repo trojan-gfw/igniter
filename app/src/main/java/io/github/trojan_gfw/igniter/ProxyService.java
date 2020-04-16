@@ -382,29 +382,16 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         Tun2socks.start(tun2socksStartOptions);
         LogHelper.i(TAG, tun2socksStartOptions.toString());
 
-        StringBuilder runningStatusStringBuilder = new StringBuilder();
-        runningStatusStringBuilder.append("Trojan SOCKS5 port: ")
-                .append(trojanPort)
-                .append("\n")
-                .append("Tun2socks port: ")
-                .append(tun2socksPort)
-                .append("\n");
-        if (enable_clash) {
-            runningStatusStringBuilder.append("Clash SOCKS listen port: ")
-                    .append(clashSocksPort)
-                    .append("\n");
-        }
-
         setState(STARTED);
 
         Intent openMainActivityIntent = new Intent(this, MainActivity.class);
         openMainActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingOpenMainActivityIntent = PendingIntent.getActivity(this, 0, openMainActivityIntent, 0);
-        String igniterRunningStatusStr = runningStatusStringBuilder.toString();
+        String igniterRunningStatusStr = "listening on port: " + tun2socksPort;
         final String channelId = getString(R.string.notification_channel_id);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle("Igniter is running")
+                .setContentTitle("Igniter Active")
                 .setContentText(igniterRunningStatusStr)
                 .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText(igniterRunningStatusStr))

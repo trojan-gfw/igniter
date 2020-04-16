@@ -10,6 +10,9 @@
             app:summary="Trojan-GFW"
             app:title="@string/author_title" />
         <Preference
+            app:summary="GPLv3"
+            app:title="License" />
+        <Preference
             app:summary="@string/versionName"
             app:title="@string/version_title" />
 
@@ -25,6 +28,10 @@
         <Preference
             app:summary="https://github.com/eycorsican/go-tun2socks"
             app:title="@string/credit_item2_title" />
+
+        <Preference
+            app:summary="https://github.com/bingoogolapple/BGAQRCode-Android"
+            app:title="@string/credit_item3_title" />
 
     </PreferenceCategory>
 
