@@ -11,7 +11,6 @@ import androidx.annotation.RequiresApi;
 import io.github.trojan_gfw.igniter.LogHelper;
 import io.github.trojan_gfw.igniter.MainActivity;
 import io.github.trojan_gfw.igniter.ProxyService;
-import io.github.trojan_gfw.igniter.R;
 import io.github.trojan_gfw.igniter.common.os.MultiProcessSP;
 import io.github.trojan_gfw.igniter.connection.TrojanConnection;
 import io.github.trojan_gfw.igniter.proxy.aidl.ITrojanService;
@@ -94,23 +93,15 @@ public class IgniterTileService extends TileService implements TrojanConnection.
         switch (state) {
             case ProxyService.STATE_NONE:
                 tile.setState(Tile.STATE_INACTIVE);
-                tile.setLabel(getString(R.string.app_name));
+                break;
+            case ProxyService.STOPPED:
                 break;
             case ProxyService.STARTED:
                 tile.setState(Tile.STATE_ACTIVE);
-                tile.setLabel(getString(R.string.tile_on));
                 break;
             case ProxyService.STARTING:
-                tile.setState(Tile.STATE_ACTIVE);
-                tile.setLabel(getString(R.string.tile_starting));
-                break;
-            case ProxyService.STOPPED:
-                tile.setState(Tile.STATE_INACTIVE);
-                tile.setLabel(getString(R.string.tile_off));
-                break;
             case ProxyService.STOPPING:
-                tile.setState(Tile.STATE_INACTIVE);
-                tile.setLabel(getString(R.string.tile_stopping));
+                tile.setState(Tile.STATE_UNAVAILABLE);
                 break;
             default:
                 LogHelper.e(TAG, "Unknown state: " + state);
@@ -134,9 +125,11 @@ public class IgniterTileService extends TileService implements TrojanConnection.
         ITrojanService service = mConnection.getService();
         if (service == null) {
             mTapPending = true;
+            updateTile(ProxyService.STARTING);
         } else {
             try {
                 @ProxyService.ProxyState int state = service.getState();
+                updateTile(state);
                 switch (state) {
                     case ProxyService.STARTED:
                         stopProxyService();

@@ -17,7 +17,7 @@
     <string name="button_service__stop">Stop</string>
     <string name="button_service__stopping">Stopping</string>
     <string name="verify_certificate">Verify Certificate</string>
-    <string name="label_clash">Bypass China with <a href="https://github.com/Dreamacro/clash">Clash</a></string>
+    <string name="label_clash">Exempt Chinese Domain/IPs</string>
     <string name="enable_ipv6">Enable IPv6</string>
     <string name="bc_service_state">io.github.trojan_gfw.igniter.BC_SERVICE_STATE</string>
     <string name="stop_service">io.github.trojan_gfw.igniter.STOP_SERVICE</string>
@@ -74,4 +74,19 @@
     <string name="exempt_app_exit_without_saving_confirm">Exit without saving exempt app list?</string>
     <string name="action_save_profile">Save Server</string>
     <string name="action_sharelink">Share Link</string>
+    <string name="title_activity_about">About</string>
+
+    <!-- Preference Titles -->
+    <string name="about_header">About</string>
+    <string name="credits_header">Credits</string>
+
+    <!-- Messages Preferences -->
+    <string name="version_title">Version</string>
+    <string name="author_title">Developed by</string>
+
+    <!-- Sync Preferences -->
+    <string name="credit_item1_title">Dreamacro/clash</string>
+    <string name="credit_item2_title">eycorsican/go-tun2socks</string>
+
+    <string name="action_about">About</string>
 </resources>
