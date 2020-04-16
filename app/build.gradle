@@ -1,5 +1,29 @@
 apply plugin: 'com.android.application'
 
+ext.versionMajor = 0
+ext.versionMinor = 9
+ext.versionPatch = 1
+ext.versionClassifier = "beta" // or null
+ext.isSnapshot = true
+ext.minimumSdkVersion = 21
+ext.targetSdkVersion = 28
+
+private Integer GenerateVersionCode() {
+    return ext.minimumSdkVersion * 10000000 + ext.versionMajor * 10000 + ext.versionMinor * 100 + ext.versionPatch
+}
+
+private String GenerateVersionName() {
+    String versionName = "${ext.versionMajor}.${ext.versionMinor}.${ext.versionPatch}"
+    if (ext.versionClassifier == null && ext.isSnapshot) {
+        ext.versionClassifier = "SNAPSHOT"
+    }
+
+    if (ext.versionClassifier != null) {
+        versionName += "-" + ext.versionClassifier
+    }
+    return versionName;
+}
+
 android {
     ndkVersion "21.0.6113669"
     compileSdkVersion 28
@@ -10,10 +34,10 @@ android {
 
     defaultConfig {
         applicationId "io.github.trojan_gfw.igniter"
-        minSdkVersion 21
-        targetSdkVersion 28
-        versionCode 90014 // 00(major) 09(minor) 001(patch) 4(stage, 0=dev, 2=alpha, 4=beta, 8=final)
-        versionName "0.9.1-beta"
+        minSdkVersion project.ext.minimumSdkVersion
+        targetSdkVersion project.ext.targetSdkVersion
+        versionCode GenerateVersionCode()
+        versionName GenerateVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a", "x86"
