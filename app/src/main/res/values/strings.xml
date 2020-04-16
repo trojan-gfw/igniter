@@ -87,6 +87,7 @@
     <!-- Sync Preferences -->
     <string name="credit_item1_title">Dreamacro/clash</string>
     <string name="credit_item2_title">eycorsican/go-tun2socks</string>
+    <string name="credit_item3_title">bingoogolapple/BGAQRCode-Android</string>
 
     <string name="action_about">About</string>
 </resources>
