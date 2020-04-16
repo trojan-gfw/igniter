@@ -164,7 +164,7 @@ public class ExemptAppFragment extends BaseFragment implements ExemptAppContract
     @Override
     public void showLoading() {
         if (mLoadingDialog == null) {
-            mLoadingDialog = new LoadingDialog(Objects.requireNonNull(getContext()));
+            mLoadingDialog = new LoadingDialog(requireContext());
             mLoadingDialog.setMsg(getString(R.string.exempt_app_loading_tip));
         }
         mLoadingDialog.show();
