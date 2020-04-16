@@ -229,7 +229,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         openMainActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingOpenMainActivityIntent = PendingIntent.getActivity(this, 0, openMainActivityIntent, 0);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_tile)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.notification_starting_service))
@@ -390,7 +390,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         String igniterRunningStatusStr = "listening on port: " + tun2socksPort;
         final String channelId = getString(R.string.notification_channel_id);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_tile)
                 .setContentTitle("Igniter Active")
                 .setContentText(igniterRunningStatusStr)
                 .setStyle(new NotificationCompat.BigTextStyle()
