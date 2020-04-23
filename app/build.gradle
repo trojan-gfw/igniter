@@ -2,9 +2,9 @@ apply plugin: 'com.android.application'
 
 ext.versionMajor = 0
 ext.versionMinor = 9
-ext.versionPatch = 1
+ext.versionPatch = 2
 ext.versionClassifier = "beta" // or null
-ext.isSnapshot = true
+ext.isSnapshot = true // set to false when publishing new releases
 ext.minimumSdkVersion = 21
 ext.targetSdkVersion = 28
 
@@ -14,12 +14,12 @@ private Integer GenerateVersionCode() {
 
 private String GenerateVersionName() {
     String versionName = "${ext.versionMajor}.${ext.versionMinor}.${ext.versionPatch}"
-    if (ext.versionClassifier == null && ext.isSnapshot) {
-        ext.versionClassifier = "SNAPSHOT"
-    }
-
     if (ext.versionClassifier != null) {
         versionName += "-" + ext.versionClassifier
+    }
+
+    if (ext.isSnapshot) {
+        versionName += "-" + "SNAPSHOT"
     }
     return versionName;
 }
