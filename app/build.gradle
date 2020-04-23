@@ -47,7 +47,7 @@ android {
                 arguments "-DANDROID_CPP_FEATURES=rtti exceptions"
             }
         }
-        archivesBaseName = "$applicationId-v$versionName($versionCode)"
+        archivesBaseName = "$applicationId-v$versionName-$versionCode"
     }
     buildTypes {
         release {
