@@ -9,7 +9,7 @@ import android.content.SharedPreferences;
 public class MultiProcessSP {
     private static final String SP_NAME = "MultiProcessSP";
     private static final String FIRST_START = "first_start";
-    private static final String ENABLE_CLASH = "enb_clash";
+    private static final String ENABLE_CLASH = "enable_clash";
     private static Context sContext;
 
     public static void init(Context context) {

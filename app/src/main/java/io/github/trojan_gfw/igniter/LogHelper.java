@@ -77,5 +77,8 @@ public final class LogHelper {
         UnderlyingLog(msg, _e, tag);
     }
 
-
+    public static void showDevelopInfoInLogcat() {
+        util.Util.logGoRoutineCount();
+        util.Util.logGoroutineStackTrace();
+    }
 }

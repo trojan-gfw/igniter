@@ -13,7 +13,7 @@ jobs:
           command: git submodule update --init --recursive --remote
       - run:
           name: Download Go Libs
-          command: curl -L https://github.com/trojan-gfw/igniter-go-libs/releases/download/1.10/golibs.aar > app/src/libs/golibs.aar
+          command: curl -L https://github.com/trojan-gfw/igniter-go-libs/releases/download/1.14/golibs.aar > app/src/libs/golibs.aar
       - restore_cache:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
       - run:
@@ -35,15 +35,3 @@ jobs:
       - store_artifacts:
           path: app/build/outputs/apk/
           destination: apks/
-      - deploy:
-          name: "Deploy Igniter🐎"
-          command: |
-            echo "Branch: ${CIRCLE_BRANCH} , PR: ${CIRCLE_PULL_REQUEST}"
-            if [ "${CIRCLE_BRANCH}" == "develop" -o "${CIRCLE_PULL_REQUEST}" != "" ]; then
-              ./gradlew crashlyticsUploadDistributionDevelopmentRelease --stacktrace --debug --no-daemon
-            fi
-
-            release=$(cut -c-7 <<< "${CIRCLE_BRANCH}")
-            if [ "$release" == "release"]; then
-              ./gradlew crashlyticsUploadDistributionProductionRelease --stacktrace --debug --no-daemon
-            fi

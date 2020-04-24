@@ -1,7 +1,7 @@
 package io.github.trojan_gfw.igniter.exempt.contract;
 
-import android.support.annotation.AnyThread;
-import android.support.annotation.UiThread;
+import androidx.annotation.AnyThread;
+import androidx.annotation.UiThread;
 
 import java.util.List;
 
@@ -19,6 +19,8 @@ public interface ExemptAppContract {
          * @return true if exit directly, false to cancel exiting.
          */
         boolean handleBackPressed();
+
+        void filterAppsByName(String name);
 
         void exit();
     }

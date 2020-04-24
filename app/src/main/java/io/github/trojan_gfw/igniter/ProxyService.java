@@ -17,17 +17,19 @@ import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
-import android.support.annotation.IntDef;
-import android.support.v4.app.NotificationCompat;
+import androidx.annotation.IntDef;
+import androidx.core.app.NotificationCompat;
 
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Collections;
 import java.util.Set;
 
 import clash.Clash;
 import freeport.Freeport;
+import io.github.trojan_gfw.igniter.common.utils.PermissionUtils;
 import io.github.trojan_gfw.igniter.connection.TestConnection;
 import io.github.trojan_gfw.igniter.exempt.data.ExemptAppDataManager;
 import io.github.trojan_gfw.igniter.exempt.data.ExemptAppDataSource;
@@ -41,7 +43,7 @@ import tun2socks.Tun2socksStartOptions;
  * test connection and state change. You should call {@link #startForegroundService(Intent)} to start
  * this service and send broadcast with action {@link R.string#stop_service} to shutdown the service.
  * It's recommended to start this service by the help
- * of {@link io.github.trojan_gfw.igniter.tile.ProxyControlActivity}.
+ * of {@link io.github.trojan_gfw.igniter.tile.ProxyHelper}.
  * <br/>
  * If you want to interact withthe service, you should call {@link #bindService(Intent, ServiceConnection, int)}
  * with the action {@link R.string#bind_service}. Then {@link ProxyService} will return a binder
@@ -116,6 +118,11 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
                 return;
             }
             new TestConnection(TUN2SOCKS5_SERVER_HOST, tun2socksPort, ProxyService.this).execute(testUrl);
+        }
+
+        @Override
+        public void showDevelopInfoInLogcat() {
+            LogHelper.showDevelopInfoInLogcat();
         }
 
         @Override
@@ -202,8 +209,11 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
     }
 
     private Set<String> getExemptAppPackageNames() {
+        if (!PermissionUtils.hasReadWriteExtStoragePermission(this)) {
+            return Collections.emptySet();
+        }
         if (mExemptAppDataSource == null) {
-            mExemptAppDataSource = new ExemptAppDataManager(getPackageManager());
+            mExemptAppDataSource = new ExemptAppDataManager(getApplicationContext(), Globals.getExemptedAppListPath());
         }
         // ensures that new exempted app list can be applied on proxy after modification.
         return mExemptAppDataSource.loadExemptAppPackageNameSet();
@@ -219,15 +229,20 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         openMainActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingOpenMainActivityIntent = PendingIntent.getActivity(this, 0, openMainActivityIntent, 0);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
-                .setWhen(0L)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_tile)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.notification_starting_service))
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 // Set the intent that will fire when the user taps the notification
                 .setContentIntent(pendingOpenMainActivityIntent)
-                .setAutoCancel(false);
+                .setAutoCancel(false)
+                .setOngoing(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            builder.setShowWhen(true);
+        }
+        builder.setWhen(0L);
+
         // it's required to create a notification channel before startForeground on SDK >= Android O
         createNotificationChannel(channelId);
         LogHelper.i(TAG, "start foreground notification");
@@ -285,8 +300,9 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
                 String[] parts = route.split("/", 2);
                 b.addRoute(parts[0], Integer.parseInt(parts[1]));
             }
-            // fake ip range for clash
-            b.addRoute("255.0.128.0", 20);
+            // fake ip range for go-tun2socks
+            // should match clash configuration
+            b.addRoute("198.18.0.0", 16);
         } else {
             b.addRoute("0.0.0.0", 0);
         }
@@ -307,7 +323,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         LogHelper.i("VPN", "pfd established");
 
         if (pfd == null) {
-            shutdown();
+            stop();
             return START_NOT_STICKY;
         }
         int fd = pfd.detachFd();
@@ -358,39 +374,24 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
 
         Tun2socks.setLoglevel("info");
         if (enable_clash) {
-            tun2socksStartOptions.setFakeIPStart("255.0.128.1");
-            tun2socksStartOptions.setFakeIPStop("255.0.143.254");
+            tun2socksStartOptions.setFakeIPRange("198.18.0.1/16");
         } else {
             // Disable go-tun2socks fake ip
-            tun2socksStartOptions.setFakeIPStart("");
-            tun2socksStartOptions.setFakeIPStop("");
+            tun2socksStartOptions.setFakeIPRange("");
         }
         Tun2socks.start(tun2socksStartOptions);
         LogHelper.i(TAG, tun2socksStartOptions.toString());
-
-        StringBuilder runningStatusStringBuilder = new StringBuilder();
-        runningStatusStringBuilder.append("Trojan SOCKS5 port: ")
-                .append(trojanPort)
-                .append("\n")
-                .append("Tun2socks port: ")
-                .append(tun2socksPort)
-                .append("\n");
-        if (enable_clash) {
-            runningStatusStringBuilder.append("Clash SOCKS listen port: ")
-                    .append(clashSocksPort)
-                    .append("\n");
-        }
 
         setState(STARTED);
 
         Intent openMainActivityIntent = new Intent(this, MainActivity.class);
         openMainActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingOpenMainActivityIntent = PendingIntent.getActivity(this, 0, openMainActivityIntent, 0);
-        String igniterRunningStatusStr = runningStatusStringBuilder.toString();
+        String igniterRunningStatusStr = "listening on port: " + tun2socksPort;
         final String channelId = getString(R.string.notification_channel_id);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle("Igniter is running")
+                .setSmallIcon(R.drawable.ic_tile)
+                .setContentTitle("Igniter Active")
                 .setContentText(igniterRunningStatusStr)
                 .setStyle(new NotificationCompat.BigTextStyle()
                         .bigText(igniterRunningStatusStr))
@@ -438,5 +439,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
 
     public void stop() {
         shutdown();
+        // this is essential for gomobile aar
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
 }

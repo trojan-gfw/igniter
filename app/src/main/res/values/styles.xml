@@ -21,6 +21,20 @@
         <item name="android:windowAnimationStyle">@null</item>
     </style>
 
+    <style name="ToolBarTheme" parent="AppTheme">
+        <item name="android:colorControlNormal">@android:color/white</item>
+    </style>
+
+    <style name="CommonToolBar">
+        <item name="titleTextColor">@android:color/white</item>
+        <item name="subtitleTextColor">@android:color/white</item>
+        <item name="layout_constraintStart_toStartOf">parent</item>
+        <item name="layout_constraintEnd_toEndOf">parent</item>
+        <item name="layout_constraintTop_toTopOf">parent</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:theme">@style/ToolBarTheme</item>
+    </style>
+
     <style name="CommonImageButton">
         <item name="android:adjustViewBounds">true</item>
         <item name="android:scaleType">fitCenter</item>
@@ -29,8 +43,8 @@
 
     <style name="PrimaryFlatButton" parent="Theme.AppCompat.Light">
         <item name="android:buttonStyle">@style/Widget.AppCompat.Button.Borderless.Colored</item>
-        <item name="colorControlHighlight">@color/colorAccent</item>
-        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="android:colorControlHighlight">@color/colorAccent</item>
+        <item name="android:colorAccent">@color/colorPrimary</item>
     </style>
 
     <style name="CommonListItemLayout">

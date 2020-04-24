@@ -5,20 +5,19 @@ import android.os.Build;
 import android.os.RemoteException;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import io.github.trojan_gfw.igniter.LogHelper;
 import io.github.trojan_gfw.igniter.MainActivity;
 import io.github.trojan_gfw.igniter.ProxyService;
-import io.github.trojan_gfw.igniter.R;
 import io.github.trojan_gfw.igniter.common.os.MultiProcessSP;
 import io.github.trojan_gfw.igniter.connection.TrojanConnection;
 import io.github.trojan_gfw.igniter.proxy.aidl.ITrojanService;
 
 /**
  * Igniter's implementation of TileService, showing current state of {@link ProxyService} and providing a
- * shortcut to start or stop {@link ProxyService} by the help of {@link ProxyControlActivity}. This
+ * shortcut to start or stop {@link ProxyService} by the help of {@link ProxyHelper}. This
  * service receives state change by the help of {@link TrojanConnection}.
  *
  * @see ProxyService
@@ -94,23 +93,15 @@ public class IgniterTileService extends TileService implements TrojanConnection.
         switch (state) {
             case ProxyService.STATE_NONE:
                 tile.setState(Tile.STATE_INACTIVE);
-                tile.setLabel(getString(R.string.app_name));
+                break;
+            case ProxyService.STOPPED:
                 break;
             case ProxyService.STARTED:
                 tile.setState(Tile.STATE_ACTIVE);
-                tile.setLabel(getString(R.string.tile_on));
                 break;
             case ProxyService.STARTING:
-                tile.setState(Tile.STATE_ACTIVE);
-                tile.setLabel(getString(R.string.tile_starting));
-                break;
-            case ProxyService.STOPPED:
-                tile.setState(Tile.STATE_INACTIVE);
-                tile.setLabel(getString(R.string.tile_off));
-                break;
             case ProxyService.STOPPING:
-                tile.setState(Tile.STATE_INACTIVE);
-                tile.setLabel(getString(R.string.tile_stopping));
+                tile.setState(Tile.STATE_UNAVAILABLE);
                 break;
             default:
                 LogHelper.e(TAG, "Unknown state: " + state);
@@ -134,22 +125,22 @@ public class IgniterTileService extends TileService implements TrojanConnection.
         ITrojanService service = mConnection.getService();
         if (service == null) {
             mTapPending = true;
+            updateTile(ProxyService.STARTING);
         } else {
             try {
                 @ProxyService.ProxyState int state = service.getState();
+                updateTile(state);
                 switch (state) {
-                    case ProxyService.STARTED: {
-                        startActivity(ProxyControlActivity.startOrStopProxy(this, false, false));
+                    case ProxyService.STARTED:
+                        stopProxyService();
                         break;
-                    }
                     case ProxyService.STARTING:
                     case ProxyService.STOPPING:
                         break;
                     case ProxyService.STATE_NONE:
-                    case ProxyService.STOPPED: {
-                        startActivity(ProxyControlActivity.startOrStopProxy(this, true, false));
+                    case ProxyService.STOPPED:
+                        startProxyService();
                         break;
-                    }
                     default:
                         LogHelper.e(TAG, "Unknown state: " + state);
                         break;
@@ -158,5 +149,20 @@ public class IgniterTileService extends TileService implements TrojanConnection.
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * Start ProxyService if everything is ready. Otherwise start the launcher Activity.
+     */
+    private void startProxyService() {
+        if (ProxyHelper.isTrojanConfigValid() && ProxyHelper.isVPNServiceConsented(this)) {
+            ProxyHelper.startProxyService(this);
+        } else {
+            ProxyHelper.startLauncherActivity(this);
+        }
+    }
+
+    private void stopProxyService() {
+        ProxyHelper.stopProxyService(this);
     }
 }

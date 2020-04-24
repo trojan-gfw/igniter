@@ -16,6 +16,8 @@ public interface ServerListContract {
         void handleServerSelection(TrojanConfig config);
         void deleteServerConfig(TrojanConfig config, int pos);
         void gotoScanQRCode();
+        void displayImportFileDescription();
+        void hideImportFileDescription();
         void importConfigFromFile();
         void parseConfigsInFileStream(Context context, Uri fileUri);
     }
@@ -27,6 +29,8 @@ public interface ServerListContract {
         void showServerConfigList(List<TrojanConfig> configs);
         void removeServerConfig(TrojanConfig config, int pos);
         void gotoScanQRCode();
-        void importConfigFromFile();
+        void showImportFileDescription();
+        void dismissImportFileDescription();
+        void openFileChooser();
     }
 }

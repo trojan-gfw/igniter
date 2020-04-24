@@ -3,15 +3,19 @@ package io.github.trojan_gfw.igniter.exempt.fragment;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
+import androidx.core.view.MenuItemCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -91,6 +95,26 @@ public class ExemptAppFragment extends BaseFragment implements ExemptAppContract
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         inflater.inflate(R.menu.menu_exempt_app, menu);
+
+        MenuItem item = menu.findItem(R.id.action_search_app);
+        SearchView searchView = null;
+        if (item != null) {
+            searchView = (SearchView) item.getActionView();
+        }
+        if (searchView != null) {
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String s) {
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String s) {
+                    mPresenter.filterAppsByName(s);
+                    return true;
+                }
+            });
+        }
     }
 
     @Override
@@ -140,7 +164,7 @@ public class ExemptAppFragment extends BaseFragment implements ExemptAppContract
     @Override
     public void showLoading() {
         if (mLoadingDialog == null) {
-            mLoadingDialog = new LoadingDialog(Objects.requireNonNull(getContext()));
+            mLoadingDialog = new LoadingDialog(requireContext());
             mLoadingDialog.setMsg(getString(R.string.exempt_app_loading_tip));
         }
         mLoadingDialog.show();

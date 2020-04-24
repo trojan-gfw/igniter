@@ -2,8 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_search_app"
+        android:icon="@drawable/ic_search"
+        android:title="@string/exempt_app_search_title"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always|collapseActionView" />
+
+    <item
         android:id="@+id/action_save_exempt_apps"
+        android:icon="@drawable/ic_save"
         android:title="@string/menu_action_exempt_app_save"
-        app:showAsAction="always"
-        />
+        app:showAsAction="ifRoom" />
 </menu>

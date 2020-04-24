@@ -2,10 +2,12 @@ package io.github.trojan_gfw.igniter.initializer;
 
 import android.content.Context;
 import android.os.Process;
+import android.text.TextUtils;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import io.github.trojan_gfw.igniter.LogHelper;
 import io.github.trojan_gfw.igniter.common.os.Task;
 import io.github.trojan_gfw.igniter.common.os.Threads;
 import io.github.trojan_gfw.igniter.common.utils.ProcessUtils;
@@ -16,36 +18,44 @@ import io.github.trojan_gfw.igniter.common.utils.ProcessUtils;
  * You should consider carefully to determine which process your initializers are run in.
  */
 public class InitializerHelper {
-    private static List<Initializer> sMainInitializerList;
-    private static List<Initializer> sToolsInitializerList;
+    private static final String TOOL_PROCESS_POSTFIX = ":tools";
+    private static final String PROXY_PROCESS_POSTFIX = ":proxy";
+    private static List<Initializer> sInitializerList;
 
-    static {
-        sMainInitializerList = new LinkedList<>();
-        sToolsInitializerList = new LinkedList<>();
-        registerMainInitializers();
-        registerToolsInitializers();
+    private static void createInitializerList() {
+        sInitializerList = new LinkedList<>();
     }
 
     private static void registerMainInitializers() {
-        sMainInitializerList.add(new MainInitializer());
+        createInitializerList();
+        sInitializerList.add(new MainInitializer());
     }
 
     private static void registerToolsInitializers() {
-        sToolsInitializerList.add(new ToolInitializer());
+        createInitializerList();
+        sInitializerList.add(new ToolInitializer());
+    }
+
+    private static void registerProxyInitializers() {
+        createInitializerList();
+        sInitializerList.add(new ProxyInitializer());
     }
 
     public static void runInit(Context context) {
-        if (isToolProcess(context)) {
-            runInit(context, sToolsInitializerList);
+        final String processName = ProcessUtils.getProcessNameByPID(context, Process.myPid());
+        if (isToolProcess(processName)) {
+            registerToolsInitializers();
+        } else if (isProxyProcess(processName)) {
+            registerProxyInitializers();
         } else {
-            runInit(context, sMainInitializerList);
+            registerMainInitializers();
         }
+        runInit(context, sInitializerList);
         clearInitializerLists();
     }
 
     private static void clearInitializerLists() {
-        sMainInitializerList = null;
-        sToolsInitializerList = null;
+        sInitializerList = null;
     }
 
     private static void runInit(final Context context, List<Initializer> initializerList) {
@@ -70,15 +80,15 @@ public class InitializerHelper {
         }
     }
 
-    public static boolean isMainProcess(Context context) {
-        return !isToolProcess(context);
+    private static boolean isMainProcess(String processName) {
+        return !isToolProcess(processName) && !isProxyProcess(processName);
     }
 
-    public static boolean isToolProcess(Context context) {
-        String currentProcessName = ProcessUtils.getProcessNameByPID(context, Process.myPid());
-        if (currentProcessName != null) {
-            return currentProcessName.endsWith(":tools");
-        }
-        return false;
+    private static boolean isToolProcess(String processName) {
+        return TextUtils.equals(processName, TOOL_PROCESS_POSTFIX);
+    }
+
+    private static boolean isProxyProcess(String processName) {
+        return TextUtils.equals(processName, PROXY_PROCESS_POSTFIX);
     }
 }

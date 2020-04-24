@@ -1,7 +1,6 @@
 package io.github.trojan_gfw.igniter.exempt.data;
 
-import android.content.pm.ResolveInfo;
-import android.support.annotation.WorkerThread;
+import androidx.annotation.WorkerThread;
 
 import java.util.List;
 import java.util.Set;

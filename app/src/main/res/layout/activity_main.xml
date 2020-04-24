@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -82,35 +82,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/remotePortText" />
 
-        <EditText
-            android:id="@+id/trojanURLText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="12dp"
-            android:ems="10"
-            android:hint="@string/trojan_url"
-            android:inputType="textPassword"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/passwordText" />
-
         <Switch
             android:id="@+id/ipv6Switch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
-            android:layout_marginBottom="16dp"
             android:text="@string/enable_ipv6"
             android:textSize="@dimen/text_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/trojanURLText" />
+            app:layout_constraintTop_toBottomOf="@+id/passwordText" />
 
         <Switch
             android:id="@+id/verifySwitch"
@@ -160,27 +143,17 @@
         </LinearLayout>
 
         <Button
-            android:id="@+id/saveConfigBtn"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/main_btn_height"
-            android:layout_margin="@dimen/main_btn_margin"
-            android:text="@string/main_save_config_btn"
-            android:textSize="@dimen/text_size"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/columnContainer" />
-
-        <Button
             android:id="@+id/startStopButton"
             android:layout_width="match_parent"
             android:layout_height="@dimen/main_btn_height"
             android:layout_margin="@dimen/main_btn_margin"
+            android:layout_marginTop="96dp"
             android:text="@string/button_service__start"
             android:textSize="@dimen/text_size"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/saveConfigBtn" />
+            app:layout_constraintTop_toBottomOf="@+id/columnContainer" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

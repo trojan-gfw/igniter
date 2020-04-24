@@ -1,6 +1,6 @@
 package io.github.trojan_gfw.igniter.servers.data;
 
-import android.support.annotation.WorkerThread;
+import androidx.annotation.WorkerThread;
 
 import java.util.List;
 

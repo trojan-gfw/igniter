@@ -17,7 +17,7 @@
     <string name="button_service__stop">Stop</string>
     <string name="button_service__stopping">Stopping</string>
     <string name="verify_certificate">Verify Certificate</string>
-    <string name="label_clash">Bypass China with <a href="https://github.com/Dreamacro/clash">Clash</a></string>
+    <string name="label_clash">Exempt Chinese Domain/IPs</string>
     <string name="enable_ipv6">Enable IPv6</string>
     <string name="bc_service_state">io.github.trojan_gfw.igniter.BC_SERVICE_STATE</string>
     <string name="stop_service">io.github.trojan_gfw.igniter.STOP_SERVICE</string>
@@ -30,6 +30,7 @@
     <string name="notification_channel_description">Igniter notifications channel</string>
     <string name="notification_starting_service">Starting service</string>
     <string name="main_restart_proxy_service_tip">Restart proxy yourself to apply new exempt apps configuration.</string>
+    <string name="clipboard_import_tip">Do you want to import the Trojan URL you just copied?</string>
 
     <string name="tile_on">Igniter ON</string>
     <string name="tile_starting">Igniter STARTING</string>
@@ -39,6 +40,7 @@
     <string name="action_test_connection">Test Connection</string>
     <string name="action_show_develop_info_logcat">Show develop info in logcat</string>
 
+    <string name="server_list_import_file_desc">Import config in file extension (*.txt)</string>
     <string name="server_list_file_chooser_msg">Select a TXT file</string>
     <string name="server_list_menu_import_from_file">Import from file</string>
     <string name="server_list_delete_btn">@string/common_delete</string>
@@ -48,7 +50,15 @@
     <string name="main_save_success">@string/common_save_success</string>
     <string name="main_save_failed">Save failed</string>
 
-    <string name="main_menu_server_list">Server List</string>
+    <string name="main_write_external_storage_permission_requirement">
+        Igniter needs to read and write external storage for reading or writing exempted app
+        list, which is recoverable even when Igniter is uninstalled. Denying the permission
+        will deactivate exempted app feature.
+    </string>
+    <string name="main_exempt_feature_permission_requirement">
+        Please grant read and write external storage permission in Igniter application settings first.
+    </string>
+    <string name="main_menu_server_list">Load Server</string>
 
     <string name="scan_qr_code_success">Add server success</string>
     <string name="scan_qr_code_failed">Cannot recognize trojanURL: %s</string>
@@ -57,8 +67,27 @@
 
     <string name="menu_action_exempt_app_save">Save</string>
     <string name="menu_action_exempt_app">Exempt Apps</string>
+    <string name="exempt_app_search_title">Search Apps</string>
     <string name="exempt_app_exit">Exit</string>
     <string name="exempt_app_exit_confirm">Are you sure to exit without save?</string>
     <string name="exempt_app_loading_tip">Loading…</string>
     <string name="exempt_app_exit_without_saving_confirm">Exit without saving exempt app list?</string>
+    <string name="action_save_profile">Save Server</string>
+    <string name="action_sharelink">Share Link</string>
+    <string name="title_activity_about">About</string>
+
+    <!-- Preference Titles -->
+    <string name="about_header">About</string>
+    <string name="credits_header">Credits</string>
+
+    <!-- Messages Preferences -->
+    <string name="version_title">Version</string>
+    <string name="author_title">Developed by</string>
+
+    <!-- Sync Preferences -->
+    <string name="credit_item1_title">Dreamacro/clash</string>
+    <string name="credit_item2_title">eycorsican/go-tun2socks</string>
+    <string name="credit_item3_title">bingoogolapple/BGAQRCode-Android</string>
+
+    <string name="action_about">About</string>
 </resources>

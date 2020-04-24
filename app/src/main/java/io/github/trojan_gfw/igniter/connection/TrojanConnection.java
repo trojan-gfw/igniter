@@ -8,7 +8,8 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 
 import io.github.trojan_gfw.igniter.ProxyService;
 import io.github.trojan_gfw.igniter.R;
@@ -98,6 +99,7 @@ public class TrojanConnection implements ServiceConnection, Binder.DeathRecipien
             throw new IllegalStateException("Required to call disconnect(Context) first.");
         }
         mCallback = callback;
+
         // todo: choose the service class dynamically.
         Intent intent = new Intent(context, ProxyService.class);
         intent.setAction(context.getString(R.string.bind_service));
