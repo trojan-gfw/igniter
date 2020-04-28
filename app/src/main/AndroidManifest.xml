@@ -8,11 +8,10 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
-    <application
+    <application xmlns:tools="http://schemas.android.com/tools"
         android:name=".IgniterApplication"
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -20,7 +19,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".AboutActivity"
-            android:label="@string/title_activity_about" />
+            android:label="@string/title_activity_about"></activity>
         <activity
             android:name=".exempt.activity.ExemptAppActivity"
             android:theme="@style/AppThemeNoTitle" />
@@ -34,8 +33,7 @@
             android:windowSoftInputMode="adjustPan|stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES" />
-
+                <action android:name="android.service.quicksettings.action.QS_TILE_PREFERENCES"/>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

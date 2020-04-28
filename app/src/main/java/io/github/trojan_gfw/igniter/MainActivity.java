@@ -5,17 +5,12 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.os.RemoteException;
-import android.provider.Settings;
 import android.text.InputType;
 import android.text.method.LinkMovementMethod;
 import android.view.Menu;
@@ -347,7 +342,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     @Override
     protected void onResume() {
         super.onResume();
-        forceRequestIgnoreBatteryOptimization(MainActivity.this);
+
         checkTrojanURLFromClipboard();
     }
 
@@ -651,23 +646,5 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     protected void onDestroy() {
         super.onDestroy();
         connection.disconnect(this);
-    }
-
-    private void forceRequestIgnoreBatteryOptimization(Context ctx) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
-        try {
-            PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
-            PackageManager packageManager = ctx.getPackageManager();
-            String pkgName = ctx.getPackageName();
-            boolean hasIgnored = powerManager.isIgnoringBatteryOptimizations(pkgName);
-            Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-            intent.setData(Uri.parse("package:" + pkgName));
-            boolean ableToIgnore = intent.resolveActivity(packageManager) != null;
-            if (ableToIgnore && !hasIgnored) {
-                startActivity(intent);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }
