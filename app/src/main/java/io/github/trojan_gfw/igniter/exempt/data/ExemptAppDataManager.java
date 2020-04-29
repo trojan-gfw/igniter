@@ -111,7 +111,7 @@ public class ExemptAppDataManager implements ExemptAppDataSource {
         int flags = 0;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             flags |= PackageManager.MATCH_UNINSTALLED_PACKAGES | PackageManager.MATCH_DISABLED_COMPONENTS;
-        } else {
+        } else { // These flags are deprecated since Nougat.
             flags |= PackageManager.GET_UNINSTALLED_PACKAGES | PackageManager.GET_DISABLED_COMPONENTS;
         }
         return mPackageManager.getInstalledApplications(flags);

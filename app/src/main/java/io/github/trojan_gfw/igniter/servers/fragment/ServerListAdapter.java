@@ -77,7 +77,7 @@ class ViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
                 if (itemClickListener != null) {
-                    itemClickListener.onItemSelected(mConfig, getAdapterPosition());
+                    itemClickListener.onItemSelected(mConfig, getBindingAdapterPosition());
                 }
             }
         });
@@ -85,7 +85,7 @@ class ViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
                 if (itemClickListener != null) {
-                    itemClickListener.onItemDelete(mConfig, getAdapterPosition());
+                    itemClickListener.onItemDelete(mConfig, getBindingAdapterPosition());
                 }
             }
         });
