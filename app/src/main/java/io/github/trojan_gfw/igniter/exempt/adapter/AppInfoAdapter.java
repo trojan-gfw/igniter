@@ -84,7 +84,7 @@ public class AppInfoAdapter extends RecyclerView.Adapter<AppInfoAdapter.ViewHold
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             if (mOnItemOperationListener != null) {
-                mOnItemOperationListener.onToggle(isChecked, mCurrentInfo, getAdapterPosition());
+                mOnItemOperationListener.onToggle(isChecked, mCurrentInfo, getBindingAdapterPosition());
             }
         }
 
