@@ -364,9 +364,11 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 }
 
                 // show once if trojan url
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    clipboardManager.clearPrimaryClip();
-                }
+                try{
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        clipboardManager.clearPrimaryClip();
+                    }
+                } catch (Exception ignored) {}
                 new AlertDialog.Builder(MainActivity.this)
                         .setMessage(R.string.clipboard_import_tip)
                         .setPositiveButton(R.string.common_confirm, new DialogInterface.OnClickListener() {
