@@ -266,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         trojanURLText.setSelectAllOnFocus(true);
 
         FrameLayout container = new FrameLayout(this);
-        FrameLayout.LayoutParams params = new  FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.leftMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
         params.rightMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
         trojanURLText.setLayoutParams(params);
@@ -351,6 +351,9 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
             @Override
             public void run() {
                 final ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                if (!clipboardManager.hasPrimaryClip()) {
+                    return;
+                }
                 ClipData clipData = clipboardManager.getPrimaryClip();
                 // check clipboard
                 if (clipData == null || clipData.getItemCount() == 0) {
@@ -364,11 +367,9 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 }
 
                 // show once if trojan url
-                try{
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        clipboardManager.clearPrimaryClip();
-                    }
-                } catch (Exception ignored) {}
+                if (clipboardManager.hasPrimaryClip()) {
+                    clipboardManager.setPrimaryClip(ClipData.newPlainText("", ""));
+                }
                 new AlertDialog.Builder(MainActivity.this)
                         .setMessage(R.string.clipboard_import_tip)
                         .setPositiveButton(R.string.common_confirm, new DialogInterface.OnClickListener() {
