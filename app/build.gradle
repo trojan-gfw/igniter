@@ -50,6 +50,10 @@ android {
         archivesBaseName = "$applicationId-v$versionName-$versionCode"
     }
     buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+            debuggable true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
