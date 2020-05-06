@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import java.util.LinkedList;
 import java.util.List;
 
-import io.github.trojan_gfw.igniter.LogHelper;
 import io.github.trojan_gfw.igniter.common.os.Task;
 import io.github.trojan_gfw.igniter.common.os.Threads;
 import io.github.trojan_gfw.igniter.common.utils.ProcessUtils;

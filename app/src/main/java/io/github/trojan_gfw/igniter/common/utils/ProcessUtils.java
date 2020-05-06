@@ -2,7 +2,7 @@ package io.github.trojan_gfw.igniter.common.utils;
 
 import android.app.ActivityManager;
 import android.content.Context;
-import androidx.annotation.NonNull;
+
 import androidx.annotation.Nullable;
 
 import java.util.List;

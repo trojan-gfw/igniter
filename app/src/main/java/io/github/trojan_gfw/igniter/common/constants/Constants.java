@@ -1,9 +1,5 @@
 package io.github.trojan_gfw.igniter.common.constants;
 
-import java.security.PublicKey;
-
-import io.github.trojan_gfw.igniter.common.os.PreferencesProvider;
-
 public abstract class Constants {
     public static final String PREFERENCE_AUTHORITY = "io.github.trojan_gfw.igniter";
     public static final String PREFERENCE_PATH = "preferences";

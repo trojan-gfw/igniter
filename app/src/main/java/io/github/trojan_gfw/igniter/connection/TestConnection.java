@@ -1,6 +1,7 @@
 package io.github.trojan_gfw.igniter.connection;
 
 import android.os.AsyncTask;
+
 import androidx.annotation.NonNull;
 
 import java.lang.ref.WeakReference;
