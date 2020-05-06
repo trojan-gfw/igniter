@@ -6,11 +6,14 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.IBinder;
@@ -19,6 +22,7 @@ import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import androidx.annotation.IntDef;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContentResolverCompat;
 
 import org.json.JSONObject;
 
@@ -29,7 +33,9 @@ import java.util.Set;
 
 import clash.Clash;
 import freeport.Freeport;
+import io.github.trojan_gfw.igniter.common.constants.Constants;
 import io.github.trojan_gfw.igniter.common.utils.PermissionUtils;
+import io.github.trojan_gfw.igniter.common.utils.PreferenceUtils;
 import io.github.trojan_gfw.igniter.connection.TestConnection;
 import io.github.trojan_gfw.igniter.exempt.data.ExemptAppDataManager;
 import io.github.trojan_gfw.igniter.exempt.data.ExemptAppDataSource;
@@ -64,7 +70,6 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
     public static final int STARTED = 1;
     public static final int STOPPING = 2;
     public static final int STOPPED = 3;
-    public static final String CLASH_EXTRA_NAME = "enable_clash";
     public static final int IGNITER_STATUS_NOTIFY_MSG_ID = 114514;
     public long tun2socksPort;
     public boolean enable_clash = false;
@@ -249,6 +254,11 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         startForeground(IGNITER_STATUS_NOTIFY_MSG_ID, builder.build());
     }
 
+    private boolean readClashPreference() {
+        return PreferenceUtils.getBooleanPreference(getContentResolver(), Uri.parse(Constants.PREFERENCE_URI),
+                Constants.PREFERENCE_KEY_ENABLE_CLASH, true);
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         LogHelper.i(TAG, "onStartCommand");
@@ -276,7 +286,8 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
                 e.printStackTrace();
             }
         }
-        enable_clash = intent.getBooleanExtra(CLASH_EXTRA_NAME, true);
+        enable_clash = readClashPreference();
+        LogHelper.e(TAG, "enable_clash: " + enable_clash);
         boolean enable_ipv6 = false;
 
         File file = new File(getFilesDir(), "config.json");

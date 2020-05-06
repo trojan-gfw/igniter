@@ -5,8 +5,11 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,16 +34,18 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContentResolverCompat;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
-import io.github.trojan_gfw.igniter.common.os.MultiProcessSP;
+import io.github.trojan_gfw.igniter.common.constants.Constants;
 import io.github.trojan_gfw.igniter.common.os.Task;
 import io.github.trojan_gfw.igniter.common.os.Threads;
 import io.github.trojan_gfw.igniter.common.utils.PermissionUtils;
+import io.github.trojan_gfw.igniter.common.utils.PreferenceUtils;
 import io.github.trojan_gfw.igniter.common.utils.SnackbarUtils;
 import io.github.trojan_gfw.igniter.connection.TrojanConnection;
 import io.github.trojan_gfw.igniter.exempt.activity.ExemptAppActivity;
@@ -230,11 +235,18 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
             }
         });
 
-        clashSwitch.setChecked(MultiProcessSP.getEnableClash(true));
+        boolean enableClash = PreferenceUtils.getBooleanPreference(getContentResolver(),
+                Uri.parse(Constants.PREFERENCE_URI), Constants.PREFERENCE_KEY_ENABLE_CLASH, true);
+        clashSwitch.setChecked(enableClash);
         clashSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                MultiProcessSP.setEnableClash(isChecked);
+                // Generally speaking, it's better to insert content into ContentProvider in background
+                // thread, but that may cause data inconsistency when user starts proxy right after
+                // switching.
+                PreferenceUtils.putBooleanPreference(getContentResolver(),
+                        Uri.parse(Constants.PREFERENCE_URI), Constants.PREFERENCE_KEY_ENABLE_CLASH,
+                        isChecked);
             }
         });
 
@@ -337,12 +349,19 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 .shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             requestReadWriteExternalStoragePermission();
         }
+        Threads.instance().runOnWorkThread(new Task() {
+            @Override
+            public void onRun() {
+                PreferenceUtils.putBooleanPreference(getContentResolver(),
+                        Uri.parse(Constants.PREFERENCE_URI),
+                        Constants.PREFERENCE_KEY_FIRST_START, false);
+            }
+        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
         checkTrojanURLFromClipboard();
     }
 

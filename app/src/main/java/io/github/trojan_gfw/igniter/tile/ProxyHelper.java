@@ -3,6 +3,7 @@ package io.github.trojan_gfw.igniter.tile;
 import android.content.Context;
 import android.content.Intent;
 import android.net.VpnService;
+
 import androidx.core.content.ContextCompat;
 
 import io.github.trojan_gfw.igniter.BuildConfig;
@@ -12,7 +13,6 @@ import io.github.trojan_gfw.igniter.ProxyService;
 import io.github.trojan_gfw.igniter.R;
 import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.TrojanHelper;
-import io.github.trojan_gfw.igniter.common.os.MultiProcessSP;
 
 /**
  * Helper class for starting or stopping {@link ProxyService}. Before starting {@link ProxyService},
@@ -40,9 +40,7 @@ public abstract class ProxyHelper {
     }
 
     public static void startProxyService(Context context) {
-        Intent intent = new Intent(context, ProxyService.class);
-        intent.putExtra(ProxyService.CLASH_EXTRA_NAME, MultiProcessSP.getEnableClash(true));
-        ContextCompat.startForegroundService(context, intent);
+        ContextCompat.startForegroundService(context, new Intent(context, ProxyService.class));
     }
 
     public static void startLauncherActivity(Context context) {
