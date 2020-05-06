@@ -1,17 +1,21 @@
 package io.github.trojan_gfw.igniter.tile;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.RemoteException;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
 import io.github.trojan_gfw.igniter.LogHelper;
 import io.github.trojan_gfw.igniter.MainActivity;
 import io.github.trojan_gfw.igniter.ProxyService;
-import io.github.trojan_gfw.igniter.common.os.MultiProcessSP;
+import io.github.trojan_gfw.igniter.common.constants.Constants;
+import io.github.trojan_gfw.igniter.common.utils.PreferenceUtils;
 import io.github.trojan_gfw.igniter.connection.TrojanConnection;
 import io.github.trojan_gfw.igniter.proxy.aidl.ITrojanService;
 
@@ -110,11 +114,16 @@ public class IgniterTileService extends TileService implements TrojanConnection.
         tile.updateTile();
     }
 
+    private boolean isFirstStart() {
+        return PreferenceUtils.getBooleanPreference(getContentResolver(), Uri.parse(Constants.PREFERENCE_URI),
+                Constants.PREFERENCE_KEY_FIRST_START, true);
+    }
+
     @Override
     public void onClick() {
         super.onClick();
         LogHelper.i(TAG, "onClick");
-        if (MultiProcessSP.isFirstStart(true)) {
+        if (isFirstStart()) {
             // if user never open Igniter before, when he/she clicks the tile, it is necessary
             // to start the launcher activity for resource preparation.
             Intent intent = new Intent(this, MainActivity.class);

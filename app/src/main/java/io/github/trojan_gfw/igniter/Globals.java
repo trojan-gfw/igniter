@@ -10,7 +10,6 @@ public class Globals {
     private static String cacheDir;
     private static String filesDir;
     private static String externalFilesDir;
-
     private static TrojanConfig trojanConfigInstance;
 
     public static void Init(Context ctx) {
@@ -41,6 +40,10 @@ public class Globals {
 
     public static String getTrojanConfigListPath() {
         return PathHelper.combine(filesDir, "config_list.json");
+    }
+
+    public static String getPreferencesFilePath() {
+        return PathHelper.combine(filesDir, "preferences.txt");
     }
 
     public static String getExemptedAppListPath() {
