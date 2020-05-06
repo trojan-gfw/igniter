@@ -412,7 +412,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
                 .setAutoCancel(false)
                 .setOngoing(true);
         startForeground(IGNITER_STATUS_NOTIFY_MSG_ID, builder.build());
-        return START_REDELIVER_INTENT;
+        return START_STICKY;
     }
 
     private void shutdown() {
