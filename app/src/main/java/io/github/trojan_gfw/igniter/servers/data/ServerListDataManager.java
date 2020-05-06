@@ -1,6 +1,5 @@
 package io.github.trojan_gfw.igniter.servers.data;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 

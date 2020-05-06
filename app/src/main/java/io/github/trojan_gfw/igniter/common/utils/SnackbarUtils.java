@@ -1,8 +1,10 @@
 package io.github.trojan_gfw.igniter.common.utils;
 
-import androidx.annotation.StringRes;
-import com.google.android.material.snackbar.Snackbar;
 import android.view.View;
+
+import androidx.annotation.StringRes;
+
+import com.google.android.material.snackbar.Snackbar;
 
 public class SnackbarUtils {
 

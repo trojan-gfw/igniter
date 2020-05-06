@@ -2,6 +2,7 @@ package io.github.trojan_gfw.igniter.common.app;
 
 import android.content.Context;
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
