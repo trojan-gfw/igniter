@@ -6,13 +6,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.net.VpnService;
 import android.os.Build;
@@ -20,9 +18,9 @@ import android.os.IBinder;
 import android.os.ParcelFileDescriptor;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
+
 import androidx.annotation.IntDef;
 import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContentResolverCompat;
 
 import org.json.JSONObject;
 
