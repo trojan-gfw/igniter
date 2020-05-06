@@ -4,10 +4,8 @@
     <dimen name="top_bar_height">55dp</dimen>
     <dimen name="common_corner_radius">15dp</dimen>
 
-    <dimen name="main_menu_btn_size">20dp</dimen>
     <dimen name="main_btn_height">64dp</dimen>
     <dimen name="main_btn_margin">16dp</dimen>
 
-    <dimen name="exempt_app_icon_size">40dp</dimen>
     <dimen name="dialog_margin">20dp</dimen>
 </resources>

@@ -13,14 +13,6 @@
         <item name="actionMenuTextColor">@android:color/white</item>
     </style>
 
-    <style name="Theme.AppCompat.Translucent" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:colorBackgroundCacheHint">@null</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowAnimationStyle">@null</item>
-    </style>
-
     <style name="ToolBarTheme" parent="AppTheme">
         <item name="android:colorControlNormal">@android:color/white</item>
     </style>
@@ -33,12 +25,6 @@
         <item name="layout_constraintTop_toTopOf">parent</item>
         <item name="android:background">@color/colorPrimary</item>
         <item name="android:theme">@style/ToolBarTheme</item>
-    </style>
-
-    <style name="CommonImageButton">
-        <item name="android:adjustViewBounds">true</item>
-        <item name="android:scaleType">fitCenter</item>
-        <item name="android:padding">1dp</item>
     </style>
 
     <style name="PrimaryFlatButton" parent="Theme.AppCompat.Light">
