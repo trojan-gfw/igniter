@@ -1,5 +1,7 @@
 package io.github.trojan_gfw.igniter.servers.data;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,7 @@ public class ServerListDataManager implements ServerListDataSource {
     }
 
     @Override
+    @NonNull
     public List<TrojanConfig> loadServerConfigList() {
         return new ArrayList<>(TrojanHelper.readTrojanServerConfigList(mConfigFilePath));
     }
@@ -32,10 +35,19 @@ public class ServerListDataManager implements ServerListDataSource {
 
     @Override
     public void saveServerConfig(TrojanConfig config) {
+        if (config == null) {
+            return;
+        }
+        final String remoteAddr = config.getRemoteAddr();
+        if (remoteAddr == null) {
+            return;
+        }
         boolean configRemoteAddrExists = false;
         List<TrojanConfig> trojanConfigs = loadServerConfigList();
         for (int i = trojanConfigs.size() - 1; i >= 0; i--) {
-            if (trojanConfigs.get(i).getRemoteAddr().equals(config.getRemoteAddr())) {
+            TrojanConfig cacheConfig = trojanConfigs.get(i);
+            if (cacheConfig == null) continue;
+            if (remoteAddr.equals(cacheConfig.getRemoteAddr())) {
                 trojanConfigs.set(i, config);
                 configRemoteAddrExists = true;
                 break;

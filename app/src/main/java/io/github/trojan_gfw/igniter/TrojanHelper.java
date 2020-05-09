@@ -128,6 +128,7 @@ public class TrojanHelper {
         return null;
     }
 
+    @NonNull
     private static TrojanConfig parseTrojanConfigFromJSON(String json) {
         TrojanConfig config = new TrojanConfig();
         config.fromJSON(json);
