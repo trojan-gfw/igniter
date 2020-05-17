@@ -94,7 +94,7 @@ class ViewHolder extends RecyclerView.ViewHolder {
 
     public void bindData(TrojanConfig config) {
         this.mConfig = config;
-        mRemoteAddrTv.setText(config.getRemoteAddr());
+        mRemoteAddrTv.setText(config.name());
     }
 
     public void bindListener(ServerListAdapter.OnItemClickListener listener) {

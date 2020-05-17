@@ -19,7 +19,6 @@ public class Globals {
         File igniterExternalFileDir = new File(externalDocDir, "igniter");
         externalFilesDir = igniterExternalFileDir.getAbsolutePath();
         trojanConfigInstance = new TrojanConfig();
-        trojanConfigInstance.setCaCertPath(Globals.getCaCertPath());
     }
 
     public static String getCaCertPath() {

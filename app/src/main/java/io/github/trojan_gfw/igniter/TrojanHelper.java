@@ -63,7 +63,7 @@ public class TrojanHelper {
             int len = jsonArr.length();
             List<TrojanConfig> list = new ArrayList<>(len);
             for (int i = 0; i < len; i++) {
-                list.add(parseTrojanConfigFromJSON(jsonArr.getJSONObject(i).toString()));
+                list.add(parseTrojanConfigFromJSON(jsonArr.getJSONObject(i).toString(4)));
             }
             return list;
         } catch (IOException | JSONException e) {

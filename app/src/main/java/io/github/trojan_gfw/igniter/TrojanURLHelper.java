@@ -4,20 +4,7 @@ import java.net.URI;
 
 public class TrojanURLHelper {
     public static String GenerateTrojanURL(TrojanConfig trojanConfig) {
-
-        URI trojanUri;
-        try {
-            trojanUri = new URI("trojan",
-                    trojanConfig.getPassword(),
-                    trojanConfig.getRemoteAddr(),
-                    trojanConfig.getRemotePort(),
-                    null, null, null);
-        } catch (java.net.URISyntaxException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        return trojanUri.toString();
+        return null;
     }
 
     public static TrojanConfig ParseTrojanURL(String trojanURLStr) {
@@ -39,9 +26,6 @@ public class TrojanURLHelper {
         String userInfo = trojanUri.getUserInfo();
 
         TrojanConfig retConfig = new TrojanConfig();
-        retConfig.setRemoteAddr(host);
-        retConfig.setRemotePort(port);
-        retConfig.setPassword(userInfo);
         return retConfig;
     }
 }

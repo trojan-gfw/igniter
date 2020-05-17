@@ -39,14 +39,6 @@ android {
         versionCode GenerateVersionCode()
         versionName GenerateVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        ndk {
-            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
-        }
-        externalNativeBuild {
-            cmake {
-                arguments "-DANDROID_CPP_FEATURES=rtti exceptions"
-            }
-        }
         archivesBaseName = "$applicationId-v$versionName-$versionCode"
     }
     buildTypes {
@@ -57,11 +49,6 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-    externalNativeBuild {
-        cmake {
-            path file('src/main/cpp/CMakeLists.txt')
         }
     }
 }

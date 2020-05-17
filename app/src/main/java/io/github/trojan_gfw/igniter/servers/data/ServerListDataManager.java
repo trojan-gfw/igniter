@@ -25,7 +25,7 @@ public class ServerListDataManager implements ServerListDataSource {
     public void deleteServerConfig(TrojanConfig config) {
         List<TrojanConfig> trojanConfigs = loadServerConfigList();
         for (int i = trojanConfigs.size() - 1; i >= 0; i--) {
-            if (trojanConfigs.get(i).getRemoteAddr().equals(config.getRemoteAddr())) {
+            if (trojanConfigs.get(i).name().equals(config.name())) {
                 trojanConfigs.remove(i);
                 replaceServerConfigs(trojanConfigs);
                 break;
@@ -38,7 +38,7 @@ public class ServerListDataManager implements ServerListDataSource {
         if (config == null) {
             return;
         }
-        final String remoteAddr = config.getRemoteAddr();
+        final String remoteAddr = config.name();
         if (remoteAddr == null) {
             return;
         }
@@ -47,7 +47,7 @@ public class ServerListDataManager implements ServerListDataSource {
         for (int i = trojanConfigs.size() - 1; i >= 0; i--) {
             TrojanConfig cacheConfig = trojanConfigs.get(i);
             if (cacheConfig == null) continue;
-            if (remoteAddr.equals(cacheConfig.getRemoteAddr())) {
+            if (remoteAddr.equals(cacheConfig.name())) {
                 trojanConfigs.set(i, config);
                 configRemoteAddrExists = true;
                 break;

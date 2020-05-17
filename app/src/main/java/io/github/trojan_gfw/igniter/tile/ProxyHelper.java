@@ -28,7 +28,6 @@ public abstract class ProxyHelper {
         if (cacheConfig == null) {
             return false;
         }
-        cacheConfig.setCaCertPath(Globals.getCaCertPath());
         if (BuildConfig.DEBUG) {
             TrojanHelper.ShowConfig(Globals.getTrojanConfigPath());
         }

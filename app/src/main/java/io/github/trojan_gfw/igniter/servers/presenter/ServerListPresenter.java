@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.github.trojan_gfw.igniter.LogHelper;
 import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.TrojanURLHelper;
 import io.github.trojan_gfw.igniter.common.os.Task;
@@ -68,10 +69,10 @@ public class ServerListPresenter implements ServerListContract.Presenter {
                 // remove repeated configurations
                 Set<String> newTrojanConfigRemoteAddrSet = new HashSet<>();
                 for (TrojanConfig config : trojanConfigs) {
-                    newTrojanConfigRemoteAddrSet.add(config.getRemoteAddr());
+                    newTrojanConfigRemoteAddrSet.add(config.name());
                 }
                 for (int i = currentConfigs.size() - 1; i >= 0; i--) {
-                    if (newTrojanConfigRemoteAddrSet.contains(currentConfigs.get(i).getRemoteAddr())) {
+                    if (newTrojanConfigRemoteAddrSet.contains(currentConfigs.get(i).name())) {
                         currentConfigs.remove(i);
                     }
                 }
@@ -99,10 +100,7 @@ public class ServerListPresenter implements ServerListContract.Presenter {
                     continue;
                 }
                 TrojanConfig tmp = new TrojanConfig();
-                tmp.setRemoteAddr(remoteAddr);
-                tmp.setRemotePort(config.optInt("server_port"));
-                tmp.setPassword(config.optString("password"));
-                tmp.setVerifyCert(config.optBoolean("verify"));
+                tmp.setConfig(config.toString());
                 list.add(tmp);
             }
             return list;
@@ -162,6 +160,12 @@ public class ServerListPresenter implements ServerListContract.Presenter {
 
     private void loadConfigs() {
         List<TrojanConfig> trojanConfigs = mDataManager.loadServerConfigList();
+        // HACK race
+        try {
+            Thread.sleep(200);
+        } catch (Throwable t) {
+
+        }
         mView.showServerConfigList(trojanConfigs);
     }
 }
