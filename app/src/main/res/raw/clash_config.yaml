@@ -56,6 +56,10 @@ rules:
   ## 您可以在此处插入您补充的自定义规则（请注意保持缩进）
   # Chinese ROM uses googleapis.cn, which is broken
   - DOMAIN-KEYWORD,googleapis,Proxy
+  - DOMAIN,services.googleapis.cn,Proxy
+  - DOMAIN,services.googleapis.com,Proxy
+  - DOMAIN,www.googleapis.com,Proxy
+  - DOMAIN,www.googleapis.cn,Proxy
 
 # 国内网站
   - DOMAIN,cdn.hockeyapp.net,DIRECT
