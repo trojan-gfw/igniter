@@ -621,10 +621,10 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                     startActivityForResult(ExemptAppActivity.create(this), EXEMPT_APP_CONFIGURE_REQUEST_CODE);
                 } else {
                     if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        SnackbarUtils.showTextLong(rootViewGroup, R.string.main_exempt_feature_permission_requirement);
+                    } else {
                         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
                                 Manifest.permission.WRITE_EXTERNAL_STORAGE}, READ_WRITE_EXT_STORAGE_PERMISSION_REQUEST);
-                    } else {
-                        SnackbarUtils.showTextLong(rootViewGroup, R.string.main_exempt_feature_permission_requirement);
                     }
                 }
                 return true;
