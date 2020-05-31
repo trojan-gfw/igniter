@@ -25,7 +25,7 @@ private String GenerateVersionName() {
 }
 
 android {
-    ndkVersion "21.1.6352462"
+    ndkVersion "21.2.6472646"
     compileSdkVersion 28
 
     applicationVariants.all { variant ->
