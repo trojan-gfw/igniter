@@ -32,8 +32,8 @@ public class ExemptAppActivity extends BaseAppCompatActivity {
         if (fragment == null) {
             fragment = ExemptAppFragment.newInstance();
         }
-        mPresenter = new ExemptAppPresenter(fragment, new ExemptAppDataManager(getApplicationContext(),
-                Globals.getExemptedAppListPath()));
+        mPresenter = new ExemptAppPresenter(this, fragment, new ExemptAppDataManager(getApplicationContext(),
+                Globals.getInternalExemptedAppListPath(), Globals.getExternalExemptedAppListPath()));
         fm.beginTransaction()
                 .replace(R.id.parent_fl, fragment, ExemptAppFragment.TAG)
                 .commitAllowingStateLoss();

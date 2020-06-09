@@ -45,6 +45,8 @@ import io.github.trojan_gfw.igniter.common.utils.PreferenceUtils;
 import io.github.trojan_gfw.igniter.common.utils.SnackbarUtils;
 import io.github.trojan_gfw.igniter.connection.TrojanConnection;
 import io.github.trojan_gfw.igniter.exempt.activity.ExemptAppActivity;
+import io.github.trojan_gfw.igniter.exempt.data.ExemptAppDataManager;
+import io.github.trojan_gfw.igniter.exempt.data.ExemptAppDataSource;
 import io.github.trojan_gfw.igniter.proxy.aidl.ITrojanService;
 import io.github.trojan_gfw.igniter.servers.activity.ServerListActivity;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataManager;
@@ -341,18 +343,26 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         });
         serverListDataManager = new ServerListDataManager(Globals.getTrojanConfigListPath());
         connection.connect(this, this);
-        if (!PermissionUtils.hasReadWriteExtStoragePermission(this) && ActivityCompat
-                .shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            requestReadWriteExternalStoragePermission();
-        }
         Threads.instance().runOnWorkThread(new Task() {
             @Override
             public void onRun() {
                 PreferenceUtils.putBooleanPreference(getContentResolver(),
                         Uri.parse(Constants.PREFERENCE_URI),
                         Constants.PREFERENCE_KEY_FIRST_START, false);
+                migrateExternalExemptAppInfoImplicitly();
             }
         });
+    }
+
+    private void migrateExternalExemptAppInfoImplicitly() {
+        if (PermissionUtils.hasReadWriteExtStoragePermission(MainActivity.this)) {
+            ExemptAppDataSource dataSource = new ExemptAppDataManager(MainActivity.this,
+                    Globals.getInternalExemptedAppListPath(), Globals.getExternalExemptedAppListPath());
+            if (dataSource.checkExternalExemptAppInfoConfigExistence()) {
+                dataSource.migrateExternalExemptAppInfo();
+                dataSource.deleteExternalExemptAppInfo();
+            }
+        }
     }
 
     @Override
@@ -398,27 +408,6 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                         .show();
             }
         });
-    }
-
-    private void requestReadWriteExternalStoragePermission() {
-        new AlertDialog.Builder(this).setTitle(R.string.common_alert)
-                .setMessage(R.string.main_write_external_storage_permission_requirement)
-                .setPositiveButton(R.string.common_confirm, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{
-                                Manifest.permission.READ_EXTERNAL_STORAGE,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE
-                        }, READ_WRITE_EXT_STORAGE_PERMISSION_REQUEST);
-                    }
-                })
-                .setNegativeButton(R.string.common_cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).show();
     }
 
     @Override
@@ -617,16 +606,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 trojanURLText.selectAll();
                 return true;
             case R.id.action_exempt_app:
-                if (PermissionUtils.hasReadWriteExtStoragePermission(this)) {
-                    startActivityForResult(ExemptAppActivity.create(this), EXEMPT_APP_CONFIGURE_REQUEST_CODE);
-                } else {
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                        SnackbarUtils.showTextLong(rootViewGroup, R.string.main_exempt_feature_permission_requirement);
-                    } else {
-                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE}, READ_WRITE_EXT_STORAGE_PERMISSION_REQUEST);
-                    }
-                }
+                startActivityForResult(ExemptAppActivity.create(this), EXEMPT_APP_CONFIGURE_REQUEST_CODE);
                 return true;
             default:
                 // Invoke the superclass to handle it.
