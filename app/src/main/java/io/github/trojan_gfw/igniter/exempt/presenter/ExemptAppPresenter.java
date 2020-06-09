@@ -1,5 +1,7 @@
 package io.github.trojan_gfw.igniter.exempt.presenter;
 
+import android.content.Context;
+import android.net.Uri;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
@@ -8,13 +10,17 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import io.github.trojan_gfw.igniter.common.constants.Constants;
 import io.github.trojan_gfw.igniter.common.os.Task;
 import io.github.trojan_gfw.igniter.common.os.Threads;
+import io.github.trojan_gfw.igniter.common.utils.PreferenceUtils;
 import io.github.trojan_gfw.igniter.exempt.contract.ExemptAppContract;
 import io.github.trojan_gfw.igniter.exempt.data.AppInfo;
 import io.github.trojan_gfw.igniter.exempt.data.ExemptAppDataSource;
 
 public class ExemptAppPresenter implements ExemptAppContract.Presenter {
+    private static final String KEY_CHECK_EXTERNAL_EXEMPTED_APP_LIST_CONFIG = "check_external_exempted";
+    private final Context mContext;
     private final ExemptAppContract.View mView;
     private final ExemptAppDataSource mDataSource;
     private boolean mDirty;
@@ -22,8 +28,9 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
     private List<AppInfo> mAllAppInfoList;
     private Set<String> mExemptAppPackageNameSet;
 
-    public ExemptAppPresenter(ExemptAppContract.View view, ExemptAppDataSource dataSource) {
+    public ExemptAppPresenter(Context context, ExemptAppContract.View view, ExemptAppDataSource dataSource) {
         super();
+        mContext = context;
         mView = view;
         mDataSource = dataSource;
         view.setPresenter(this);
@@ -107,7 +114,27 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
     }
 
     @Override
-    public void start() {
+    public void migrateExternalExemptedAppListFileToPrivateDirectory() {
+        mView.showLoading();
+        Threads.instance().runOnWorkThread(new Task() {
+            @Override
+            public void onRun() {
+                mDataSource.migrateExternalExemptAppInfo();
+                mDataSource.deleteExternalExemptAppInfo();
+                loadExemptedAppListConfig();
+            }
+        });
+    }
+
+    @Override
+    public void ignoreExternalExemptedAppListConfigForever() {
+        PreferenceUtils.putBooleanPreference(mContext.getContentResolver(),
+                Uri.parse(Constants.PREFERENCE_URI), KEY_CHECK_EXTERNAL_EXEMPTED_APP_LIST_CONFIG,
+                false);
+    }
+
+    @Override
+    public void loadExemptedAppListConfig() {
         mView.showLoading();
         Threads.instance().runOnWorkThread(new Task() {
             @Override
@@ -139,5 +166,21 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
                 });
             }
         });
+    }
+
+    private boolean needCheckExternalExemptedAppListConfig() {
+        return PreferenceUtils.getBooleanPreference(mContext.getContentResolver(),
+                Uri.parse(Constants.PREFERENCE_URI), KEY_CHECK_EXTERNAL_EXEMPTED_APP_LIST_CONFIG,
+                true);
+    }
+
+    @Override
+    public void start() {
+        if (needCheckExternalExemptedAppListConfig() &&
+                mDataSource.checkExternalExemptAppInfoConfigExistence()) {
+            mView.showExemptedAppListMigrationNotice();
+        } else {
+            loadExemptedAppListConfig();
+        }
     }
 }

@@ -22,10 +22,19 @@ public interface ExemptAppContract {
 
         void filterAppsByName(String name);
 
+        void ignoreExternalExemptedAppListConfigForever();
+
+        void migrateExternalExemptedAppListFileToPrivateDirectory();
+
+        void loadExemptedAppListConfig();
+
         void exit();
     }
 
     interface View extends BaseView<Presenter> {
+        @UiThread
+        void showExemptedAppListMigrationNotice();
+
         @UiThread
         void showLoading();
 

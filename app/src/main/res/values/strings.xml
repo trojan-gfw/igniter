@@ -5,6 +5,7 @@
     <string name="common_alert">Alert</string>
     <string name="common_confirm">Confirm</string>
     <string name="common_cancel">Cancel</string>
+    <string name="common_never">Never</string>
     <string name="common_save_success">Save success</string>
 
     <string name="remote_addr">Remote Address</string>
@@ -62,6 +63,10 @@
     <string name="exempt_app_exit">Exit</string>
     <string name="exempt_app_loading_tip">Loading…</string>
     <string name="exempt_app_exit_without_saving_confirm">Exit without saving exempt app list?</string>
+    <string name="exempt_app_migrate_external_exempted_app_list_msg">
+        External exempted app list configuration file detected,
+        would you like to migrate it?
+    </string>
     <string name="action_save_profile">Save Server</string>
     <string name="action_sharelink">Share Link</string>
     <string name="title_activity_about">About</string>

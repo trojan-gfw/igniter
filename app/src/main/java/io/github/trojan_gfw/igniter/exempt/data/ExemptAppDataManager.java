@@ -21,6 +21,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.github.trojan_gfw.igniter.Globals;
+import io.github.trojan_gfw.igniter.common.utils.FileUtils;
+
 /**
  * Implementation of {@link ExemptAppDataSource}. This class reads and writes exempted app list in a
  * file. The exempted app package names will be written line by line in the file.
@@ -35,17 +38,37 @@ import java.util.Set;
  */
 public class ExemptAppDataManager implements ExemptAppDataSource {
     private final PackageManager mPackageManager;
-    private final String mExemptAppListFilePath;
+    private final String mInternalExemptAppListFilePath;
+    private final String mExternalExemptAppListFilePath;
 
-    public ExemptAppDataManager(Context context, String exemptAppListFilePath) {
+    public ExemptAppDataManager(Context context, String internalExemptAppListFilePath,
+                                String externalExemptAppListFilePath) {
         super();
         mPackageManager = context.getPackageManager();
-        mExemptAppListFilePath = exemptAppListFilePath;
+        mInternalExemptAppListFilePath = internalExemptAppListFilePath;
+        mExternalExemptAppListFilePath = externalExemptAppListFilePath;
+    }
+
+    @Override
+    public void deleteExternalExemptAppInfo() {
+        new File(mExternalExemptAppListFilePath).delete();
+    }
+
+    @Override
+    public void migrateExternalExemptAppInfo() {
+        File externalSrcFile = new File(Globals.getExternalExemptedAppListPath());
+        File internalDestFile = new File(Globals.getInternalExemptedAppListPath());
+        FileUtils.copy(externalSrcFile, internalDestFile);
+    }
+
+    @Override
+    public boolean checkExternalExemptAppInfoConfigExistence() {
+        return new File(mExternalExemptAppListFilePath).exists();
     }
 
     @Override
     public void saveExemptAppInfoSet(Set<String> exemptAppPackageNames) {
-        File file = new File(mExemptAppListFilePath);
+        File file = new File(mInternalExemptAppListFilePath);
         if (file.exists()) {
             file.delete();
         }
@@ -71,7 +94,7 @@ public class ExemptAppDataManager implements ExemptAppDataSource {
 
     @NonNull
     private Set<String> readExemptAppListConfig() {
-        File file = new File(mExemptAppListFilePath);
+        File file = new File(mInternalExemptAppListFilePath);
         Set<String> exemptAppSet = new HashSet<>();
         if (!file.exists()) {
             return exemptAppSet;
