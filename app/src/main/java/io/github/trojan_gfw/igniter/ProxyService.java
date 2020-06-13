@@ -117,7 +117,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         @Override
         public void testConnection(String testUrl) {
             if (state != STARTED) {
-                onResult(TUN2SOCKS5_SERVER_HOST, false, 0L, "ProxyService not yet connected.");
+                onResult(TUN2SOCKS5_SERVER_HOST, false, 0L, getString(R.string.proxy_service_not_connected));
                 return;
             }
             new TestConnection(TUN2SOCKS5_SERVER_HOST, tun2socksPort, ProxyService.this).execute(testUrl);
