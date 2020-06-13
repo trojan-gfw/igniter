@@ -24,7 +24,7 @@
     <string name="bind_service">io.github.trojan_gfw.igniter.BIND_SERVICE</string>
     <string name="connected_to__in__ms">连接 %1$s 用时 %2$sms.</string>
     <string name="failed_to_connect_to__">连接失败 %1$s: %2$s</string>
-    <string name="invalid_configuration">非法配置</string>
+    <string name="invalid_configuration">无效配置</string>
     <string name="notification_channel_id">igniter_notify_chan</string>
     <string name="notification_channel_name">Igniter 通知</string>
     <string name="notification_starting_service">开启服务</string>
@@ -44,9 +44,9 @@
     <string name="main_save_failed">保存失败</string>
 
     <string name="main_write_external_storage_permission_requirement">
-        Igniter needs to read and write external storage for reading or writing exempted app
-        list, which is recoverable even when Igniter is uninstalled. Denying the permission
-        will deactivate exempted app feature.
+        为了保存或修改过滤应用配置列表，Igniter 需要读写外部存储空间权限。
+        卸载了 Igniter 后，进行重新安装时，也可以用此来恢复。
+        否则将无法使用此功能。
     </string>
     <string name="main_exempt_feature_permission_requirement">
         请先在 Igniter 应用程序设置中授予读写外部存储权限。
@@ -65,8 +65,7 @@
     <string name="exempt_app_loading_tip">加载中…</string>
     <string name="exempt_app_exit_without_saving_confirm">确定不保存过滤应用列表就退出吗?</string>
     <string name="exempt_app_migrate_external_exempted_app_list_msg">
-        External exempted app list configuration file detected,
-        would you like to migrate it?
+        在外部存储中有过滤应用相关配置，是否需要迁移?
     </string>
     <string name="action_save_profile">保存配置</string>
     <string name="action_sharelink">分享链接</string>
