@@ -5,13 +5,13 @@
 
         <Preference
             app:summary="https://github.com/trojan-gfw/igniter"
-            app:title="Project Page" />
+            app:title="@string/project_page" />
         <Preference
             app:summary="Trojan-GFW"
             app:title="@string/author_title" />
         <Preference
             app:summary="GPLv3"
-            app:title="License" />
+            app:title="@string/project_license" />
         <Preference
             app:summary="@string/versionName"
             app:title="@string/version_title" />

@@ -6,6 +6,7 @@
     <string name="common_confirm">Confirm</string>
     <string name="common_cancel">Cancel</string>
     <string name="common_never">Never</string>
+    <string name="common_update">Update</string>
     <string name="common_save_success">Save success</string>
 
     <string name="remote_addr">Remote Address</string>
@@ -72,8 +73,10 @@
     <string name="title_activity_about">About</string>
 
     <!-- Preference Titles -->
+    <string name="project_page">Project Page</string>
     <string name="about_header">About</string>
     <string name="credits_header">Credits</string>
+    <string name="project_license">License</string>
 
     <!-- Messages Preferences -->
     <string name="version_title">Version</string>
@@ -85,4 +88,9 @@
     <string name="credit_item3_title">bingoogolapple/BGAQRCode-Android</string>
 
     <string name="action_about">About</string>
+
+    <!-- others -->
+    <string name="trojan_service_not_available">Trojan service is not available.</string>
+    <string name="trojan_service_error">Trojan service throws RemoteException.</string>
+    <string name="proxy_service_not_connected">ProxyService not yet connected.</string>
 </resources>

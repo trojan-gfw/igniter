@@ -283,14 +283,14 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         container.addView(trojanURLText);
         builder.setView(container);
 
-        builder.setPositiveButton("Update", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.common_update, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 applyConfigString(trojanURLText.getText().toString());
                 dialog.cancel();
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.common_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
@@ -484,12 +484,12 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     private void testConnection() {
         ITrojanService service = trojanService;
         if (service == null) {
-            showTestConnectionResult(CONNECTION_TEST_URL, false, 0L, "Trojan service is not available.");
+            showTestConnectionResult(CONNECTION_TEST_URL, false, 0L, getString(R.string.trojan_service_not_available));
         } else {
             try {
                 service.testConnection(CONNECTION_TEST_URL);
             } catch (RemoteException e) {
-                showTestConnectionResult(CONNECTION_TEST_URL, false, 0L, "Trojan service throws RemoteException.");
+                showTestConnectionResult(CONNECTION_TEST_URL, false, 0L, getString(R.string.trojan_service_error));
                 e.printStackTrace();
             }
         }

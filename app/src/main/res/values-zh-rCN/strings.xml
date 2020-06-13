@@ -1,0 +1,95 @@
+<resources>
+    <string name="app_name">Igniter</string>
+
+    <string name="common_delete">删除</string>
+    <string name="common_alert">提示</string>
+    <string name="common_confirm">确认</string>
+    <string name="common_cancel">取消</string>
+    <string name="common_never">远不</string>
+    <string name="common_update">更新</string>
+    <string name="common_save_success">保存成功</string>
+
+    <string name="remote_addr">远程地址</string>
+    <string name="remote_port">远程端口</string>
+    <string name="default_port">443</string>
+    <string name="password">密码</string>
+    <string name="button_service__start">连接</string>
+    <string name="button_service__starting">正在打开连接</string>
+    <string name="button_service__stop">断开连接</string>
+    <string name="button_service__stopping">正在断开连接</string>
+    <string name="verify_certificate">验证证书</string>
+    <string name="label_clash">过滤大陆域名/IP</string>
+    <string name="enable_ipv6">开启 IPv6</string>
+    <string name="stop_service">io.github.trojan_gfw.igniter.STOP_SERVICE</string>
+    <string name="bind_service">io.github.trojan_gfw.igniter.BIND_SERVICE</string>
+    <string name="connected_to__in__ms">连接 %1$s 用时 %2$sms.</string>
+    <string name="failed_to_connect_to__">连接失败 %1$s: %2$s</string>
+    <string name="invalid_configuration">无效配置</string>
+    <string name="notification_channel_id">igniter_notify_chan</string>
+    <string name="notification_channel_name">Igniter 通知</string>
+    <string name="notification_starting_service">开启服务</string>
+    <string name="main_restart_proxy_service_tip">启用新的过滤应用配置请重新应用</string>
+    <string name="clipboard_import_tip">导入粘贴板中的 Trojan 地址吗?</string>
+
+    <!-- App Bar Menu -->
+    <string name="action_test_connection">测试连接</string>
+    <string name="action_show_develop_info_logcat">在logcat中显示开发信息</string>
+
+    <string name="server_list_import_file_desc">导入配置 (*.txt)</string>
+    <string name="server_list_file_chooser_msg">选择 TXT 文件</string>
+    <string name="server_list_menu_import_from_file">从文件中导入</string>
+    <string name="server_list_delete_btn">@string/common_delete</string>
+    <string name="server_list_lack_of_camera_permission">缺少相机权限</string>
+    <string name="main_save_success">@string/common_save_success</string>
+    <string name="main_save_failed">保存失败</string>
+
+    <string name="main_write_external_storage_permission_requirement">
+        为了保存或修改过滤应用配置列表，Igniter 需要读写外部存储空间权限。
+        卸载了 Igniter 后，进行重新安装时，也可以用此来恢复。
+        否则将无法使用此功能。
+    </string>
+    <string name="main_exempt_feature_permission_requirement">
+        请先在 Igniter 应用程序设置中授予读写外部存储权限。
+    </string>
+    <string name="main_menu_server_list">加载配置</string>
+
+    <string name="scan_qr_code_success">添加服务成功</string>
+    <string name="scan_qr_code_failed">无法识别 trojan 地址: %s</string>
+    <string name="scan_qr_code">扫描二维码</string>
+    <string name="scan_qr_code_camera_error">相机错误</string>
+
+    <string name="menu_action_exempt_app_save">保存</string>
+    <string name="menu_action_exempt_app">过滤应用</string>
+    <string name="exempt_app_search_title">搜索应用</string>
+    <string name="exempt_app_exit">退出</string>
+    <string name="exempt_app_loading_tip">加载中…</string>
+    <string name="exempt_app_exit_without_saving_confirm">确定不保存过滤应用列表就退出吗?</string>
+    <string name="exempt_app_migrate_external_exempted_app_list_msg">
+        在外部存储中有过滤应用相关配置，是否需要迁移?
+    </string>
+    <string name="action_save_profile">保存配置</string>
+    <string name="action_sharelink">分享链接</string>
+    <string name="title_activity_about">关于</string>
+
+    <!-- Preference Titles -->
+    <string name="project_page">项目地址</string>
+    <string name="about_header">关于</string>
+    <string name="credits_header">鸣谢</string>
+    <string name="project_license">许可</string>
+
+    <!-- Messages Preferences -->
+    <string name="version_title">版本</string>
+    <string name="author_title">开发者</string>
+
+    <!-- Sync Preferences -->
+    <string name="credit_item1_title">Dreamacro/clash</string>
+    <string name="credit_item2_title">eycorsican/go-tun2socks</string>
+    <string name="credit_item3_title">bingoogolapple/BGAQRCode-Android</string>
+
+    <string name="action_about">关于</string>
+
+    <!-- others -->
+    <string name="trojan_service_not_available">Trojan 服务不可用</string>
+    <string name="trojan_service_error">Trojan 服务错误</string>
+    <string name="proxy_service_not_connected">代理服务暂未开启</string>
+</resources>
