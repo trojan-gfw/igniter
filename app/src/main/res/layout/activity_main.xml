@@ -35,6 +35,23 @@
             app:srcCompat="@mipmap/ic_launcher_foreground" />
 
         <EditText
+            android:id="@+id/remoteServerNameText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="12dp"
+            android:ems="10"
+            android:hint="@string/remote_server_name"
+            android:inputType="textUri"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+
+        <EditText
             android:id="@+id/remoteAddrText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,7 +65,7 @@
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView" />
+            app:layout_constraintTop_toBottomOf="@+id/remoteServerNameText" />
 
         <EditText
             android:id="@+id/remotePortText"

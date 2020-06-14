@@ -14,6 +14,7 @@ public class TrojanConfig implements Parcelable {
     private String localAddr;
     private int localPort;
     private String remoteAddr;
+    private String remoteServerName;
     private int remotePort;
     private String password;
     private boolean verifyCert;
@@ -52,6 +53,7 @@ public class TrojanConfig implements Parcelable {
     protected TrojanConfig(Parcel in) {
         localAddr = in.readString();
         localPort = in.readInt();
+        remoteServerName = in.readString();
         remoteAddr = in.readString();
         remotePort = in.readInt();
         password = in.readString();
@@ -79,6 +81,7 @@ public class TrojanConfig implements Parcelable {
             return new JSONObject()
                     .put("local_addr", this.localAddr)
                     .put("local_port", this.localPort)
+                    .put("remote_server_name", this.remoteServerName)
                     .put("remote_addr", this.remoteAddr)
                     .put("remote_port", this.remotePort)
                     .put("password", new JSONArray().put(password))
@@ -102,6 +105,7 @@ public class TrojanConfig implements Parcelable {
             JSONObject json = new JSONObject(jsonStr);
             this.setLocalAddr(json.getString("local_addr"))
                     .setLocalPort(json.getInt("local_port"))
+                    .setRemoteServerName(json.optString("remote_server_name"))
                     .setRemoteAddr(json.getString("remote_addr"))
                     .setRemotePort(json.getInt("remote_port"))
                     .setPassword(json.getJSONArray("password").getString(0))
@@ -117,6 +121,7 @@ public class TrojanConfig implements Parcelable {
         this
                 .setLocalAddr(that.localAddr)
                 .setLocalPort(that.localPort)
+                .setRemoteServerName(that.remoteServerName)
                 .setRemoteAddr(that.remoteAddr)
                 .setRemotePort(that.remotePort)
                 .setPassword(that.password)
@@ -149,6 +154,15 @@ public class TrojanConfig implements Parcelable {
 
     public TrojanConfig setLocalPort(int localPort) {
         this.localPort = localPort;
+        return this;
+    }
+
+    public String getRemoteServerName() {
+        return remoteServerName;
+    }
+
+    public TrojanConfig setRemoteServerName(String remoteServerName) {
+        this.remoteServerName = remoteServerName;
         return this;
     }
 

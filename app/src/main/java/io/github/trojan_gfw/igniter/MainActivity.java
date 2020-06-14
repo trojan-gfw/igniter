@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
 
     private String shareLink;
     private ViewGroup rootViewGroup;
+    private EditText remoteServerNameText;
     private EditText remoteAddrText;
     private EditText remotePortText;
     private EditText passwordText;
@@ -74,6 +75,20 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     private ITrojanService trojanService;
     private ServerListDataSource serverListDataManager;
     private AlertDialog linkDialog;
+
+    private TextViewListener remoteServerNameTextListener = new TextViewListener() {
+        @Override
+        protected void onTextChanged(String before, String old, String aNew, String after) {
+            // update TextView
+            startUpdates(); // to prevent infinite loop.
+            if (remoteServerNameText.hasFocus()) {
+                TrojanConfig ins = Globals.getTrojanConfigInstance();
+                ins.setRemoteServerName(remoteServerNameText.getText().toString());
+            }
+            endUpdates();
+        }
+    };
+
     private TextViewListener remoteAddrTextListener = new TextViewListener() {
         @Override
         protected void onTextChanged(String before, String old, String aNew, String after) {
@@ -165,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 break;
             }
         }
+        remoteServerNameText.setEnabled(inputEnabled);
         remoteAddrText.setEnabled(inputEnabled);
         remotePortText.setEnabled(inputEnabled);
         ipv6Switch.setEnabled(inputEnabled);
@@ -178,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         TrojanConfig ins = Globals.getTrojanConfigInstance();
         TrojanConfig parsedConfig = TrojanURLHelper.ParseTrojanURL(configString);
         if (parsedConfig != null) {
+            String remoteServerName = parsedConfig.getRemoteServerName();
             String remoteAddress = parsedConfig.getRemoteAddr();
             int remotePort = parsedConfig.getRemotePort();
             String password = parsedConfig.getPassword();
@@ -189,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
             passwordText.setText(password);
             remotePortText.setText(String.valueOf(remotePort));
             remoteAddrText.setText(remoteAddress);
+            remoteServerNameText.setText(remoteServerName);
         }
     }
 
@@ -197,6 +215,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         rootViewGroup = findViewById(R.id.rootScrollView);
+        remoteServerNameText = findViewById(R.id.remoteServerNameText);
         remoteAddrText = findViewById(R.id.remoteAddrText);
         remotePortText = findViewById(R.id.remotePortText);
         passwordText = findViewById(R.id.passwordText);
@@ -210,6 +229,8 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         copyRawResourceToDir(R.raw.cacert, Globals.getCaCertPath(), true);
         copyRawResourceToDir(R.raw.country, Globals.getCountryMmdbPath(), true);
         copyRawResourceToDir(R.raw.clash_config, Globals.getClashConfigPath(), false);
+
+        remoteServerNameText.addTextChangedListener(remoteServerNameTextListener);
 
         remoteAddrText.addTextChangedListener(remoteAddrTextListener);
 

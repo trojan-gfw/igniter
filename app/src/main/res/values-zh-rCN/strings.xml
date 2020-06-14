@@ -9,6 +9,7 @@
     <string name="common_update">更新</string>
     <string name="common_save_success">保存成功</string>
 
+    <string name="remote_server_name">远程服务名称</string>
     <string name="remote_addr">远程地址</string>
     <string name="remote_port">远程端口</string>
     <string name="default_port">443</string>
