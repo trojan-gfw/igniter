@@ -19,6 +19,7 @@ public interface ServerListContract {
         void hideImportFileDescription();
         void importConfigFromFile();
         void parseConfigsInFileStream(Context context, Uri fileUri);
+        void exportServerListToFile();
     }
 
     interface View extends BaseView<Presenter> {
@@ -31,5 +32,6 @@ public interface ServerListContract {
         void showImportFileDescription();
         void dismissImportFileDescription();
         void openFileChooser();
+        void showExportServerListMsg(int msgId);
     }
 }

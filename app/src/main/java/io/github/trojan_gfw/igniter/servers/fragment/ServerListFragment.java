@@ -205,6 +205,9 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
             case R.id.action_import_from_file:
                 mPresenter.displayImportFileDescription();
                 return true;
+            case R.id.action_export_to_file:
+                mPresenter.exportServerListToFile();
+                return true;
             default:
                 break;
         }
@@ -243,6 +246,16 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
                 .setType("text/plain")
                 .setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, getString(R.string.server_list_file_chooser_msg)), FILE_IMPORT_REQUEST_CODE);
+    }
+
+    @Override
+    public void showExportServerListMsg(final int msgId) {
+        mRootView.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), getString(msgId), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

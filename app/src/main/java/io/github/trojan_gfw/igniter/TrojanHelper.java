@@ -34,13 +34,16 @@ public class TrojanHelper {
                 return false;
             }
         }
-        String configStr = jsonArray.toString();
-        File file = new File(trojanConfigListPath);
+        return writeStringToFile(jsonArray.toString(), trojanConfigListPath);
+    }
+
+    public static boolean writeStringToFile(String content, String filepath) {
+        File file = new File(filepath);
         if (file.exists()) {
             file.delete();
         }
         try (OutputStream fos = new FileOutputStream(file)) {
-            fos.write(configStr.getBytes());
+            fos.write(content.getBytes());
             fos.flush();
         } catch (IOException e) {
             e.printStackTrace();

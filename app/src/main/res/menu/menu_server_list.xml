@@ -9,4 +9,9 @@
     <item android:id="@+id/action_import_from_file"
         android:title="@string/server_list_menu_import_from_file"
         app:showAsAction="never" />
+
+    <item android:id="@+id/action_export_to_file"
+        android:title="@string/server_list_menu_export_to_file"
+        app:showAsAction="never" />
+
 </menu>

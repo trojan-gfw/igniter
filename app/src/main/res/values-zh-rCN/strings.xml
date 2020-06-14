@@ -95,4 +95,7 @@
     <string name="proxy_service_not_connected">代理服务暂未开启</string>
     <string name="exempt_app_mode_allow">代理应用模式</string>
     <string name="exempt_app_mode_block">屏蔽应用模式</string>
+    <string name="server_list_menu_export_to_file">导出配置</string>
+    <string name="export_server_list_success">导出配置成功</string>
+    <string name="export_server_list_error">导出配置失败</string>
 </resources>
