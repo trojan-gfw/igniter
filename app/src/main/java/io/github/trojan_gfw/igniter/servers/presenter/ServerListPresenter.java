@@ -16,7 +16,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import io.github.trojan_gfw.igniter.Globals;
+import io.github.trojan_gfw.igniter.R;
 import io.github.trojan_gfw.igniter.TrojanConfig;
+import io.github.trojan_gfw.igniter.TrojanHelper;
 import io.github.trojan_gfw.igniter.TrojanURLHelper;
 import io.github.trojan_gfw.igniter.common.os.Task;
 import io.github.trojan_gfw.igniter.common.os.Threads;
@@ -41,6 +44,52 @@ public class ServerListPresenter implements ServerListContract.Presenter {
     @Override
     public void displayImportFileDescription() {
         mView.showImportFileDescription();
+    }
+
+    @Override
+    public void exportServerListToFile() {
+        Threads.instance().runOnWorkThread(new Task() {
+            @Override
+            public void onRun() {
+                exportConfigFile();
+            }
+        });
+    }
+
+    private void exportConfigFile() {
+        boolean success = false;
+        try {
+            String exportContent = getExportContent();
+            success = TrojanHelper.writeStringToFile(exportContent, Globals.getIgniterExportPath());
+        } catch (Exception ignore) {
+        }
+        if (success) {
+            mView.showExportServerListMsg(R.string.export_server_list_success);
+        } else {
+            mView.showExportServerListMsg(R.string.export_server_list_error);
+        }
+    }
+
+    private String getExportContent() throws JSONException {
+        List<TrojanConfig> trojanConfigs = mDataManager.loadServerConfigList();
+        JSONArray array = new JSONArray();
+        int index = 0;
+        for (TrojanConfig trojanConfig : trojanConfigs) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("remarks", trojanConfig.getRemoteServerName());
+            jsonObject.put("server", trojanConfig.getRemoteAddr());
+            jsonObject.put("server_port", trojanConfig.getRemotePort());
+            jsonObject.put("password", trojanConfig.getPassword());
+            jsonObject.put("verify", trojanConfig.getVerifyCert());
+            // for future
+            // jsonObject.put("type", "trojan");
+            // jsonObject.put("enable_ipv6", trojanConfig.getEnableIpv6());
+            // jsonObject.put("enable_clash", trojanConfig.getEnableClash());
+            array.put(index++, jsonObject);
+        }
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("configs", array);
+        return jsonObject.toString();
     }
 
     @Override
@@ -99,6 +148,7 @@ public class ServerListPresenter implements ServerListContract.Presenter {
                     continue;
                 }
                 TrojanConfig tmp = new TrojanConfig();
+                tmp.setRemoteServerName(config.optString("remarks", "-"));
                 tmp.setRemoteAddr(remoteAddr);
                 tmp.setRemotePort(config.optInt("server_port"));
                 tmp.setPassword(config.optString("password"));

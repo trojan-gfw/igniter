@@ -39,6 +39,7 @@
     <string name="server_list_import_file_desc">Import config in file extension (*.txt)</string>
     <string name="server_list_file_chooser_msg">Select a TXT file</string>
     <string name="server_list_menu_import_from_file">Import from file</string>
+    <string name="server_list_menu_export_to_file">Export to file</string>
     <string name="server_list_delete_btn">@string/common_delete</string>
     <string name="server_list_lack_of_camera_permission">Lack of camera permission!</string>
     <string name="main_save_success">@string/common_save_success</string>
@@ -96,4 +97,6 @@
     <string name="trojan_service_not_available">Trojan service is not available.</string>
     <string name="trojan_service_error">Trojan service throws RemoteException.</string>
     <string name="proxy_service_not_connected">ProxyService not yet connected.</string>
+    <string name="export_server_list_success">Export Config Success</string>
+    <string name="export_server_list_error">Export Config Error</string>
 </resources>

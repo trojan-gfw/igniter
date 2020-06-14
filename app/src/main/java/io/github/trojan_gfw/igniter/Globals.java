@@ -38,6 +38,10 @@ public class Globals {
         return PathHelper.combine(filesDir, "config_list.json");
     }
 
+    public static String getIgniterExportPath() {
+        return PathHelper.combine(externalFilesDir, "config_list.txt");
+    }
+
     public static String getPreferencesFilePath() {
         return PathHelper.combine(filesDir, "preferences.txt");
     }

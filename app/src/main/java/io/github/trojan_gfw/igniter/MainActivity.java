@@ -199,14 +199,15 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
             int remotePort = parsedConfig.getRemotePort();
             String password = parsedConfig.getPassword();
 
+            ins.setRemoteServerName(remoteServerName);
             ins.setRemoteAddr(remoteAddress);
             ins.setRemotePort(remotePort);
             ins.setPassword(password);
 
+            remoteServerNameText.setText(remoteServerName);
             passwordText.setText(password);
             remotePortText.setText(String.valueOf(remotePort));
             remoteAddrText.setText(remoteAddress);
-            remoteServerNameText.setText(remoteServerName);
         }
     }
 
@@ -515,6 +516,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     }
 
     private void clearEditTextFocus() {
+        remoteServerNameText.clearFocus();
         remoteAddrText.clearFocus();
         remotePortText.clearFocus();
         passwordText.clearFocus();
@@ -543,6 +545,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        remoteServerNameText.setText(config.getRemoteServerName());
                         remoteAddrText.setText(config.getRemoteAddr());
                         remotePortText.setText(String.valueOf(config.getRemotePort()));
                         passwordText.setText(config.getPassword());
@@ -632,6 +635,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                     TrojanConfig ins = Globals.getTrojanConfigInstance();
                     ins.fromJSON(contentStr);
 
+                    remoteServerNameText.setText(ins.getRemoteServerName());
                     remoteAddrText.setText(ins.getRemoteAddr());
                     remotePortText.setText(String.valueOf(ins.getRemotePort()));
                     passwordText.setText(ins.getPassword());

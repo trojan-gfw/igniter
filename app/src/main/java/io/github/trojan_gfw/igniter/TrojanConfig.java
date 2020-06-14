@@ -244,7 +244,8 @@ public class TrojanConfig implements Parcelable {
             return false;
         }
         TrojanConfig that = (TrojanConfig) obj;
-        return (paramEquals(remoteAddr, that.remoteAddr) && paramEquals(remotePort, that.remotePort)
+        return (paramEquals(remoteServerName, that.remoteServerName) &&
+                paramEquals(remoteAddr, that.remoteAddr) && paramEquals(remotePort, that.remotePort)
                 && paramEquals(localAddr, that.localAddr) && paramEquals(localPort, that.localPort))
                 && paramEquals(password, that.password) && paramEquals(verifyCert, that.verifyCert)
                 && paramEquals(caCertPath, that.caCertPath) && paramEquals(enableIpv6, that.enableIpv6)
@@ -270,6 +271,7 @@ public class TrojanConfig implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(localAddr);
         dest.writeInt(localPort);
+        dest.writeString(remoteServerName);
         dest.writeString(remoteAddr);
         dest.writeInt(remotePort);
         dest.writeString(password);
