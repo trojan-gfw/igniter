@@ -82,7 +82,6 @@ public class ServerListPresenter implements ServerListContract.Presenter {
             jsonObject.put("password", trojanConfig.getPassword());
             jsonObject.put("verify", trojanConfig.getVerifyCert());
             // for future
-            // jsonObject.put("type", "trojan");
             // jsonObject.put("enable_ipv6", trojanConfig.getEnableIpv6());
             // jsonObject.put("enable_clash", trojanConfig.getEnableClash());
             array.put(index++, jsonObject);
