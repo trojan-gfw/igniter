@@ -4,9 +4,11 @@ import android.content.Context;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import androidx.annotation.UiThread;
+import androidx.annotation.WorkerThread;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -25,8 +27,10 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
     private final ExemptAppDataSource mDataSource;
     private boolean mDirty;
     private boolean mConfigurationChanged;
+    private boolean mWorkInAllowMode;
     private List<AppInfo> mAllAppInfoList;
-    private Set<String> mExemptAppPackageNameSet;
+    private Set<String> mBlockAppPackageNameSet;
+    private Set<String> mAllowAppPackageNameSet;
 
     public ExemptAppPresenter(Context context, ExemptAppContract.View view, ExemptAppDataSource dataSource) {
         super();
@@ -37,41 +41,47 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
     }
 
     @Override
-    public void updateAppInfo(AppInfo appInfo, int position, boolean exempt) {
+    public void updateAppInfo(AppInfo appInfo, int position, boolean isChecked) {
         mDirty = true;
         String packageName = appInfo.getPackageName();
-        if (mExemptAppPackageNameSet.contains(packageName)) {
-            if (!exempt) {
-                mExemptAppPackageNameSet.remove(packageName);
+        Set<String> packageNameSet = getAppPackageNameSet(mWorkInAllowMode);
+        if (packageNameSet.contains(packageName)) {
+            if (!isChecked) {
+                packageNameSet.remove(packageName);
             }
-        } else if (exempt) {
-            mExemptAppPackageNameSet.add(packageName);
+        } else if (isChecked) {
+            packageNameSet.add(packageName);
         }
-        appInfo.setExempt(exempt);
+        appInfo.setExempt(isChecked);
+    }
+
+    @UiThread
+    private void displayAppList(List<AppInfo> appInfoList) {
+        if (mWorkInAllowMode) {
+            mView.showAllowAppList(appInfoList);
+        } else {
+            mView.showBlockAppList(appInfoList);
+        }
     }
 
     @Override
     public void filterAppsByName(final String name) {
         if (TextUtils.isEmpty(name)) {
-            mView.showAppList(mAllAppInfoList);
+            displayAppList(mAllAppInfoList);
             return;
         }
         Threads.instance().runOnWorkThread(new Task() {
             @Override
             public void onRun() {
                 final List<AppInfo> tmpInfoList = new ArrayList<>();
+                final List<AppInfo> allAppInfoList = mAllAppInfoList;
                 final String lowercaseName = name.toLowerCase();
-                for (AppInfo appInfo : mAllAppInfoList) {
+                for (AppInfo appInfo : allAppInfoList) {
                     if (appInfo.getAppNameInLowercase().contains(lowercaseName)) {
                         tmpInfoList.add(appInfo);
                     }
                 }
-                Threads.instance().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mView.showAppList(tmpInfoList);
-                    }
-                });
+                Threads.instance().runOnUiThread(() -> displayAppList(tmpInfoList));
             }
         });
     }
@@ -87,14 +97,15 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
         Threads.instance().runOnWorkThread(new Task() {
             @Override
             public void onRun() {
-                mDataSource.saveExemptAppInfoSet(mExemptAppPackageNameSet);
+                PreferenceUtils.putBooleanPreference(mContext.getContentResolver(),
+                        Uri.parse(Constants.PREFERENCE_URI),
+                        Constants.PREFERENCE_KEY_PROXY_IN_ALLOW_MODE, mWorkInAllowMode);
+                mDataSource.saveBlockAppInfoSet(mBlockAppPackageNameSet);
+                mDataSource.saveAllowAppInfoSet(mAllowAppPackageNameSet);
                 mDirty = false;
-                Threads.instance().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mView.dismissLoading();
-                        mView.showSaveSuccess();
-                    }
+                Threads.instance().runOnUiThread(() -> {
+                    mView.dismissLoading();
+                    mView.showSaveSuccess();
                 });
             }
         });
@@ -121,7 +132,7 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
             public void onRun() {
                 mDataSource.migrateExternalExemptAppInfo();
                 mDataSource.deleteExternalExemptAppInfo();
-                loadExemptedAppListConfig();
+                loadBlockAppListConfig();
             }
         });
     }
@@ -133,39 +144,60 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
                 false);
     }
 
-    @Override
-    public void loadExemptedAppListConfig() {
-        mView.showLoading();
-        Threads.instance().runOnWorkThread(new Task() {
-            @Override
-            public void onRun() {
-                final List<AppInfo> allAppInfoList = mDataSource.getAllAppInfoList();
-                mExemptAppPackageNameSet = mDataSource.loadExemptAppPackageNameSet();
-                for (AppInfo appInfo : allAppInfoList) {
-                    if (mExemptAppPackageNameSet.contains(appInfo.getPackageName())) {
-                        appInfo.setExempt(true);
-                    }
-                }
-                // cluster exempted apps.
-                Collections.sort(allAppInfoList, new Comparator<AppInfo>() {
-                    @Override
-                    public int compare(AppInfo o1, AppInfo o2) {
-                        if (o1.isExempt() != o2.isExempt()) {
-                            return o1.isExempt() ? -1 : 1;
-                        }
-                        return o1.getAppName().compareTo(o2.getAppName());
-                    }
-                });
-                mAllAppInfoList = allAppInfoList;
-                Threads.instance().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mView.showAppList(allAppInfoList);
-                        mView.dismissLoading();
-                    }
-                });
+    private void showViewLoading() {
+        Threads.instance().runOnUiThread(mView::showLoading);
+    }
+
+    private Set<String> getAppPackageNameSet(boolean workInAllowMode) {
+        if (workInAllowMode) {
+            if (mAllowAppPackageNameSet == null) {
+                mAllowAppPackageNameSet = mDataSource.loadAllowAppPackageNameSet();
             }
+            return mAllowAppPackageNameSet;
+        } else {
+            if (mBlockAppPackageNameSet == null) {
+                mBlockAppPackageNameSet = mDataSource.loadBlockAppPackageNameSet();
+            }
+            return mBlockAppPackageNameSet;
+        }
+    }
+
+    @WorkerThread
+    private void loadAppListConfigInner(boolean inAllowMode) {
+        showViewLoading();
+        if (mAllAppInfoList == null) {
+            mAllAppInfoList = mDataSource.getAllAppInfoList();
+        }
+        List<AppInfo> allAppInfoList = mAllAppInfoList;
+        Set<String> packageNameSet = getAppPackageNameSet(inAllowMode);
+        for (AppInfo appInfo : allAppInfoList) {
+            appInfo.setExempt(packageNameSet.contains(appInfo.getPackageName()));
+        }
+        Collections.sort(allAppInfoList, AppInfo::compareTo);
+        Threads.instance().runOnUiThread(()->{
+            if (inAllowMode) {
+                mView.showAllowAppList(allAppInfoList);
+            } else {
+                mView.showBlockAppList(allAppInfoList);
+            }
+            mView.dismissLoading();
         });
+    }
+
+    @Override
+    public void loadAllowAppListConfig() {
+        if (mWorkInAllowMode) return;
+        mDirty = true;
+        mWorkInAllowMode = true;
+        loadAppListConfigInner(true);
+    }
+
+    @Override
+    public void loadBlockAppListConfig() {
+        if (!mWorkInAllowMode) return;
+        mDirty = true;
+        mWorkInAllowMode = false;
+        loadAppListConfigInner(false);
     }
 
     private boolean needCheckExternalExemptedAppListConfig() {
@@ -174,13 +206,24 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
                 true);
     }
 
+    private void loadWorkModeAndAppListConfig() {
+        Threads.instance().runOnWorkThread(new Task() {
+            @Override
+            public void onRun() {
+                mWorkInAllowMode = PreferenceUtils.getBooleanPreference(mContext.getContentResolver(),
+                        Uri.parse(Constants.PREFERENCE_URI), Constants.PREFERENCE_KEY_PROXY_IN_ALLOW_MODE, false);
+                loadAppListConfigInner(mWorkInAllowMode);
+            }
+        });
+    }
+
     @Override
     public void start() {
         if (needCheckExternalExemptedAppListConfig() &&
                 mDataSource.checkExternalExemptAppInfoConfigExistence()) {
             mView.showExemptedAppListMigrationNotice();
         } else {
-            loadExemptedAppListConfig();
+            loadWorkModeAndAppListConfig();
         }
     }
 }

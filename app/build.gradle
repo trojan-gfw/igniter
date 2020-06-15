@@ -25,7 +25,7 @@ private String GenerateVersionName() {
 }
 
 android {
-    ndkVersion "21.3.6528147"
+    ndkVersion '21.0.6113669'
     compileSdkVersion 28
 
     applicationVariants.all { variant ->
@@ -63,6 +63,10 @@ android {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 

@@ -2,7 +2,9 @@ package io.github.trojan_gfw.igniter.exempt.data;
 
 import android.graphics.drawable.Drawable;
 
-public class AppInfo implements Cloneable {
+import java.util.Optional;
+
+public class AppInfo implements Cloneable, Comparable<AppInfo> {
     private String appName;
     private String appNameInLowercase;
     private Drawable icon;
@@ -47,6 +49,17 @@ public class AppInfo implements Cloneable {
 
     public void setExempt(boolean exempt) {
         this.exempt = exempt;
+    }
+
+    @Override
+    public int compareTo(AppInfo o) {
+        if (exempt ^ o.exempt) {
+            return exempt ? -1 : 1;
+        }
+        if (appName == null) {
+            return "".compareTo(o.appName);
+        }
+        return appName.compareTo(o.appName);
     }
 
     @Override

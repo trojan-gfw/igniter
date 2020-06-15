@@ -1,5 +1,6 @@
 package io.github.trojan_gfw.igniter.exempt.data;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
 import java.util.List;
@@ -12,17 +13,26 @@ public interface ExemptAppDataSource {
      * @return exempt applications' package names..
      */
     @WorkerThread
-    Set<String> loadExemptAppPackageNameSet();
+    Set<String> loadBlockAppPackageNameSet();
+
+    /**
+     * Load package names of applications to whom the proxy is applied.
+     */
+    @WorkerThread
+    Set<String> loadAllowAppPackageNameSet();
 
     boolean checkExternalExemptAppInfoConfigExistence();
 
     /**
      * Save exempt applications' package names.
      *
-     * @param exemptAppPackageNames exempt app package name set
+     * @param blockAppPackageNames exempt app package name set
      */
     @WorkerThread
-    void saveExemptAppInfoSet(Set<String> exemptAppPackageNames);
+    void saveBlockAppInfoSet(@Nullable Set<String> blockAppPackageNames);
+
+    @WorkerThread
+    void saveAllowAppInfoSet(@Nullable Set<String> allowAppPackageNames);
 
     /**
      * Migrate external exempted application config file to private directory.
@@ -33,6 +43,7 @@ public interface ExemptAppDataSource {
 
     /**
      * Load all application info list, including exempt apps and non-exempt apps.
+     *
      * @return all application info list
      */
     @WorkerThread
