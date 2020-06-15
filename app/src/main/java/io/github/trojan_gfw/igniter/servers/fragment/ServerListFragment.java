@@ -249,11 +249,21 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
     }
 
     @Override
-    public void showExportServerListMsg(final int msgId) {
+    public void showExportServerListSuccess() {
         mRootView.post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getApplicationContext(), getString(msgId), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.export_server_list_success), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void showExportServerListFailure() {
+        mRootView.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), getString(R.string.export_server_list_error), Toast.LENGTH_SHORT).show();
             }
         });
     }

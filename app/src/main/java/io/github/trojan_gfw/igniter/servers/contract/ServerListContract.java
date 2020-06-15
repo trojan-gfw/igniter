@@ -32,6 +32,8 @@ public interface ServerListContract {
         void showImportFileDescription();
         void dismissImportFileDescription();
         void openFileChooser();
-        void showExportServerListMsg(int msgId);
+        void showExportServerListSuccess();
+        void showExportServerListFailure();
+
     }
 }
