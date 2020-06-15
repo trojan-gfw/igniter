@@ -43,6 +43,7 @@ public class ServerListAdapter extends RecyclerView.Adapter<ViewHolder> {
     public void removeItemOnPosition(int pos) {
         mData.remove(pos);
         notifyItemRemoved(pos);
+        notifyDataSetChanged();
     }
 
     @Override
