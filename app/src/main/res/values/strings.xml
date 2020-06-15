@@ -68,6 +68,8 @@
         External exempted app list configuration file detected,
         would you like to migrate it?
     </string>
+    <string name="exempt_app_mode_allow">Allow Mode</string>
+    <string name="exempt_app_mode_block">Block Mode</string>
     <string name="action_save_profile">Save Server</string>
     <string name="action_sharelink">Share Link</string>
     <string name="title_activity_about">About</string>

@@ -26,7 +26,9 @@ public interface ExemptAppContract {
 
         void migrateExternalExemptedAppListFileToPrivateDirectory();
 
-        void loadExemptedAppListConfig();
+        void loadBlockAppListConfig();
+
+        void loadAllowAppListConfig();
 
         void exit();
     }
@@ -48,7 +50,10 @@ public interface ExemptAppContract {
         void showExitConfirm();
 
         @UiThread
-        void showAppList(List<AppInfo> packageNames);
+        void showBlockAppList(List<AppInfo> packageNames);
+
+        @UiThread
+        void showAllowAppList(List<AppInfo> packagesNames);
 
         @AnyThread
         void exit(boolean configurationChanged);

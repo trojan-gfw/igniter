@@ -13,9 +13,30 @@
         android:layout_height="@dimen/top_bar_height"
         tools:ignore="MissingConstraints" />
 
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/exemptAppWorkModeTabLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/exemptAppTopBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/exemptAppBlockModeTi"
+            android:text="@string/exempt_app_mode_block"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/exemptAppAllowModeTi"
+            android:text="@string/exempt_app_mode_allow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </com.google.android.material.tabs.TabLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/exemptAppRv"
-        app:layout_constraintTop_toBottomOf="@id/exemptAppTopBar"
+        app:layout_constraintTop_toBottomOf="@id/exemptAppWorkModeTabLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

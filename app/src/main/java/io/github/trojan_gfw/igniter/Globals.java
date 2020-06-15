@@ -47,15 +47,19 @@ public class Globals {
     }
 
     /**
-     * @deprecated use {@link #getInternalExemptedAppListPath()} instead.
+     * @deprecated use {@link #getInternalBlockAppListPath()} instead.
      */
     @Deprecated
     public static String getExternalExemptedAppListPath() {
         return PathHelper.combine(externalFilesDir, "exempted_app_list.txt");
     }
 
-    public static String getInternalExemptedAppListPath() {
+    public static String getInternalBlockAppListPath() {
         return PathHelper.combine(filesDir, "exempted_app_list.txt");
+    }
+
+    public static String getAllowedAppListPath() {
+        return PathHelper.combine(filesDir, "allow_app_list.txt");
     }
 
     public static void setTrojanConfigInstance(TrojanConfig config) {

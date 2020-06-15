@@ -1,7 +1,6 @@
 package io.github.trojan_gfw.igniter;
 
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -30,7 +29,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -357,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     private void migrateExternalExemptAppInfoImplicitly() {
         if (PermissionUtils.hasReadWriteExtStoragePermission(MainActivity.this)) {
             ExemptAppDataSource dataSource = new ExemptAppDataManager(MainActivity.this,
-                    Globals.getInternalExemptedAppListPath(), Globals.getExternalExemptedAppListPath());
+                    Globals.getInternalBlockAppListPath(), Globals.getExternalExemptedAppListPath(), Globals.getAllowedAppListPath());
             if (dataSource.checkExternalExemptAppInfoConfigExistence()) {
                 dataSource.migrateExternalExemptAppInfo();
                 dataSource.deleteExternalExemptAppInfo();
