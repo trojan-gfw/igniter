@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Set;
 
 import io.github.trojan_gfw.igniter.Globals;
-import io.github.trojan_gfw.igniter.R;
 import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.TrojanHelper;
 import io.github.trojan_gfw.igniter.TrojanURLHelper;
@@ -64,9 +63,9 @@ public class ServerListPresenter implements ServerListContract.Presenter {
         } catch (Exception ignore) {
         }
         if (success) {
-            mView.showExportServerListMsg(R.string.export_server_list_success);
+            mView.showExportServerListSuccess();
         } else {
-            mView.showExportServerListMsg(R.string.export_server_list_error);
+            mView.showExportServerListFailure();
         }
     }
 
