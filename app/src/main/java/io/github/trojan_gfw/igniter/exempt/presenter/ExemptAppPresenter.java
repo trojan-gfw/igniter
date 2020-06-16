@@ -21,7 +21,6 @@ import io.github.trojan_gfw.igniter.exempt.data.AppInfo;
 import io.github.trojan_gfw.igniter.exempt.data.ExemptAppDataSource;
 
 public class ExemptAppPresenter implements ExemptAppContract.Presenter {
-    private static final String KEY_CHECK_EXTERNAL_EXEMPTED_APP_LIST_CONFIG = "check_external_exempted";
     private final Context mContext;
     private final ExemptAppContract.View mView;
     private final ExemptAppDataSource mDataSource;
@@ -124,26 +123,6 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
         mView.exit(mConfigurationChanged);
     }
 
-    @Override
-    public void migrateExternalExemptedAppListFileToPrivateDirectory() {
-        mView.showLoading();
-        Threads.instance().runOnWorkThread(new Task() {
-            @Override
-            public void onRun() {
-                mDataSource.migrateExternalExemptAppInfo();
-                mDataSource.deleteExternalExemptAppInfo();
-                loadBlockAppListConfig();
-            }
-        });
-    }
-
-    @Override
-    public void ignoreExternalExemptedAppListConfigForever() {
-        PreferenceUtils.putBooleanPreference(mContext.getContentResolver(),
-                Uri.parse(Constants.PREFERENCE_URI), KEY_CHECK_EXTERNAL_EXEMPTED_APP_LIST_CONFIG,
-                false);
-    }
-
     private void showViewLoading() {
         Threads.instance().runOnUiThread(mView::showLoading);
     }
@@ -200,13 +179,8 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
         loadAppListConfigInner(false);
     }
 
-    private boolean needCheckExternalExemptedAppListConfig() {
-        return PreferenceUtils.getBooleanPreference(mContext.getContentResolver(),
-                Uri.parse(Constants.PREFERENCE_URI), KEY_CHECK_EXTERNAL_EXEMPTED_APP_LIST_CONFIG,
-                true);
-    }
-
-    private void loadWorkModeAndAppListConfig() {
+    @Override
+    public void start() {
         Threads.instance().runOnWorkThread(new Task() {
             @Override
             public void onRun() {
@@ -215,15 +189,5 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
                 loadAppListConfigInner(mWorkInAllowMode);
             }
         });
-    }
-
-    @Override
-    public void start() {
-        if (needCheckExternalExemptedAppListConfig() &&
-                mDataSource.checkExternalExemptAppInfoConfigExistence()) {
-            mView.showExemptedAppListMigrationNotice();
-        } else {
-            loadWorkModeAndAppListConfig();
-        }
     }
 }

@@ -1,9 +1,7 @@
 package io.github.trojan_gfw.igniter.exempt.fragment;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,7 +16,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -39,13 +36,11 @@ import io.github.trojan_gfw.igniter.exempt.data.AppInfo;
 
 public class ExemptAppFragment extends BaseFragment implements ExemptAppContract.View {
     public static final String TAG = "ExemptAppFragment";
-    private static final int WRITE_REQUEST = 1024;
     private ExemptAppContract.Presenter mPresenter;
     private Toolbar mTopBar;
     private RecyclerView mAppRv;
     private AppInfoAdapter mAppInfoAdapter;
     private LoadingDialog mLoadingDialog;
-    private TabItem mBlockModeTi, mAllowModeTi;
     private TabLayout mWorkModeTl;
 
     public ExemptAppFragment() {
@@ -75,8 +70,6 @@ public class ExemptAppFragment extends BaseFragment implements ExemptAppContract
     private void findViews() {
         mTopBar = findViewById(R.id.exemptAppTopBar);
         mAppRv = findViewById(R.id.exemptAppRv);
-        mBlockModeTi = findViewById(R.id.exemptAppBlockModeTi);
-        mAllowModeTi = findViewById(R.id.exemptAppAllowModeTi);
         mWorkModeTl = findViewById(R.id.exemptAppWorkModeTabLayout);
     }
 
@@ -187,50 +180,6 @@ public class ExemptAppFragment extends BaseFragment implements ExemptAppContract
                         mPresenter.exit();
                     }
                 }).create().show();
-    }
-
-    @Override
-    public void showExemptedAppListMigrationNotice() {
-        new AlertDialog.Builder(mContext)
-                .setTitle(R.string.common_alert)
-                .setMessage(R.string.exempt_app_migrate_external_exempted_app_list_msg)
-                .setNegativeButton(R.string.common_cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        mPresenter.loadBlockAppListConfig();
-                    }
-                }).setNeutralButton(R.string.common_never, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                mPresenter.ignoreExternalExemptedAppListConfigForever();
-                mPresenter.loadBlockAppListConfig();
-            }
-        }).setPositiveButton(R.string.common_confirm, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_REQUEST);
-                } else {
-                    mPresenter.migrateExternalExemptedAppListFileToPrivateDirectory();
-                }
-            }
-        }).show();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (WRITE_REQUEST == requestCode) {
-            if (PackageManager.PERMISSION_GRANTED == grantResults[0]) {
-                mPresenter.migrateExternalExemptedAppListFileToPrivateDirectory();
-            } else {
-                mPresenter.loadBlockAppListConfig();
-            }
-        }
     }
 
     @Override

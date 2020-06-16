@@ -22,9 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import io.github.trojan_gfw.igniter.Globals;
-import io.github.trojan_gfw.igniter.common.utils.FileUtils;
-
 /**
  * Implementation of {@link ExemptAppDataSource}. This class reads and writes exempted app list in a
  * file. The exempted app package names will be written line by line in the file.
@@ -39,16 +36,14 @@ import io.github.trojan_gfw.igniter.common.utils.FileUtils;
  */
 public class ExemptAppDataManager implements ExemptAppDataSource {
     private final PackageManager mPackageManager;
-    private final String mInternalExemptAppListFilePath;
-    private final String mExternalExemptAppListFilePath;
+    private final String mBlockAppListFilePath;
     private final String mAllowAppListFilePath;
 
-    public ExemptAppDataManager(Context context, String internalExemptAppListFilePath,
-                                String externalExemptAppListFilePath, String allowAppListFilePath) {
+    public ExemptAppDataManager(Context context, String blockAppListFilePath,
+                                String allowAppListFilePath) {
         super();
         mPackageManager = context.getPackageManager();
-        mInternalExemptAppListFilePath = internalExemptAppListFilePath;
-        mExternalExemptAppListFilePath = externalExemptAppListFilePath;
+        mBlockAppListFilePath = blockAppListFilePath;
         mAllowAppListFilePath = allowAppListFilePath;
     }
 
@@ -58,25 +53,8 @@ public class ExemptAppDataManager implements ExemptAppDataSource {
     }
 
     @Override
-    public void deleteExternalExemptAppInfo() {
-        new File(mExternalExemptAppListFilePath).delete();
-    }
-
-    @Override
-    public void migrateExternalExemptAppInfo() {
-        File externalSrcFile = new File(Globals.getExternalExemptedAppListPath());
-        File internalDestFile = new File(Globals.getInternalBlockAppListPath());
-        FileUtils.copy(externalSrcFile, internalDestFile);
-    }
-
-    @Override
-    public boolean checkExternalExemptAppInfoConfigExistence() {
-        return new File(mExternalExemptAppListFilePath).exists();
-    }
-
-    @Override
     public void saveBlockAppInfoSet(@Nullable Set<String> blockAppPackageNames) {
-        saveAppPackageNameSet(blockAppPackageNames, mInternalExemptAppListFilePath);
+        saveAppPackageNameSet(blockAppPackageNames, mBlockAppListFilePath);
     }
 
     private void saveAppPackageNameSet(@Nullable Set<String> packageNameSet, String filePath) {
@@ -132,7 +110,7 @@ public class ExemptAppDataManager implements ExemptAppDataSource {
 
     @Override
     public Set<String> loadBlockAppPackageNameSet() {
-        return loadAppPackageNameSet(mInternalExemptAppListFilePath);
+        return loadAppPackageNameSet(mBlockAppListFilePath);
     }
 
     private Set<String> loadAppPackageNameSet(String filePath) {
