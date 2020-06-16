@@ -38,13 +38,10 @@ import java.io.InputStream;
 import io.github.trojan_gfw.igniter.common.constants.Constants;
 import io.github.trojan_gfw.igniter.common.os.Task;
 import io.github.trojan_gfw.igniter.common.os.Threads;
-import io.github.trojan_gfw.igniter.common.utils.PermissionUtils;
 import io.github.trojan_gfw.igniter.common.utils.PreferenceUtils;
 import io.github.trojan_gfw.igniter.common.utils.SnackbarUtils;
 import io.github.trojan_gfw.igniter.connection.TrojanConnection;
 import io.github.trojan_gfw.igniter.exempt.activity.ExemptAppActivity;
-import io.github.trojan_gfw.igniter.exempt.data.ExemptAppDataManager;
-import io.github.trojan_gfw.igniter.exempt.data.ExemptAppDataSource;
 import io.github.trojan_gfw.igniter.proxy.aidl.ITrojanService;
 import io.github.trojan_gfw.igniter.servers.activity.ServerListActivity;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataManager;
@@ -347,20 +344,8 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 PreferenceUtils.putBooleanPreference(getContentResolver(),
                         Uri.parse(Constants.PREFERENCE_URI),
                         Constants.PREFERENCE_KEY_FIRST_START, false);
-                migrateExternalExemptAppInfoImplicitly();
             }
         });
-    }
-
-    private void migrateExternalExemptAppInfoImplicitly() {
-        if (PermissionUtils.hasReadWriteExtStoragePermission(MainActivity.this)) {
-            ExemptAppDataSource dataSource = new ExemptAppDataManager(MainActivity.this,
-                    Globals.getInternalBlockAppListPath(), Globals.getExternalExemptedAppListPath(), Globals.getAllowedAppListPath());
-            if (dataSource.checkExternalExemptAppInfoConfigExistence()) {
-                dataSource.migrateExternalExemptAppInfo();
-                dataSource.deleteExternalExemptAppInfo();
-            }
-        }
     }
 
     @Override

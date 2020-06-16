@@ -212,8 +212,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
     private Set<String> getExemptAppPackageNames(boolean allowMode) {
         if (mExemptAppDataSource == null) {
             mExemptAppDataSource = new ExemptAppDataManager(getApplicationContext(),
-                    Globals.getInternalBlockAppListPath(), Globals.getExternalExemptedAppListPath(),
-                    Globals.getAllowedAppListPath());
+                    Globals.getBlockedAppListPath(), Globals.getAllowedAppListPath());
         }
         if (allowMode) {
             return mExemptAppDataSource.loadAllowAppPackageNameSet();
@@ -267,9 +266,10 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         Set<String> exemptAppPackageNames = getExemptAppPackageNames(workInAllowMode);
         RuleApplier applier;
         if (workInAllowMode) {
+            exemptAppPackageNames.remove(getPackageName()); // disallow Igniter
             applier = Builder::addAllowedApplication;
         } else {
-            exemptAppPackageNames.add(getPackageName()); // disallowed Igniter
+            exemptAppPackageNames.add(getPackageName()); // disallow Igniter
             applier = Builder::addDisallowedApplication;
         }
         for (String packageName : exemptAppPackageNames) {

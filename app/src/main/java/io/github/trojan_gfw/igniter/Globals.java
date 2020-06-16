@@ -9,15 +9,11 @@ public class Globals {
 
     private static String cacheDir;
     private static String filesDir;
-    private static String externalFilesDir;
     private static TrojanConfig trojanConfigInstance;
 
     public static void Init(Context ctx) {
         cacheDir = ctx.getCacheDir().getAbsolutePath();
         filesDir = ctx.getFilesDir().getAbsolutePath();
-        File externalDocDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
-        File igniterExternalFileDir = new File(externalDocDir, "igniter");
-        externalFilesDir = igniterExternalFileDir.getAbsolutePath();
         trojanConfigInstance = new TrojanConfig();
         trojanConfigInstance.setCaCertPath(Globals.getCaCertPath());
     }
@@ -46,15 +42,7 @@ public class Globals {
         return PathHelper.combine(filesDir, "preferences.txt");
     }
 
-    /**
-     * @deprecated use {@link #getInternalBlockAppListPath()} instead.
-     */
-    @Deprecated
-    public static String getExternalExemptedAppListPath() {
-        return PathHelper.combine(externalFilesDir, "exempted_app_list.txt");
-    }
-
-    public static String getInternalBlockAppListPath() {
+    public static String getBlockedAppListPath() {
         return PathHelper.combine(filesDir, "exempted_app_list.txt");
     }
 

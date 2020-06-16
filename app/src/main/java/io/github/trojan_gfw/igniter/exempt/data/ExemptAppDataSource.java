@@ -21,8 +21,6 @@ public interface ExemptAppDataSource {
     @WorkerThread
     Set<String> loadAllowAppPackageNameSet();
 
-    boolean checkExternalExemptAppInfoConfigExistence();
-
     /**
      * Save exempt applications' package names.
      *
@@ -33,13 +31,6 @@ public interface ExemptAppDataSource {
 
     @WorkerThread
     void saveAllowAppInfoSet(@Nullable Set<String> allowAppPackageNames);
-
-    /**
-     * Migrate external exempted application config file to private directory.
-     */
-    void migrateExternalExemptAppInfo();
-
-    void deleteExternalExemptAppInfo();
 
     /**
      * Load all application info list, including exempt apps and non-exempt apps.

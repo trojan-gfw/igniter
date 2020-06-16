@@ -92,4 +92,6 @@
     <string name="trojan_service_not_available">Trojan 服务不可用</string>
     <string name="trojan_service_error">Trojan 服务错误</string>
     <string name="proxy_service_not_connected">代理服务暂未开启</string>
+    <string name="exempt_app_mode_allow">代理应用模式</string>
+    <string name="exempt_app_mode_block">屏蔽应用模式</string>
 </resources>
