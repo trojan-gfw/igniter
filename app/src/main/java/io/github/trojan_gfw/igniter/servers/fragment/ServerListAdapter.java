@@ -85,8 +85,9 @@ class ViewHolder extends RecyclerView.ViewHolder {
         itemView.findViewById(R.id.deleteServerBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (itemClickListener != null) {
-                    itemClickListener.onItemDelete(mConfig, getBindingAdapterPosition());
+                int position = getBindingAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
+                    itemClickListener.onItemDelete(mConfig, position);
                 }
             }
         });

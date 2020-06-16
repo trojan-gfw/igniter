@@ -525,6 +525,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                         remoteAddrText.setText(config.getRemoteAddr());
                         remotePortText.setText(String.valueOf(config.getRemotePort()));
                         passwordText.setText(config.getPassword());
+                        TrojanHelper.WriteTrojanConfig(Globals.getTrojanConfigInstance(), Globals.getTrojanConfigPath());
                     }
                 });
                 shareLink = TrojanURLHelper.GenerateTrojanURL(config);
