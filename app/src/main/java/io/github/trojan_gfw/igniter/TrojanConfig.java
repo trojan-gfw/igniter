@@ -14,7 +14,7 @@ public class TrojanConfig implements Parcelable {
     private String localAddr;
     private int localPort;
     private String remoteAddr;
-    private String remoteServerName;
+    private String remoteServerRemark;
     private int remotePort;
     private String password;
     private boolean verifyCert;
@@ -53,7 +53,7 @@ public class TrojanConfig implements Parcelable {
     protected TrojanConfig(Parcel in) {
         localAddr = in.readString();
         localPort = in.readInt();
-        remoteServerName = in.readString();
+        remoteServerRemark = in.readString();
         remoteAddr = in.readString();
         remotePort = in.readInt();
         password = in.readString();
@@ -81,7 +81,7 @@ public class TrojanConfig implements Parcelable {
             return new JSONObject()
                     .put("local_addr", this.localAddr)
                     .put("local_port", this.localPort)
-                    .put("remote_server_name", this.remoteServerName)
+                    .put("remote_server_remark", this.remoteServerRemark)
                     .put("remote_addr", this.remoteAddr)
                     .put("remote_port", this.remotePort)
                     .put("password", new JSONArray().put(password))
@@ -105,7 +105,7 @@ public class TrojanConfig implements Parcelable {
             JSONObject json = new JSONObject(jsonStr);
             this.setLocalAddr(json.getString("local_addr"))
                     .setLocalPort(json.getInt("local_port"))
-                    .setRemoteServerName(json.optString("remote_server_name"))
+                    .setRemoteServerRemark(json.optString("remote_server_remark"))
                     .setRemoteAddr(json.getString("remote_addr"))
                     .setRemotePort(json.getInt("remote_port"))
                     .setPassword(json.getJSONArray("password").getString(0))
@@ -121,7 +121,7 @@ public class TrojanConfig implements Parcelable {
         this
                 .setLocalAddr(that.localAddr)
                 .setLocalPort(that.localPort)
-                .setRemoteServerName(that.remoteServerName)
+                .setRemoteServerRemark(that.remoteServerRemark)
                 .setRemoteAddr(that.remoteAddr)
                 .setRemotePort(that.remotePort)
                 .setPassword(that.password)
@@ -157,12 +157,12 @@ public class TrojanConfig implements Parcelable {
         return this;
     }
 
-    public String getRemoteServerName() {
-        return remoteServerName;
+    public String getRemoteServerRemark() {
+        return remoteServerRemark;
     }
 
-    public TrojanConfig setRemoteServerName(String remoteServerName) {
-        this.remoteServerName = remoteServerName;
+    public TrojanConfig setRemoteServerRemark(String remoteServerRemark) {
+        this.remoteServerRemark = remoteServerRemark;
         return this;
     }
 
@@ -244,7 +244,7 @@ public class TrojanConfig implements Parcelable {
             return false;
         }
         TrojanConfig that = (TrojanConfig) obj;
-        return (paramEquals(remoteServerName, that.remoteServerName) &&
+        return (paramEquals(remoteServerRemark, that.remoteServerRemark) &&
                 paramEquals(remoteAddr, that.remoteAddr) && paramEquals(remotePort, that.remotePort)
                 && paramEquals(localAddr, that.localAddr) && paramEquals(localPort, that.localPort))
                 && paramEquals(password, that.password) && paramEquals(verifyCert, that.verifyCert)
@@ -271,7 +271,7 @@ public class TrojanConfig implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(localAddr);
         dest.writeInt(localPort);
-        dest.writeString(remoteServerName);
+        dest.writeString(remoteServerRemark);
         dest.writeString(remoteAddr);
         dest.writeInt(remotePort);
         dest.writeString(password);
