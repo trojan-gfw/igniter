@@ -9,7 +9,7 @@
     <string name="common_update">Update</string>
     <string name="common_save_success">Save success</string>
 
-    <string name="remote_server_name">Remote Server Name</string>
+    <string name="remote_server_remark">Remote Server Remark</string>
     <string name="remote_addr">Remote Address</string>
     <string name="remote_port">Remote Port</string>
     <string name="default_port">443</string>

@@ -1,12 +1,15 @@
 package io.github.trojan_gfw.igniter;
 
 import android.content.Context;
-import android.os.Environment;
+import android.util.Log;
 
-import java.io.File;
+import java.util.Objects;
+
+import io.github.trojan_gfw.igniter.common.constants.ConfigFileConstants;
 
 public class Globals {
 
+    private static String exportDir;
     private static String cacheDir;
     private static String filesDir;
     private static TrojanConfig trojanConfigInstance;
@@ -16,6 +19,16 @@ public class Globals {
         filesDir = ctx.getFilesDir().getAbsolutePath();
         trojanConfigInstance = new TrojanConfig();
         trojanConfigInstance.setCaCertPath(Globals.getCaCertPath());
+        exportDir = exportDir(ctx, filesDir);
+    }
+
+    private static String exportDir(Context ctx, String defaultDir) {
+        try {
+            return Objects.requireNonNull(ctx.getExternalFilesDir(ConfigFileConstants.CONFIGS)).getAbsolutePath();
+        } catch (Exception e) {
+            Log.e("globals", "get export dir error", e);
+        }
+        return defaultDir;
     }
 
     public static String getCaCertPath() {
@@ -39,7 +52,7 @@ public class Globals {
     }
 
     public static String getIgniterExportPath() {
-        return PathHelper.combine(externalFilesDir, "config_list.txt");
+        return PathHelper.combine(exportDir, "config_list.txt");
     }
 
     public static String getPreferencesFilePath() {
