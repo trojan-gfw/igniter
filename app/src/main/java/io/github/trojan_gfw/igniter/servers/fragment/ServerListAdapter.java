@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
 import io.github.trojan_gfw.igniter.R;
 import io.github.trojan_gfw.igniter.TrojanConfig;
@@ -103,26 +102,26 @@ public class ServerListAdapter extends RecyclerView.Adapter<ViewHolder> {
 
 class ViewHolder extends RecyclerView.ViewHolder {
     private TrojanConfigWrapper mConfig;
-    private TextView mRemoteAddrTv;
+    private TextView mRemoteServerRemarkTv;
     private CheckBox mCheckBox;
     private boolean mBatchDeleteMode;
-    private ServerListAdapter.OnItemClickListener itemClickListener;
+    private ServerListAdapter.OnItemClickListener mItemClickListener;
     private CompoundButton.OnCheckedChangeListener mOnCheckedChangeListener = ((checkBox, isChecked) -> {
-        if (itemClickListener != null) {
+        if (mItemClickListener != null) {
             mConfig.setSelected(isChecked);
-            itemClickListener.onItemBatchSelected(mConfig, getBindingAdapterPosition(), isChecked);
+            mItemClickListener.onItemBatchSelected(mConfig, getBindingAdapterPosition(), isChecked);
         }
     });
 
     public ViewHolder(@NonNull final View itemView) {
         super(itemView);
-        mRemoteAddrTv = itemView.findViewById(R.id.serverAddrTv);
+        mRemoteServerRemarkTv = itemView.findViewById(R.id.serverRemarkTv);
         itemView.setOnClickListener(v -> {
-            if (itemClickListener != null) {
+            if (mItemClickListener != null) {
                 if (mBatchDeleteMode) {
                     mCheckBox.setChecked(!mCheckBox.isChecked());
                 } else {
-                    itemClickListener.onItemSelected(mConfig.getDelegate(), getBindingAdapterPosition());
+                    mItemClickListener.onItemSelected(mConfig.getDelegate(), getBindingAdapterPosition());
                 }
             }
         });
@@ -131,7 +130,7 @@ class ViewHolder extends RecyclerView.ViewHolder {
 
     public void bindData(TrojanConfigWrapper config, boolean batchDeleteMode) {
         this.mConfig = config;
-        mRemoteAddrTv.setText(config.getRemoteServerRemark());
+        mRemoteServerRemarkTv.setText(config.getRemoteServerRemark());
         mCheckBox.setVisibility(batchDeleteMode ? View.VISIBLE : View.GONE);
         mCheckBox.setOnCheckedChangeListener(null);
         mCheckBox.setChecked(config.isSelected());
@@ -140,6 +139,6 @@ class ViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindListener(ServerListAdapter.OnItemClickListener listener) {
-        itemClickListener = listener;
+        mItemClickListener = listener;
     }
 }
