@@ -12,9 +12,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import io.github.trojan_gfw.igniter.R;
 import io.github.trojan_gfw.igniter.TrojanConfig;
+import io.github.trojan_gfw.igniter.common.constants.Constants;
 
 public class ServerListAdapter extends RecyclerView.Adapter<ViewHolder> {
     private final LayoutInflater mInflater;
@@ -101,7 +103,8 @@ class ViewHolder extends RecyclerView.ViewHolder {
 
     public void bindData(TrojanConfig config, Context context) {
         this.mConfig = config;
-        mRemoteAddrTv.setText(config.getRemoteAddr());
+        String serverInfo = String.format(Locale.ENGLISH, Constants.SERVER_INFO, config.getRemoteAddr(), config.getRemotePort());
+        mRemoteAddrTv.setText(serverInfo);
 
         String serverRemark = config.getRemoteServerRemark();
         if (TextUtils.isEmpty(serverRemark)) {

@@ -7,4 +7,6 @@ public abstract class Constants {
     public static final String PREFERENCE_KEY_ENABLE_CLASH = "enable_clash";
     public static final String PREFERENCE_KEY_FIRST_START = "first_start";
     public static final String PREFERENCE_KEY_PROXY_IN_ALLOW_MODE = "proxy_allow_mode";
+
+    public static final String SERVER_INFO = "%s:%d";
 }

@@ -42,12 +42,14 @@ public class ServerListDataManager implements ServerListDataSource {
         if (remoteAddr == null) {
             return;
         }
+        int remotePort = config.getRemotePort();
+
         boolean configRemoteAddrExists = false;
         List<TrojanConfig> trojanConfigs = loadServerConfigList();
         for (int i = trojanConfigs.size() - 1; i >= 0; i--) {
             TrojanConfig cacheConfig = trojanConfigs.get(i);
             if (cacheConfig == null) continue;
-            if (remoteAddr.equals(cacheConfig.getRemoteAddr())) {
+            if (remoteAddr.equals(cacheConfig.getRemoteAddr()) && remotePort == cacheConfig.getRemotePort()) {
                 trojanConfigs.set(i, config);
                 configRemoteAddrExists = true;
                 break;
