@@ -1,6 +1,7 @@
 package io.github.trojan_gfw.igniter.servers.fragment;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +20,13 @@ public class ServerListAdapter extends RecyclerView.Adapter<ViewHolder> {
     private final LayoutInflater mInflater;
     private final List<TrojanConfig> mData;
     private OnItemClickListener mOnItemClickListener;
+    private final Context mContext;
 
     public ServerListAdapter(Context context, List<TrojanConfig> data) {
         super();
         this.mData = new ArrayList<>(data);
         mInflater = LayoutInflater.from(context);
+        this.mContext = context;
     }
 
     @NonNull
@@ -47,7 +50,7 @@ public class ServerListAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-        viewHolder.bindData(mData.get(i));
+        viewHolder.bindData(mData.get(i), mContext);
     }
 
     @Override
@@ -69,11 +72,14 @@ public class ServerListAdapter extends RecyclerView.Adapter<ViewHolder> {
 class ViewHolder extends RecyclerView.ViewHolder {
     private TrojanConfig mConfig;
     private TextView mRemoteAddrTv;
+    private TextView mRemoteServerRemarkTv;
     private ServerListAdapter.OnItemClickListener itemClickListener;
 
     public ViewHolder(@NonNull final View itemView) {
         super(itemView);
         mRemoteAddrTv = itemView.findViewById(R.id.serverAddrTv);
+        mRemoteServerRemarkTv = itemView.findViewById(R.id.serverRemarkTv);
+
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,9 +99,15 @@ class ViewHolder extends RecyclerView.ViewHolder {
         });
     }
 
-    public void bindData(TrojanConfig config) {
+    public void bindData(TrojanConfig config, Context context) {
         this.mConfig = config;
         mRemoteAddrTv.setText(config.getRemoteAddr());
+
+        String serverRemark = config.getRemoteServerRemark();
+        if (TextUtils.isEmpty(serverRemark)) {
+            serverRemark = context.getString(R.string.unmarked_server);
+        }
+        mRemoteServerRemarkTv.setText(serverRemark);
     }
 
     public void bindListener(ServerListAdapter.OnItemClickListener listener) {

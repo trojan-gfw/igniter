@@ -98,4 +98,6 @@
     <string name="server_list_menu_export_to_file">导出配置</string>
     <string name="export_server_list_success">导出配置成功</string>
     <string name="export_server_list_error">导出配置失败</string>
+
+    <string name="unmarked_server">未标识服务</string>
 </resources>
