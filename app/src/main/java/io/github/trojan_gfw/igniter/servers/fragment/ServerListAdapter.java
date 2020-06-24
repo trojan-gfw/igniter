@@ -118,8 +118,12 @@ class ViewHolder extends RecyclerView.ViewHolder {
         super(itemView);
         mRemoteAddrTv = itemView.findViewById(R.id.serverAddrTv);
         itemView.setOnClickListener(v -> {
-            if (itemClickListener != null && !mBatchDeleteMode) {
-                itemClickListener.onItemSelected(mConfig.getDelegate(), getBindingAdapterPosition());
+            if (itemClickListener != null) {
+                if (mBatchDeleteMode) {
+                    mCheckBox.setChecked(!mCheckBox.isChecked());
+                } else {
+                    itemClickListener.onItemSelected(mConfig.getDelegate(), getBindingAdapterPosition());
+                }
             }
         });
         mCheckBox = itemView.findViewById(R.id.serverCb);
