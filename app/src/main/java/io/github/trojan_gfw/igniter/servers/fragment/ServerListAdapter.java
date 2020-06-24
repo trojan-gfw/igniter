@@ -1,6 +1,7 @@
 package io.github.trojan_gfw.igniter.servers.fragment;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -130,7 +131,11 @@ class ViewHolder extends RecyclerView.ViewHolder {
 
     public void bindData(TrojanConfigWrapper config, boolean batchDeleteMode) {
         this.mConfig = config;
-        mRemoteServerRemarkTv.setText(config.getRemoteServerRemark());
+        String name = config.getRemoteServerRemark();
+        if (TextUtils.isEmpty(name)) { // only display remote address when remark is empty.
+            name = config.getRemoteAddr();
+        }
+        mRemoteServerRemarkTv.setText(name);
         mCheckBox.setVisibility(batchDeleteMode ? View.VISIBLE : View.GONE);
         mCheckBox.setOnCheckedChangeListener(null);
         mCheckBox.setChecked(config.isSelected());
