@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:paddingStart="15dp"
-    android:paddingEnd="15dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:contentPaddingLeft="15dp"
+    app:contentPaddingRight="5dp"
     android:clickable="true"
     android:focusable="true"
     android:orientation="vertical" android:layout_width="match_parent"
