@@ -36,6 +36,10 @@
     <string name="action_test_connection">Test Connection</string>
     <string name="action_show_develop_info_logcat">Show develop info in logcat</string>
 
+    <string name="action_server_list_enter_batch_mode">Batch…</string>
+    <string name="action_server_list_select_all">Select all</string>
+    <string name="action_server_list_deselect_all">Deselect all</string>
+    <string name="batch_delete_server_list_success">Finished</string>
     <string name="server_list_import_file_desc">Import config in file extension (*.txt)</string>
     <string name="server_list_file_chooser_msg">Select a TXT file</string>
     <string name="server_list_menu_import_from_file">Import from file</string>

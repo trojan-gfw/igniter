@@ -98,4 +98,8 @@
     <string name="server_list_menu_export_to_file">导出配置</string>
     <string name="export_server_list_success">导出配置成功</string>
     <string name="export_server_list_error">导出配置失败</string>
+    <string name="action_server_list_select_all">全选</string>
+    <string name="batch_delete_server_list_success">删除成功</string>
+    <string name="action_server_list_enter_batch_mode">批量…</string>
+    <string name="action_server_list_deselect_all">全不选</string>
 </resources>

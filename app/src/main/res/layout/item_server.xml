@@ -2,11 +2,10 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:paddingStart="15dp"
     android:paddingEnd="15dp"
-    android:paddingTop="5dp"
-    android:paddingBottom="5dp"
+    android:clickable="true"
     android:orientation="vertical" android:layout_width="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="wrap_content">
+    android:layout_height="50dp">
 
     <TextView
         tools:text="www.google.com"
@@ -16,21 +15,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/deleteServerBtn"
-        android:text="@string/server_list_delete_btn"
-        android:layout_gravity="end"
-        android:colorAccent="@android:color/holo_red_light"
-        style="@style/PrimaryFlatButton"
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/serverCb"
+        tools:checked="true"
         android:layout_width="wrap_content"
+        android:layout_gravity="end|center_vertical"
         android:layout_height="wrap_content" />
-
-<!--    <ImageButton-->
-<!--        android:id="@+id/modifyServerIb"-->
-<!--        style="@style/CommonImageButton"-->
-<!--        android:src="@android:drawable/ic_menu_edit"-->
-<!--        android:layout_gravity="center_vertical|end"-->
-<!--        android:layout_width="20dp"-->
-<!--        android:layout_height="20dp" />-->
 
 </FrameLayout>

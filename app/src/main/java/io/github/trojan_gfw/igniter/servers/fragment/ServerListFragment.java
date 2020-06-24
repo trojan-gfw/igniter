@@ -26,15 +26,21 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import io.github.trojan_gfw.igniter.R;
 import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.common.app.BaseFragment;
+import io.github.trojan_gfw.igniter.common.dialog.LoadingDialog;
+import io.github.trojan_gfw.igniter.common.utils.SnackbarUtils;
 import io.github.trojan_gfw.igniter.qrcode.ScanQRCodeActivity;
 import io.github.trojan_gfw.igniter.servers.activity.ServerListActivity;
 import io.github.trojan_gfw.igniter.servers.contract.ServerListContract;
@@ -49,6 +55,8 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
     private RecyclerView mServerListRv;
     private ServerListAdapter mServerListAdapter;
     private Dialog mImportConfigDialog;
+    private Dialog mLoadingDialog;
+    private boolean mBatchOperationMode;
 
     public ServerListFragment() {
         // Required empty public constructor
@@ -85,6 +93,7 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
             setHasOptionsMenu(true);
         }
         mServerListRv.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
+        mServerListRv.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         mServerListAdapter = new ServerListAdapter(getContext(), new ArrayList<TrojanConfig>());
         mServerListRv.setAdapter(mServerListAdapter);
     }
@@ -97,8 +106,8 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
             }
 
             @Override
-            public void onItemDelete(TrojanConfig config, int pos) {
-                mPresenter.deleteServerConfig(config, pos);
+            public void onItemBatchSelected(TrojanConfig config, int pos, boolean checked) {
+                mPresenter.selectServer(config, checked);
             }
         });
     }
@@ -185,15 +194,43 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         menu.clear();
         inflater.inflate(R.menu.menu_server_list, menu);
-        MenuItem item = menu.getItem(0);
+        MenuItem qrCodeItem = menu.findItem(R.id.action_scan_qr_code).setVisible(!mBatchOperationMode);
+        menu.findItem(R.id.action_import_from_file).setVisible(!mBatchOperationMode);
+        menu.findItem(R.id.action_export_to_file).setVisible(!mBatchOperationMode);
+        menu.findItem(R.id.action_enter_batch_mode).setVisible(!mBatchOperationMode);
+        menu.findItem(R.id.action_exit_batch_operation).setVisible(mBatchOperationMode);
+        menu.findItem(R.id.action_select_all_servers).setVisible(mBatchOperationMode);
+        menu.findItem(R.id.action_deselect_all_servers).setVisible(mBatchOperationMode);
+        menu.findItem(R.id.action_batch_delete_servers).setVisible(mBatchOperationMode);
         // Tint scan QRCode icon to white.
-        if (item.getIcon() != null) {
-            Drawable drawable = item.getIcon();
+        if (qrCodeItem.getIcon() != null) {
+            Drawable drawable = qrCodeItem.getIcon();
             Drawable wrapper = DrawableCompat.wrap(drawable);
             drawable.mutate();
             DrawableCompat.setTint(wrapper, ContextCompat.getColor(mContext, android.R.color.white));
-            item.setIcon(drawable);
+            qrCodeItem.setIcon(drawable);
         }
+    }
+
+    @Override
+    public void showServerListBatchOperation() {
+        enableBatchOperationMode(true);
+    }
+
+    @Override
+    public void hideServerListBatchOperation() {
+        enableBatchOperationMode(false);
+    }
+
+    private void enableBatchOperationMode(boolean enable) {
+        mBatchOperationMode = enable;
+        requireActivity().invalidateOptionsMenu();
+        mServerListAdapter.setBatchDeleteMode(enable);
+    }
+
+    @Override
+    public void showBatchDeletionSuccess() {
+        SnackbarUtils.showTextShort(mRootView, R.string.batch_delete_server_list_success);
     }
 
     @Override
@@ -208,10 +245,55 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
             case R.id.action_export_to_file:
                 mPresenter.exportServerListToFile();
                 return true;
+            case R.id.action_enter_batch_mode:
+                mPresenter.batchOperateServerList();
+                return true;
+            case R.id.action_exit_batch_operation:
+                mPresenter.exitServerListBatchOperation();
+                return true;
+            case R.id.action_select_all_servers:
+                mPresenter.selectAll(mServerListAdapter.getData());
+                return true;
+            case R.id.action_deselect_all_servers:
+                mPresenter.deselectAll(mServerListAdapter.getData());
+                return true;
+            case R.id.action_batch_delete_servers:
+                mPresenter.batchDelete();
+                return true;
             default:
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void showLoading() {
+        if (mLoadingDialog == null) {
+            mLoadingDialog = new LoadingDialog(mContext);
+        }
+        mLoadingDialog.show();
+    }
+
+    @Override
+    public void dismissLoading() {
+        if (mLoadingDialog != null && mLoadingDialog.isShowing()) {
+            mLoadingDialog.dismiss();
+        }
+    }
+
+    @Override
+    public void batchDelete(Set<TrojanConfig> configList) {
+        mServerListAdapter.deleteServers(configList);
+    }
+
+    @Override
+    public void selectAllServers() {
+        mServerListAdapter.setAllSelected(true);
+    }
+
+    @Override
+    public void deselectAllServers() {
+        mServerListAdapter.setAllSelected(false);
     }
 
     @Override

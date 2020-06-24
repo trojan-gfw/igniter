@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -29,6 +30,7 @@ import io.github.trojan_gfw.igniter.servers.data.ServerListDataSource;
 public class ServerListPresenter implements ServerListContract.Presenter {
     private final ServerListContract.View mView;
     private final ServerListDataSource mDataManager;
+    private Set<TrojanConfig> mBatchDeleteConfigSet;
 
     public ServerListPresenter(ServerListContract.View view, ServerListDataSource dataManager) {
         mView = view;
@@ -131,6 +133,61 @@ public class ServerListPresenter implements ServerListContract.Presenter {
         });
     }
 
+    @Override
+    public void batchOperateServerList() {
+        if (mBatchDeleteConfigSet == null) {
+            mBatchDeleteConfigSet = new LinkedHashSet<>();
+        }
+        mView.showServerListBatchOperation();
+    }
+
+    @Override
+    public void selectServer(TrojanConfig config, boolean checked) {
+        if (checked) {
+            mBatchDeleteConfigSet.add(config);
+        } else {
+            mBatchDeleteConfigSet.remove(config);
+        }
+    }
+
+    @Override
+    public void selectAll(List<TrojanConfig> configList) {
+        mBatchDeleteConfigSet.addAll(configList);
+        mView.selectAllServers();
+    }
+
+    @Override
+    public void exitServerListBatchOperation() {
+        mView.hideServerListBatchOperation();
+    }
+
+    @Override
+    public void deselectAll(List<TrojanConfig> configList) {
+        mBatchDeleteConfigSet.clear();
+        mView.deselectAllServers();
+    }
+
+    @Override
+    public void batchDelete() {
+        if (mBatchDeleteConfigSet.isEmpty()) {
+            mView.showBatchDeletionSuccess();
+        } else {
+            mView.showLoading();
+            Threads.instance().runOnWorkThread(new Task() {
+                @Override
+                public void onRun() {
+                    mDataManager.batchDeleteServerConfigs(mBatchDeleteConfigSet);
+                    Threads.instance().runOnUiThread(()->{
+                        mView.batchDelete(mBatchDeleteConfigSet);
+                        mBatchDeleteConfigSet.clear();
+                        mView.dismissLoading();
+                        mView.showBatchDeletionSuccess();
+                    });
+                }
+            });
+        }
+    }
+
     private List<TrojanConfig> parseTrojanConfigsFromFileContent(String fileContent) {
         try {
             JSONObject jsonObject = new JSONObject(fileContent);
@@ -181,17 +238,6 @@ public class ServerListPresenter implements ServerListContract.Presenter {
     @Override
     public void handleServerSelection(TrojanConfig config) {
         mView.selectServerConfig(config);
-    }
-
-    @Override
-    public void deleteServerConfig(final TrojanConfig config, final int pos) {
-        Threads.instance().runOnWorkThread(new Task() {
-            @Override
-            public void onRun() {
-                mDataManager.deleteServerConfig(config);
-                mView.removeServerConfig(config, pos);
-            }
-        });
     }
 
     @Override
