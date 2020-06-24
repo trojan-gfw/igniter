@@ -220,6 +220,7 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
     @Override
     public void hideServerListBatchOperation() {
         enableBatchOperationMode(false);
+        mServerListAdapter.setAllSelected(false);
     }
 
     private void enableBatchOperationMode(boolean enable) {
