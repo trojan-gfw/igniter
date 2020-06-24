@@ -14,4 +14,29 @@
         android:title="@string/server_list_menu_export_to_file"
         app:showAsAction="never" />
 
+    <item android:id="@+id/action_enter_batch_mode"
+        android:title="@string/action_server_list_enter_batch_mode"
+        app:showAsAction="never"
+         />
+
+    <item android:id="@+id/action_exit_batch_operation"
+        android:title="@string/common_cancel"
+        android:visible="false"
+        app:showAsAction="always" />
+
+    <item android:id="@+id/action_select_all_servers"
+        android:title="@string/action_server_list_select_all"
+        app:showAsAction="always"
+        android:visible="false" />
+
+    <item android:id="@+id/action_deselect_all_servers"
+        android:title="@string/action_server_list_deselect_all"
+        app:showAsAction="always"
+        android:visible="false" />
+
+    <item android:id="@+id/action_batch_delete_servers"
+        android:title="@string/common_delete"
+        app:showAsAction="always"
+        android:visible="false" />
+
 </menu>

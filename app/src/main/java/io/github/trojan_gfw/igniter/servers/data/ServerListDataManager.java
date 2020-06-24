@@ -3,7 +3,10 @@ package io.github.trojan_gfw.igniter.servers.data;
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.TrojanHelper;
@@ -19,6 +22,21 @@ public class ServerListDataManager implements ServerListDataSource {
     @NonNull
     public List<TrojanConfig> loadServerConfigList() {
         return new ArrayList<>(TrojanHelper.readTrojanServerConfigList(mConfigFilePath));
+    }
+
+    @Override
+    public void batchDeleteServerConfigs(Collection<TrojanConfig> configs) {
+        Set<String> remoteAddrSet = new HashSet<>();
+        for (TrojanConfig config : configs) {
+            remoteAddrSet.add(config.getRemoteAddr());
+        }
+        List<TrojanConfig> trojanConfigs = loadServerConfigList();
+        for (int i = trojanConfigs.size() - 1; i >= 0; i--) {
+            if (remoteAddrSet.contains(trojanConfigs.get(i).getRemoteAddr())) {
+                trojanConfigs.remove(i);
+            }
+        }
+        replaceServerConfigs(trojanConfigs);
     }
 
     @Override
