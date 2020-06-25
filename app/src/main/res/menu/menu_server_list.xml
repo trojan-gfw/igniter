@@ -19,6 +19,14 @@
         app:showAsAction="never"
          />
 
+    <item android:id="@+id/action_subscribe_servers"
+        android:title="@string/action_subscribe_server_list"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/action_subscribe_settings"
+        android:title="@string/action_subscribe_settings"
+        app:showAsAction="never" />
+
     <item android:id="@+id/action_exit_batch_operation"
         android:title="@string/common_cancel"
         android:visible="false"

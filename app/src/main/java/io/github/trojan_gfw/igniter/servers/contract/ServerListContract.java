@@ -26,6 +26,10 @@ public interface ServerListContract {
         void selectAll(List<TrojanConfig> configList);
         void deselectAll(List<TrojanConfig> configList);
         void batchDelete();
+        void displaySubscribeSettings();
+        void updateSubscribeServers();
+        void saveSubscribeSettings(String url);
+        void hideSubscribeSettings();
     }
 
     interface View extends BaseView<Presenter> {
@@ -48,5 +52,9 @@ public interface ServerListContract {
         void showLoading();
         void dismissLoading();
         void batchDelete(Set<TrojanConfig> configList);
+        void showSubscribeSettings(String url);
+        void dismissSubscribeSettings();
+        void showSubscribeUpdateSuccess();
+        void showSubscribeUpdateFailed();
     }
 }

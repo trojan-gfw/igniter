@@ -2,6 +2,9 @@ package io.github.trojan_gfw.igniter.servers.presenter;
 
 import android.content.Context;
 import android.net.Uri;
+import android.text.TextUtils;
+
+import androidx.annotation.WorkerThread;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,6 +13,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,6 +28,7 @@ import io.github.trojan_gfw.igniter.TrojanURLHelper;
 import io.github.trojan_gfw.igniter.common.constants.ConfigFileConstants;
 import io.github.trojan_gfw.igniter.common.os.Task;
 import io.github.trojan_gfw.igniter.common.os.Threads;
+import io.github.trojan_gfw.igniter.common.sp.CommonSP;
 import io.github.trojan_gfw.igniter.servers.contract.ServerListContract;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataSource;
 
@@ -241,6 +246,37 @@ public class ServerListPresenter implements ServerListContract.Presenter {
     }
 
     @Override
+    public void displaySubscribeSettings() {
+        mView.showSubscribeSettings(CommonSP.getServerSubscribeUrl(""));
+    }
+
+    @Override
+    public void updateSubscribeServers() {
+        String url = CommonSP.getServerSubscribeUrl("");
+        if (TextUtils.isEmpty(url)) {
+            mView.showSubscribeUpdateFailed();
+            return;
+        }
+        mView.showLoading();
+        Threads.instance().runOnWorkThread(new Task() {
+            @Override
+            public void onRun() {
+                mDataManager.requestSubscribeServerConfigs(url, new SubscribeCallback(ServerListPresenter.this));
+            }
+        });
+    }
+
+    @Override
+    public void saveSubscribeSettings(String url) {
+        CommonSP.setServerSubscribeUrl(url);
+    }
+
+    @Override
+    public void hideSubscribeSettings() {
+        mView.dismissSubscribeSettings();
+    }
+
+    @Override
     public void start() {
         Threads.instance().runOnWorkThread(new Task() {
             @Override
@@ -255,8 +291,49 @@ public class ServerListPresenter implements ServerListContract.Presenter {
         mView.gotoScanQRCode();
     }
 
+    @WorkerThread
     private void loadConfigs() {
         List<TrojanConfig> trojanConfigs = mDataManager.loadServerConfigList();
         mView.showServerConfigList(trojanConfigs);
+    }
+
+    @WorkerThread
+    private void showSubscribeServersSuccess() {
+        Threads.instance().runOnUiThread(()-> {
+            mView.dismissLoading();
+            mView.showSubscribeUpdateSuccess();
+        });
+        loadConfigs();
+    }
+
+    private void showSubscribeServersFailed() {
+        Threads.instance().runOnUiThread(()-> {
+            mView.dismissLoading();
+            mView.showSubscribeUpdateFailed();
+        });
+    }
+
+    private static class SubscribeCallback implements ServerListDataSource.Callback {
+        private final WeakReference<ServerListPresenter> mPresenterRef;
+
+        public SubscribeCallback(ServerListPresenter presenter) {
+            mPresenterRef = new WeakReference<>(presenter);
+        }
+
+        @Override
+        public void onSuccess() {
+            ServerListPresenter presenter = mPresenterRef.get();
+            if (presenter != null) {
+                presenter.showSubscribeServersSuccess();
+            }
+        }
+
+        @Override
+        public void onFailed() {
+            ServerListPresenter presenter = mPresenterRef.get();
+            if (presenter != null) {
+                presenter.showSubscribeServersFailed();
+            }
+        }
     }
 }

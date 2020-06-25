@@ -42,6 +42,7 @@ import io.github.trojan_gfw.igniter.common.app.BaseFragment;
 import io.github.trojan_gfw.igniter.common.dialog.LoadingDialog;
 import io.github.trojan_gfw.igniter.common.utils.SnackbarUtils;
 import io.github.trojan_gfw.igniter.qrcode.ScanQRCodeActivity;
+import io.github.trojan_gfw.igniter.servers.SubscribeSettingDialog;
 import io.github.trojan_gfw.igniter.servers.activity.ServerListActivity;
 import io.github.trojan_gfw.igniter.servers.contract.ServerListContract;
 
@@ -188,7 +189,45 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
         }
     }
 
+    private SubscribeSettingDialog mSubscribeSettingDialog;
 
+    @Override
+    public void showSubscribeSettings(String url) {
+        if (mSubscribeSettingDialog == null) {
+            mSubscribeSettingDialog = new SubscribeSettingDialog(mContext);
+            mSubscribeSettingDialog.setOnButtonClickListener(new SubscribeSettingDialog.OnButtonClickListener() {
+                @Override
+                public void onConfirm(String url) {
+                    mPresenter.saveSubscribeSettings(url);
+                    mPresenter.hideSubscribeSettings();
+                }
+
+                @Override
+                public void onCancel() {
+                    mPresenter.hideSubscribeSettings();
+                }
+            });
+        }
+        mSubscribeSettingDialog.setSubscribeUrl(url);
+        mSubscribeSettingDialog.show();
+    }
+
+    @Override
+    public void dismissSubscribeSettings() {
+        if (mSubscribeSettingDialog != null && mSubscribeSettingDialog.isShowing()) {
+            mSubscribeSettingDialog.dismiss();
+        }
+    }
+
+    @Override
+    public void showSubscribeUpdateSuccess() {
+        SnackbarUtils.showTextShort(mRootView, R.string.subscribe_servers_success);
+    }
+
+    @Override
+    public void showSubscribeUpdateFailed() {
+        SnackbarUtils.showTextShort(mRootView, R.string.subscribe_servers_failed);
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -198,6 +237,8 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
         menu.findItem(R.id.action_import_from_file).setVisible(!mBatchOperationMode);
         menu.findItem(R.id.action_export_to_file).setVisible(!mBatchOperationMode);
         menu.findItem(R.id.action_enter_batch_mode).setVisible(!mBatchOperationMode);
+        menu.findItem(R.id.action_subscribe_settings).setVisible(!mBatchOperationMode);
+        menu.findItem(R.id.action_subscribe_servers).setVisible(!mBatchOperationMode);
         menu.findItem(R.id.action_exit_batch_operation).setVisible(mBatchOperationMode);
         menu.findItem(R.id.action_select_all_servers).setVisible(mBatchOperationMode);
         menu.findItem(R.id.action_deselect_all_servers).setVisible(mBatchOperationMode);
@@ -260,6 +301,12 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
                 return true;
             case R.id.action_batch_delete_servers:
                 mPresenter.batchDelete();
+                return true;
+            case R.id.action_subscribe_settings:
+                mPresenter.displaySubscribeSettings();
+                return true;
+            case R.id.action_subscribe_servers:
+                mPresenter.updateSubscribeServers();
                 return true;
             default:
                 break;
