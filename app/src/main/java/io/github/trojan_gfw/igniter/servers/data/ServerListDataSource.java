@@ -1,5 +1,6 @@
 package io.github.trojan_gfw.igniter.servers.data;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
 
 import java.util.Collection;
@@ -18,4 +19,11 @@ public interface ServerListDataSource {
     void saveServerConfig(TrojanConfig config);
     @WorkerThread
     void replaceServerConfigs(List<TrojanConfig> list);
+    @WorkerThread
+    void requestSubscribeServerConfigs(String url, @NonNull Callback callback);
+
+    interface Callback {
+        void onSuccess();
+        void onFailed();
+    }
 }

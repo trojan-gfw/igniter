@@ -358,7 +358,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 }
             }
         });
-        serverListDataManager = new ServerListDataManager(Globals.getTrojanConfigListPath());
+        serverListDataManager = new ServerListDataManager(Globals.getTrojanConfigListPath(), false, "", 0L);
         connection.connect(this, this);
         Threads.instance().runOnWorkThread(new Task() {
             @Override
@@ -601,8 +601,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 });
                 return true;
             case R.id.action_view_server_list:
-                clearEditTextFocus();
-                startActivityForResult(ServerListActivity.create(MainActivity.this), SERVER_LIST_CHOOSE_REQUEST_CODE);
+                gotoServerList();
                 return true;
             case R.id.action_about:
                 clearEditTextFocus();
@@ -620,6 +619,27 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void gotoServerList() {
+        clearEditTextFocus();
+        Threads.instance().runOnWorkThread(new Task() {
+            @Override
+            public void onRun() {
+                boolean proxyOn = false;
+                String proxyHost = null;
+                long proxyPort = 0L;
+                try {
+                    proxyOn = trojanService.getState() == ProxyService.STARTED;
+                    proxyHost = trojanService.getProxyHost();
+                    proxyPort = trojanService.getProxyPort();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                startActivityForResult(ServerListActivity.create(MainActivity.this,
+                        proxyOn, proxyHost, proxyPort), SERVER_LIST_CHOOSE_REQUEST_CODE);
+            }
+        });
     }
 
     @Override

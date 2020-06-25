@@ -36,6 +36,11 @@
     <string name="action_test_connection">Test Connection</string>
     <string name="action_show_develop_info_logcat">Show develop info in logcat</string>
 
+    <string name="action_subscribe_server_list">Subscribe</string>
+    <string name="action_subscribe_settings">Subscribe settings</string>
+    <string name="subscribe_servers_success">Subscribe success</string>
+    <string name="subscribe_servers_failed">Subscribe failed. Please check your subscribe setting or try to subscribe after starting proxy. It also might be caused by format inconsistence.</string>
+    <string name="server_list_subscribe_hint">Subscribe link</string>
     <string name="action_server_list_enter_batch_mode">Batch…</string>
     <string name="action_server_list_select_all">Select all</string>
     <string name="action_server_list_deselect_all">Deselect all</string>

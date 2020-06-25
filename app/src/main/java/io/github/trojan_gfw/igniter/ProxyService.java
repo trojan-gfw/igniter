@@ -122,6 +122,16 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         }
 
         @Override
+        public String getProxyHost() throws RemoteException {
+            return TUN2SOCKS5_SERVER_HOST;
+        }
+
+        @Override
+        public long getProxyPort() throws RemoteException {
+            return tun2socksPort;
+        }
+
+        @Override
         public void showDevelopInfoInLogcat() {
             LogHelper.showDevelopInfoInLogcat();
         }

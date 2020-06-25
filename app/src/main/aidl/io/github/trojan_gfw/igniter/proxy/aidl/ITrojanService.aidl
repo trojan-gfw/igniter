@@ -7,6 +7,8 @@ interface ITrojanService {
     int getState();
     void testConnection(String testUrl);
     void showDevelopInfoInLogcat();
+    String getProxyHost();
+    long getProxyPort();
     oneway void registerCallback(in ITrojanServiceCallback callback);
     oneway void unregisterCallback(in ITrojanServiceCallback callback);
 }

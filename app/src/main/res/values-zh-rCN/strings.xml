@@ -102,4 +102,9 @@
     <string name="batch_delete_server_list_success">删除成功</string>
     <string name="action_server_list_enter_batch_mode">批量…</string>
     <string name="action_server_list_deselect_all">全不选</string>
+    <string name="server_list_subscribe_hint">订阅链接</string>
+    <string name="action_subscribe_settings">订阅设置</string>
+    <string name="action_subscribe_server_list">订阅更新</string>
+    <string name="subscribe_servers_success">更新成功</string>
+    <string name="subscribe_servers_failed">更新失败，请检查订阅设置或者尝试开启代理后再更新，也可能是Igniter不支持该订阅信息的格式</string>
 </resources>
