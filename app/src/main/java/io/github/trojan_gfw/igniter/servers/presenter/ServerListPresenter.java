@@ -164,6 +164,7 @@ public class ServerListPresenter implements ServerListContract.Presenter {
     @Override
     public void exitServerListBatchOperation() {
         mView.hideServerListBatchOperation();
+        mBatchDeleteConfigSet.clear();
     }
 
     @Override
