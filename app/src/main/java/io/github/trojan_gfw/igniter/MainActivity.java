@@ -72,7 +72,8 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     private @ProxyService.ProxyState
     int proxyState = ProxyService.STATE_NONE;
     private final TrojanConnection connection = new TrojanConnection(false);
-    private ITrojanService trojanService;
+    private final Object lock = new Object();
+    private volatile ITrojanService trojanService;
     private ServerListDataSource serverListDataManager;
     private AlertDialog linkDialog;
 
@@ -418,7 +419,9 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     @Override
     public void onServiceConnected(final ITrojanService service) {
         LogHelper.i(TAG, "onServiceConnected");
-        trojanService = service;
+        synchronized (lock) {
+            trojanService = service;
+        }
         Threads.instance().runOnWorkThread(new Task() {
             @Override
             public void onRun() {
@@ -440,7 +443,9 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     @Override
     public void onServiceDisconnected() {
         LogHelper.i(TAG, "onServiceConnected");
-        trojanService = null;
+        synchronized (lock) {
+            trojanService = null;
+        }
     }
 
     @Override
@@ -487,7 +492,10 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
      * to {@link #onTestResult(String, boolean, long, String)} by {@link TrojanConnection}.
      */
     private void testConnection() {
-        ITrojanService service = trojanService;
+        ITrojanService service;
+        synchronized (lock) {
+            service = trojanService;
+        }
         if (service == null) {
             showTestConnectionResult(CONNECTION_TEST_URL, false, 0L, getString(R.string.trojan_service_not_available));
         } else {
@@ -505,7 +513,10 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
      * is from remote process, a {@link RemoteException} might be thrown.
      */
     private void showDevelopInfoInLogcat() {
-        ITrojanService service = trojanService;
+        ITrojanService service;
+        synchronized (lock) {
+            service = trojanService;
+        }
         if (service != null) {
             try {
                 service.showDevelopInfoInLogcat();
@@ -629,12 +640,18 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 boolean proxyOn = false;
                 String proxyHost = null;
                 long proxyPort = 0L;
-                try {
-                    proxyOn = trojanService.getState() == ProxyService.STARTED;
-                    proxyHost = trojanService.getProxyHost();
-                    proxyPort = trojanService.getProxyPort();
-                } catch (RemoteException e) {
-                    e.printStackTrace();
+                ITrojanService service;
+                synchronized (lock) {
+                    service = trojanService;
+                }
+                if (service != null) {
+                    try {
+                        proxyOn = service.getState() == ProxyService.STARTED;
+                        proxyHost = service.getProxyHost();
+                        proxyPort = service.getProxyPort();
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
                 }
                 startActivityForResult(ServerListActivity.create(MainActivity.this,
                         proxyOn, proxyHost, proxyPort), SERVER_LIST_CHOOSE_REQUEST_CODE);
