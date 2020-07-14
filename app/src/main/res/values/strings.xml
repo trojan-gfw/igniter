@@ -7,6 +7,7 @@
     <string name="common_cancel">Cancel</string>
     <string name="common_never">Never</string>
     <string name="common_update">Update</string>
+    <string name="common_exit">Exit</string>
     <string name="common_save_success">Save success</string>
 
     <string name="remote_server_remark">Remote Server Remark</string>
@@ -72,7 +73,7 @@
     <string name="menu_action_exempt_app_save">Save</string>
     <string name="menu_action_exempt_app">Exempt Apps</string>
     <string name="exempt_app_search_title">Search Apps</string>
-    <string name="exempt_app_exit">Exit</string>
+    <string name="exempt_app_exit">@string/common_exit</string>
     <string name="exempt_app_loading_tip">Loading…</string>
     <string name="exempt_app_exit_without_saving_confirm">Exit without saving exempt app list?</string>
     <string name="exempt_app_migrate_external_exempted_app_list_msg">

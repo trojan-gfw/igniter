@@ -30,6 +30,7 @@ public interface ServerListContract {
         void updateSubscribeServers();
         void saveSubscribeSettings(String url);
         void hideSubscribeSettings();
+        void saveServerList(List<TrojanConfig> configList);
     }
 
     interface View extends BaseView<Presenter> {

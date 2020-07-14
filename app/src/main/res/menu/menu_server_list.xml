@@ -28,7 +28,7 @@
         app:showAsAction="never" />
 
     <item android:id="@+id/action_exit_batch_operation"
-        android:title="@string/common_cancel"
+        android:title="@string/common_exit"
         android:visible="false"
         app:showAsAction="always" />
 

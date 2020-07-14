@@ -174,23 +174,27 @@ public class ServerListPresenter implements ServerListContract.Presenter {
     }
 
     @Override
+    public void saveServerList(List<TrojanConfig> configList) {
+        mView.showLoading();
+        Threads.instance().runOnWorkThread(new Task() {
+            @Override
+            public void onRun() {
+                mDataManager.replaceServerConfigs(configList);
+                Threads.instance().runOnUiThread(mView::dismissLoading);
+            }
+        });
+    }
+
+    @Override
     public void batchDelete() {
         if (mBatchDeleteConfigSet.isEmpty()) {
             mView.showBatchDeletionSuccess();
         } else {
-            mView.showLoading();
-            Threads.instance().runOnWorkThread(new Task() {
-                @Override
-                public void onRun() {
-                    mDataManager.batchDeleteServerConfigs(mBatchDeleteConfigSet);
-                    Threads.instance().runOnUiThread(()->{
-                        mView.batchDelete(mBatchDeleteConfigSet);
-                        mBatchDeleteConfigSet.clear();
-                        mView.dismissLoading();
-                        mView.showBatchDeletionSuccess();
-                    });
-                }
-            });
+            // only remove items in view here.
+            // Actual deletion should be done after exiting batch operation mode.
+            mView.batchDelete(mBatchDeleteConfigSet);
+            mBatchDeleteConfigSet.clear();
+            mView.showBatchDeletionSuccess();
         }
     }
 
@@ -300,7 +304,7 @@ public class ServerListPresenter implements ServerListContract.Presenter {
 
     @WorkerThread
     private void showSubscribeServersSuccess() {
-        Threads.instance().runOnUiThread(()-> {
+        Threads.instance().runOnUiThread(() -> {
             mView.dismissLoading();
             mView.showSubscribeUpdateSuccess();
         });
@@ -308,7 +312,7 @@ public class ServerListPresenter implements ServerListContract.Presenter {
     }
 
     private void showSubscribeServersFailed() {
-        Threads.instance().runOnUiThread(()-> {
+        Threads.instance().runOnUiThread(() -> {
             mView.dismissLoading();
             mView.showSubscribeUpdateFailed();
         });

@@ -27,13 +27,12 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import io.github.trojan_gfw.igniter.R;
@@ -42,6 +41,7 @@ import io.github.trojan_gfw.igniter.common.app.BaseFragment;
 import io.github.trojan_gfw.igniter.common.dialog.LoadingDialog;
 import io.github.trojan_gfw.igniter.common.utils.SnackbarUtils;
 import io.github.trojan_gfw.igniter.qrcode.ScanQRCodeActivity;
+import io.github.trojan_gfw.igniter.servers.ItemVerticalMoveCallback;
 import io.github.trojan_gfw.igniter.servers.SubscribeSettingDialog;
 import io.github.trojan_gfw.igniter.servers.activity.ServerListActivity;
 import io.github.trojan_gfw.igniter.servers.contract.ServerListContract;
@@ -54,6 +54,7 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
     public static final String KEY_TROJAN_CONFIG = ServerListActivity.KEY_TROJAN_CONFIG;
     private ServerListContract.Presenter mPresenter;
     private RecyclerView mServerListRv;
+    private ItemTouchHelper mItemTouchHelper;
     private ServerListAdapter mServerListAdapter;
     private Dialog mImportConfigDialog;
     private Dialog mLoadingDialog;
@@ -90,12 +91,13 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
     private void initViews() {
         FragmentActivity activity = getActivity();
         if (activity instanceof AppCompatActivity) {
-            ((AppCompatActivity) activity).setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
+            ((AppCompatActivity) activity).setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
             setHasOptionsMenu(true);
         }
         mServerListRv.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
         mServerListRv.addItemDecoration(new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL));
         mServerListAdapter = new ServerListAdapter(getContext(), new ArrayList<TrojanConfig>());
+        mItemTouchHelper = new ItemTouchHelper(new ItemVerticalMoveCallback(mServerListAdapter));
         mServerListRv.setAdapter(mServerListAdapter);
     }
 
@@ -268,6 +270,7 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
         mBatchOperationMode = enable;
         requireActivity().invalidateOptionsMenu();
         mServerListAdapter.setBatchDeleteMode(enable);
+        mItemTouchHelper.attachToRecyclerView(enable ? mServerListRv : null);
     }
 
     @Override
@@ -291,6 +294,7 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
                 mPresenter.batchOperateServerList();
                 return true;
             case R.id.action_exit_batch_operation:
+                mPresenter.saveServerList(mServerListAdapter.getData());
                 mPresenter.exitServerListBatchOperation();
                 return true;
             case R.id.action_select_all_servers:
@@ -318,6 +322,8 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
     public void showLoading() {
         if (mLoadingDialog == null) {
             mLoadingDialog = new LoadingDialog(mContext);
+            mLoadingDialog.setCancelable(false);
+            mLoadingDialog.setCanceledOnTouchOutside(false);
         }
         mLoadingDialog.show();
     }
