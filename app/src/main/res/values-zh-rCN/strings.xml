@@ -107,4 +107,5 @@
     <string name="action_subscribe_server_list">订阅更新</string>
     <string name="subscribe_servers_success">更新成功</string>
     <string name="subscribe_servers_failed">更新失败，请检查订阅设置或者尝试开启代理后再更新，也可能是Igniter不支持该订阅信息的格式</string>
+    <string name="common_exit">退出</string>
 </resources>

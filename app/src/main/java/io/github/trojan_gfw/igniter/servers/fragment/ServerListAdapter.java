@@ -10,17 +10,20 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import io.github.trojan_gfw.igniter.R;
 import io.github.trojan_gfw.igniter.TrojanConfig;
+import io.github.trojan_gfw.igniter.servers.ItemVerticalMoveCallback;
 import io.github.trojan_gfw.igniter.servers.data.TrojanConfigWrapper;
 
-public class ServerListAdapter extends RecyclerView.Adapter<ViewHolder> {
+public class ServerListAdapter extends RecyclerView.Adapter<ViewHolder> implements ItemVerticalMoveCallback.ItemTouchHelperContract {
     private final LayoutInflater mInflater;
     private final List<TrojanConfigWrapper> mData;
     private OnItemClickListener mOnItemClickListener;
@@ -70,7 +73,7 @@ public class ServerListAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     public void replaceData(List<TrojanConfig> data) {
         mData.clear();
-        for (TrojanConfig config: data) {
+        for (TrojanConfig config : data) {
             mData.add(new TrojanConfigWrapper(config));
         }
         notifyDataSetChanged();
@@ -95,8 +98,31 @@ public class ServerListAdapter extends RecyclerView.Adapter<ViewHolder> {
         this.mOnItemClickListener = onItemClickListener;
     }
 
+    @Override
+    public void onRowMove(int srcPosition, int destPosition) {
+        Collections.swap(mData, srcPosition, destPosition);
+        notifyItemMoved(srcPosition, destPosition);
+    }
+
+    @Override
+    public void onRowSelected(RecyclerView.ViewHolder viewHolder) {
+        if (viewHolder instanceof ViewHolder) {
+            ViewHolder vh = (ViewHolder) viewHolder;
+            vh.setItemSelected(true);
+        }
+    }
+
+    @Override
+    public void onRowClear(RecyclerView.ViewHolder viewHolder) {
+        if (viewHolder instanceof ViewHolder) {
+            ViewHolder vh = (ViewHolder) viewHolder;
+            vh.setItemSelected(false);
+        }
+    }
+
     public interface OnItemClickListener {
         void onItemSelected(TrojanConfig config, int pos);
+
         void onItemBatchSelected(TrojanConfig config, int pos, boolean checked);
     }
 }
@@ -141,6 +167,19 @@ class ViewHolder extends RecyclerView.ViewHolder {
         mCheckBox.setChecked(config.isSelected());
         mCheckBox.setOnCheckedChangeListener(mOnCheckedChangeListener);
         mBatchDeleteMode = batchDeleteMode;
+    }
+
+    public void setItemSelected(boolean selected) {
+        if (selected) {
+            int curTexColor = mRemoteServerRemarkTv.getCurrentTextColor();
+            mRemoteServerRemarkTv.setTag(curTexColor);
+            mRemoteServerRemarkTv.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.item_selected_text_foreground));
+        } else {
+            Integer previousColor = (Integer) mRemoteServerRemarkTv.getTag();
+            if (previousColor != null) {
+                mRemoteServerRemarkTv.setTextColor(previousColor);
+            }
+        }
     }
 
     public void bindListener(ServerListAdapter.OnItemClickListener listener) {
