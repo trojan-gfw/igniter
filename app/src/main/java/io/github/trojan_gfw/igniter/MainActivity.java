@@ -12,8 +12,10 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.text.InputType;
 import android.text.method.LinkMovementMethod;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
@@ -38,6 +40,7 @@ import java.io.InputStream;
 import io.github.trojan_gfw.igniter.common.constants.Constants;
 import io.github.trojan_gfw.igniter.common.os.Task;
 import io.github.trojan_gfw.igniter.common.os.Threads;
+import io.github.trojan_gfw.igniter.common.utils.AnimationUtils;
 import io.github.trojan_gfw.igniter.common.utils.PreferenceUtils;
 import io.github.trojan_gfw.igniter.common.utils.SnackbarUtils;
 import io.github.trojan_gfw.igniter.connection.TrojanConnection;
@@ -369,6 +372,25 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                         Constants.PREFERENCE_KEY_FIRST_START, false);
             }
         });
+        View horseIv = findViewById(R.id.imageView);
+        GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return true;
+            }
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                swayTheHorse();
+                return true;
+            }
+        });
+        horseIv.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
+    }
+
+    private void swayTheHorse() {
+        View v = findViewById(R.id.imageView);
+        v.clearAnimation();
+        AnimationUtils.sway(v, 60f, 500L, 4f);
     }
 
     @Override
