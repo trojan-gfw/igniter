@@ -3,6 +3,7 @@ package io.github.trojan_gfw.igniter.servers.data;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,11 +16,13 @@ import java.net.Proxy;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -166,17 +169,17 @@ public class ServerListDataManager implements ServerListDataSource {
                 idxOfSharp = i;
             } else if (c == '\n') {
                 idxOfLineEnd = i;
-            }
-            if (idxOfSharp != -1 && idxOfLineEnd != -1) {
-                String trojanUrl = configLines.substring(idxOfLineStart, idxOfSharp);
-                String remark = configLines.substring(idxOfSharp + 1, idxOfLineEnd).trim();
-                TrojanConfig config = TrojanURLHelper.ParseTrojanURL(trojanUrl);
-                if (config != null) {
-                    config.setRemoteServerRemark(remark);
-                    configMap.put(config.getRemoteAddr(), config);
+                if (idxOfSharp != -1) {
+                    String trojanUrl = configLines.substring(idxOfLineStart, idxOfSharp);
+                    String remark = configLines.substring(idxOfSharp + 1, idxOfLineEnd).trim();
+                    TrojanConfig config = TrojanURLHelper.ParseTrojanURL(trojanUrl);
+                    if (config != null) {
+                        config.setRemoteServerRemark(remark);
+                        configMap.put(config.getRemoteAddr(), config);
+                    }
                 }
                 idxOfLineStart = idxOfLineEnd + 1;
-                idxOfLineEnd = idxOfSharp = -1;
+                idxOfSharp = -1;
             }
         }
         List<TrojanConfig> previousList = loadServerConfigList();
