@@ -235,20 +235,31 @@ public class ServerListDataManager implements ServerListDataSource {
 
     @Override
     public List<TrojanConfig> importServersFromFile(Context context, Uri fileUri) {
-        List<TrojanConfig> trojanConfigs = parseTrojanConfigsFromFileContent(readFileContentFromUri(context, fileUri));
+        List<TrojanConfig> trojanConfigsFromFile = parseTrojanConfigsFromFileContent(readFileContentFromUri(context, fileUri));
         List<TrojanConfig> currentConfigs = loadServerConfigList();
-        currentConfigs.addAll(trojanConfigs);
-        // remove repeated configurations
-        Set<String> newTrojanConfigRemoteAddrSet = new HashSet<>();
-        for (TrojanConfig config : trojanConfigs) {
-            newTrojanConfigRemoteAddrSet.add(config.getRemoteAddr());
+        final int importedSize = trojanConfigsFromFile.size();
+        if (importedSize == 0) return currentConfigs;
+        // Used for filtering trojan configs with the same remote url address.
+        Map<String, TrojanConfig> currentConfigUrlMap = new HashMap<>();
+        for (TrojanConfig config : currentConfigs) {
+            currentConfigUrlMap.put(config.getRemoteAddr(), config);
         }
-        for (int i = currentConfigs.size() - 1; i >= 0; i--) {
-            if (newTrojanConfigRemoteAddrSet.contains(currentConfigs.get(i).getRemoteAddr())) {
-                currentConfigs.remove(i);
+        // Find out the intersection of previous configs and configs to be imported by comparing
+        // the remote url address. Replace the previous properties with the new imported ones.
+        int overlapCount = 0;
+        for (int i = importedSize - 1; i >= 0; i--) {
+            TrojanConfig config = trojanConfigsFromFile.get(i);
+            TrojanConfig currentIdenticalConfig = currentConfigUrlMap.get(config.getRemoteAddr());
+            if (currentIdenticalConfig != null) {
+                currentIdenticalConfig.copyFrom(config);
+                ++overlapCount;
+                Collections.swap(trojanConfigsFromFile, i, importedSize - overlapCount);
             }
         }
-        currentConfigs.addAll(trojanConfigs);
+        // Append the remaining imported trojan configs at the end of the config list.
+        for (int i = 0, end = importedSize - overlapCount; i < end; i++) {
+            currentConfigs.add(trojanConfigsFromFile.get(i));
+        }
         replaceServerConfigs(currentConfigs);
         return currentConfigs;
     }
