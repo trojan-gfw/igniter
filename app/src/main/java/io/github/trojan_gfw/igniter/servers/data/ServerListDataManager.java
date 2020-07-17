@@ -16,8 +16,8 @@ import java.net.Proxy;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -141,11 +141,11 @@ public class ServerListDataManager implements ServerListDataSource {
             }
             try (InputStream stream = connection.getInputStream()) {
                 if (stream != null) {
-                    String response = DecodeUtils.decodeBase64(readStringFromStream(stream));
+                    @Nullable String response = DecodeUtils.decodeBase64(readStringFromStream(stream));
                     if (TextUtils.isEmpty(response)) {
                         callback.onFailed();
                     } else {
-                        parseAndSaveSubscribeServers(response);
+                        parseAndSaveSubscribeServers(Objects.requireNonNull(response));
                         callback.onSuccess();
                     }
                 }
@@ -190,7 +190,14 @@ public class ServerListDataManager implements ServerListDataSource {
                 previousList.set(i, configMap.remove(remoteAddr));
             }
         }
-        previousList.addAll(configMap.values());
+        Collection<TrojanConfig> remainConfigs = configMap.values();
+        if (remainConfigs.size() > 0) {
+            // sort the remaining new TrojanConfigs from subscription, and append them to the end
+            // of server list.
+            List<TrojanConfig> newList = new ArrayList<>(remainConfigs);
+            Collections.sort(newList, (a, b) -> b.getRemoteAddr().compareTo(a.getRemoteAddr()));
+            previousList.addAll(newList);
+        }
         replaceServerConfigs(previousList);
     }
 
