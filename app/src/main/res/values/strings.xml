@@ -12,8 +12,9 @@
 
     <string name="remote_server_remark">Remote Server Remark</string>
     <string name="remote_addr">Remote Address</string>
+    <string name="remote_server_sni">Remote Server SNI</string>
     <string name="remote_port">Remote Port</string>
-    <string name="default_port">443</string>
+    <string name="default_port" translatable="false">443</string>
     <string name="password">Password</string>
     <string name="button_service__start">Start</string>
     <string name="button_service__starting">Starting</string>
@@ -22,12 +23,12 @@
     <string name="verify_certificate">Verify Certificate</string>
     <string name="label_clash">Exempt Chinese Domain/IPs</string>
     <string name="enable_ipv6">Enable IPv6</string>
-    <string name="stop_service">io.github.trojan_gfw.igniter.STOP_SERVICE</string>
-    <string name="bind_service">io.github.trojan_gfw.igniter.BIND_SERVICE</string>
+    <string name="stop_service" translatable="false">io.github.trojan_gfw.igniter.STOP_SERVICE</string>
+    <string name="bind_service" translatable="false">io.github.trojan_gfw.igniter.BIND_SERVICE</string>
     <string name="connected_to__in__ms">Connected to %1$s in %2$sms.</string>
     <string name="failed_to_connect_to__">Failed to connect to %1$s: %2$s</string>
     <string name="invalid_configuration">Invalid Configuration</string>
-    <string name="notification_channel_id">igniter_notify_chan</string>
+    <string name="notification_channel_id" translatable="false">igniter_notify_chan</string>
     <string name="notification_channel_name">Igniter notifications</string>
     <string name="notification_starting_service">Starting service</string>
     <string name="main_restart_proxy_service_tip">Restart proxy yourself to apply new exempt apps configuration.</string>
@@ -97,9 +98,9 @@
     <string name="author_title">Developed by</string>
 
     <!-- Sync Preferences -->
-    <string name="credit_item1_title">Dreamacro/clash</string>
-    <string name="credit_item2_title">eycorsican/go-tun2socks</string>
-    <string name="credit_item3_title">bingoogolapple/BGAQRCode-Android</string>
+    <string name="credit_item1_title" translatable="false">Dreamacro/clash</string>
+    <string name="credit_item2_title" translatable="false">eycorsican/go-tun2socks</string>
+    <string name="credit_item3_title" translatable="false">bingoogolapple/BGAQRCode-Android</string>
 
     <string name="action_about">About</string>
 

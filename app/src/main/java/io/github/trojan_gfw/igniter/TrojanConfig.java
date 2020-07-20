@@ -22,6 +22,7 @@ public class TrojanConfig implements Parcelable {
     private boolean enableIpv6;
     private String cipherList;
     private String tls13CipherList;
+    private String SNI;
 
 
     public TrojanConfig() {
@@ -48,6 +49,7 @@ public class TrojanConfig implements Parcelable {
         this.tls13CipherList = "TLS_AES_128_GCM_SHA256:"
                 + "TLS_CHACHA20_POLY1305_SHA256:"
                 + "TLS_AES_256_GCM_SHA384";
+        this.SNI = "";
     }
 
     protected TrojanConfig(Parcel in) {
@@ -62,6 +64,7 @@ public class TrojanConfig implements Parcelable {
         enableIpv6 = in.readByte() != 0;
         cipherList = in.readString();
         tls13CipherList = in.readString();
+        SNI = in.readString();
     }
 
     public static final Creator<TrojanConfig> CREATOR = new Creator<TrojanConfig>() {
@@ -91,7 +94,8 @@ public class TrojanConfig implements Parcelable {
                             .put("cert", this.caCertPath)
                             .put("cipher", this.cipherList)
                             .put("cipher_tls13", this.tls13CipherList)
-                            .put("alpn", new JSONArray().put("h2").put("http/1.1")))
+                            .put("alpn", new JSONArray().put("h2").put("http/1.1"))
+                            .put("sni", this.SNI))
                     .put("enable_ipv6", this.enableIpv6)
                     .toString();
         } catch (Exception e) {
@@ -110,7 +114,8 @@ public class TrojanConfig implements Parcelable {
                     .setRemotePort(json.getInt("remote_port"))
                     .setPassword(json.getJSONArray("password").getString(0))
                     .setEnableIpv6(json.getBoolean("enable_ipv6"))
-                    .setVerifyCert(json.getJSONObject("ssl").getBoolean("verify"));
+                    .setVerifyCert(json.getJSONObject("ssl").getBoolean("verify"))
+                    .setSNI(json.getJSONObject("ssl").getString("sni"));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -129,7 +134,8 @@ public class TrojanConfig implements Parcelable {
                 .setVerifyCert(that.verifyCert)
                 .setCaCertPath(that.caCertPath)
                 .setCipherList(that.cipherList)
-                .setTls13CipherList(that.tls13CipherList);
+                .setTls13CipherList(that.tls13CipherList)
+                .setSNI(that.SNI);
 
     }
 
@@ -238,6 +244,15 @@ public class TrojanConfig implements Parcelable {
         return this;
     }
 
+    public String getSNI() {
+        return SNI;
+    }
+
+    public TrojanConfig setSNI(String sni) {
+        this.SNI = sni;
+        return this;
+    }
+
     @Override
     public boolean equals(@Nullable Object obj) {
         if (!(obj instanceof TrojanConfig)) {
@@ -249,7 +264,8 @@ public class TrojanConfig implements Parcelable {
                 && paramEquals(localAddr, that.localAddr) && paramEquals(localPort, that.localPort))
                 && paramEquals(password, that.password) && paramEquals(verifyCert, that.verifyCert)
                 && paramEquals(caCertPath, that.caCertPath) && paramEquals(enableIpv6, that.enableIpv6)
-                && paramEquals(cipherList, that.cipherList) && paramEquals(tls13CipherList, that.tls13CipherList);
+                && paramEquals(cipherList, that.cipherList) && paramEquals(tls13CipherList, that.tls13CipherList)
+                && paramEquals(SNI, that.SNI);
     }
 
     private static boolean paramEquals(Object a, Object b) {
@@ -280,5 +296,6 @@ public class TrojanConfig implements Parcelable {
         dest.writeByte((byte) (enableIpv6 ? 1 : 0));
         dest.writeString(cipherList);
         dest.writeString(tls13CipherList);
+        dest.writeString(SNI);
     }
 }

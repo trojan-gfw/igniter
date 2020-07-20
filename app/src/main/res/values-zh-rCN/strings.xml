@@ -11,6 +11,7 @@
 
     <string name="remote_server_remark">远程服务标识</string>
     <string name="remote_addr">远程地址</string>
+    <string name="remote_server_sni">远程服务 SNI</string>
     <string name="remote_port">远程端口</string>
     <string name="default_port">443</string>
     <string name="password">密码</string>

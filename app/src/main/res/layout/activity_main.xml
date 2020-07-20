@@ -68,6 +68,22 @@
             app:layout_constraintTop_toBottomOf="@+id/remoteServerRemarkText" />
 
         <EditText
+            android:id="@+id/remoteServerSNIText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="12dp"
+            android:ems="10"
+            android:hint="@string/remote_server_sni"
+            android:inputType="textUri"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/remoteAddrText" />
+
+        <EditText
             android:id="@+id/remotePortText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -83,7 +99,7 @@
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/remoteAddrText" />
+            app:layout_constraintTop_toBottomOf="@+id/remoteServerSNIText" />
 
         <EditText
             android:id="@+id/passwordText"
