@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.util.Set;
 
 import clash.Clash;
+import clash.ClashStartOptions;
 import freeport.Freeport;
 import io.github.trojan_gfw.igniter.common.constants.Constants;
 import io.github.trojan_gfw.igniter.common.utils.PreferenceUtils;
@@ -385,10 +386,13 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
                 while (clashSocksPort == trojanPort);
 
                 LogHelper.i("igniter", "clash port is " + clashSocksPort);
-                ClashHelper.ChangeClashConfig(Globals.getClashConfigPath(),
-                        trojanPort, clashSocksPort);
                 ClashHelper.ShowConfig(Globals.getClashConfigPath());
-                Clash.start(getFilesDir().toString());
+                ClashStartOptions clashStartOptions = new ClashStartOptions();
+                clashStartOptions.setHomeDir(getFilesDir().toString());
+                clashStartOptions.setTrojanProxyServer("127.0.0.1:"+trojanPort);
+                clashStartOptions.setSocksListener("127.0.0.1:"+clashSocksPort);
+                clashStartOptions.setTrojanProxyServerUdpEnabled(true);
+                Clash.start(clashStartOptions);
                 LogHelper.i("Clash", "clash started");
             } catch (Exception e) {
                 e.printStackTrace();
