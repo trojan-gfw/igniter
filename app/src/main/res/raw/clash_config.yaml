@@ -19,10 +19,21 @@ dns:
 # Use format from Clash dev branch
 
 proxies:
-  - { name: "trojan", type: socks5, server: "127.0.0.1", port: 1081, udp: true}
+  - name: "trojan"
+    type: socks5
+    server: "127.0.0.1"
+    port: 1081
+    # username: username
+    # password: password
+    # tls: true
+    # skip-cert-verify: false
+    udp: true
 
 proxy-groups:
-  - { name: "Proxy", type: select, proxies: ["trojan"] }
+  - name: Proxy
+    type: select
+    proxies:
+      - trojan
 
 # from https://github.com/Hackl0us/SS-Rule-Snippet/blob/master/LAZY_RULES/clash.yaml
 
