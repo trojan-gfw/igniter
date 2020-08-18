@@ -5,8 +5,8 @@ ext.versionMinor = 9
 ext.versionPatch = 9
 ext.versionClassifier = "beta" // or null
 ext.isSnapshot = true // set to false when publishing new releases
-ext.minimumSdkVersion = 21
-ext.targetSdkVersion = 29
+ext.minimumSdkVersion = 23
+ext.targetSdkVersion = 30
 
 private Integer GenerateVersionCode() {
     return ext.minimumSdkVersion * 10000000 + ext.versionMajor * 10000 + ext.versionMinor * 100 + ext.versionPatch
