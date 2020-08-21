@@ -1,6 +1,5 @@
 package io.github.trojan_gfw.igniter.connection;
 
-import java.lang.ref.WeakReference;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
@@ -10,12 +9,12 @@ public class TestConnection {
     private static final int DEFAULT_TIMEOUT = 10 * 1000; // 10 seconds
     private final String mProxyHost;
     private final long mProxyPort;
-    private final WeakReference<OnResultListener> mOnResultListenerRef;
+    private final OnResultListener mOnResultListener;
 
     public TestConnection(String proxyHost, long proxyPort, OnResultListener onResultListener) {
         mProxyHost = proxyHost;
         mProxyPort = proxyPort;
-        mOnResultListenerRef = new WeakReference<>(onResultListener);
+        mOnResultListener = onResultListener;
     }
 
     public void testLatency(String testUrl) {
@@ -27,16 +26,9 @@ public class TestConnection {
             connection.setConnectTimeout(DEFAULT_TIMEOUT);
             connection.setReadTimeout(DEFAULT_TIMEOUT);
             connection.connect();
-            postResult(testUrl, true, "", System.currentTimeMillis() - startTime);
+            mOnResultListener.onResult(testUrl, true, System.currentTimeMillis() - startTime, "");
         } catch (Exception e) {
-            postResult(testUrl, false, e.getMessage(), 0L);
-        }
-    }
-
-    private void postResult(String url, boolean connected, String error, long latency) {
-        OnResultListener listener = mOnResultListenerRef.get();
-        if (listener != null) {
-            listener.onResult(url, connected, latency, error);
+            mOnResultListener.onResult(testUrl, false, 0L, e.getMessage());
         }
     }
 
