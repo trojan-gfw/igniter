@@ -1,16 +1,12 @@
 package io.github.trojan_gfw.igniter.connection;
 
-import android.os.AsyncTask;
-
-import androidx.annotation.NonNull;
-
 import java.lang.ref.WeakReference;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class TestConnection extends AsyncTask<String, Void, TestResult> {
+public class TestConnection {
     private static final int DEFAULT_TIMEOUT = 10 * 1000; // 10 seconds
     private final String mProxyHost;
     private final long mProxyPort;
@@ -22,9 +18,7 @@ public class TestConnection extends AsyncTask<String, Void, TestResult> {
         mOnResultListenerRef = new WeakReference<>(onResultListener);
     }
 
-    @Override
-    protected TestResult doInBackground(String... strings) {
-        String testUrl = strings[0];
+    public void testLatency(String testUrl) {
         try {
             long startTime = System.currentTimeMillis();
             InetSocketAddress proxyAddress = new InetSocketAddress(mProxyHost, (int) mProxyPort);
@@ -33,36 +27,20 @@ public class TestConnection extends AsyncTask<String, Void, TestResult> {
             connection.setConnectTimeout(DEFAULT_TIMEOUT);
             connection.setReadTimeout(DEFAULT_TIMEOUT);
             connection.connect();
-            return new TestResult(testUrl, true, "",
-                    System.currentTimeMillis() - startTime);
+            postResult(testUrl, true, "", System.currentTimeMillis() - startTime);
         } catch (Exception e) {
-            return new TestResult(testUrl, false, e.getMessage(), 0);
+            postResult(testUrl, false, e.getMessage(), 0L);
         }
     }
 
-    @Override
-    protected void onPostExecute(TestResult testResult) {
+    private void postResult(String url, boolean connected, String error, long latency) {
         OnResultListener listener = mOnResultListenerRef.get();
         if (listener != null) {
-            listener.onResult(testResult.url, testResult.connected, testResult.delay, testResult.error);
+            listener.onResult(url, connected, latency, error);
         }
     }
 
     public interface OnResultListener {
         void onResult(String testUrl, boolean connected, long delay, String error);
-    }
-}
-
-class TestResult {
-    boolean connected;
-    String url;
-    String error;
-    long delay;
-
-    TestResult(String url, boolean connected, @NonNull String error, long delay) {
-        this.connected = connected;
-        this.url = url;
-        this.error = error;
-        this.delay = delay;
     }
 }
