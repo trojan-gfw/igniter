@@ -119,7 +119,8 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
                 onResult(TUN2SOCKS5_SERVER_HOST, false, 0L, getString(R.string.proxy_service_not_connected));
                 return;
             }
-            new TestConnection(TUN2SOCKS5_SERVER_HOST, tun2socksPort, ProxyService.this).execute(testUrl);
+            new Thread(()-> new TestConnection(TUN2SOCKS5_SERVER_HOST, tun2socksPort,
+                    ProxyService.this).testLatency(testUrl)).start();
         }
 
         @Override
