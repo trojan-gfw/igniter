@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="text_size">18sp</dimen>
+    <dimen name="text_size_small">16sp</dimen>
+    <dimen name="text_size_extra_small">14sp</dimen>
     <dimen name="top_bar_height">55dp</dimen>
     <dimen name="common_corner_radius">15dp</dimen>
 
     <dimen name="main_btn_height">64dp</dimen>
     <dimen name="main_btn_margin">16dp</dimen>
+    <dimen name="main_vertical_margin">15dp</dimen>
+    <dimen name="main_vertical_margin_small">10dp</dimen>
+    <dimen name="main_horizontal_margin">16dp</dimen>
+    <dimen name="main_switch_horizontal_margin">20dp</dimen>
 
     <dimen name="dialog_margin">20dp</dimen>
 </resources>

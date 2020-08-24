@@ -39,4 +39,30 @@
         <item name="android:paddingStart">15dp</item>
         <item name="android:paddingEnd">15dp</item>
     </style>
+
+    <style name="MainEditTextStyle">
+        <item name="android:ems">10</item>
+        <item name="android:layout_marginStart">@dimen/main_horizontal_margin</item>
+        <item name="android:layout_marginEnd">@dimen/main_horizontal_margin</item>
+        <item name="android:textSize">@dimen/text_size</item>
+        <item name="android:layout_marginTop">@dimen/main_vertical_margin</item>
+        <item name="android:inputType">textUri</item>
+    </style>
+
+    <style name="MainEditTextStyleSmall" parent="MainEditTextStyle">
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:layout_marginTop">0dp</item>
+    </style>
+
+    <style name="MainSwitchStyle">
+        <item name="android:layout_marginStart">@dimen/main_switch_horizontal_margin</item>
+        <item name="android:layout_marginEnd">@dimen/main_switch_horizontal_margin</item>
+        <item name="android:layout_marginTop">@dimen/main_vertical_margin</item>
+        <item name="android:textSize">@dimen/text_size_small</item>
+    </style>
+
+    <style name="MainSwitchStyleSmall" parent="MainSwitchStyle">
+        <item name="android:layout_marginTop">@dimen/main_vertical_margin_small</item>
+        <item name="android:textSize">@dimen/text_size_extra_small</item>
+    </style>
 </resources>
