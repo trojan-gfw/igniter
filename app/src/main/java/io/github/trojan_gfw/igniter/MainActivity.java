@@ -41,6 +41,7 @@ import io.github.trojan_gfw.igniter.common.constants.Constants;
 import io.github.trojan_gfw.igniter.common.os.Task;
 import io.github.trojan_gfw.igniter.common.os.Threads;
 import io.github.trojan_gfw.igniter.common.utils.AnimationUtils;
+import io.github.trojan_gfw.igniter.common.utils.DisplayUtils;
 import io.github.trojan_gfw.igniter.common.utils.PreferenceUtils;
 import io.github.trojan_gfw.igniter.common.utils.SnackbarUtils;
 import io.github.trojan_gfw.igniter.connection.TrojanConnection;
@@ -70,7 +71,6 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     private Switch ipv6Switch;
     private Switch verifySwitch;
     private Switch clashSwitch;
-    private TextView clashLink;
     private Button startStopButton;
     private EditText trojanURLText;
     private @ProxyService.ProxyState
@@ -209,7 +209,6 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         passwordText.setEnabled(inputEnabled);
         verifySwitch.setEnabled(inputEnabled);
         clashSwitch.setEnabled(inputEnabled);
-        clashLink.setEnabled(inputEnabled);
     }
 
     private void applyConfigString(String configString) {
@@ -239,7 +238,12 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        final int screenWidth = DisplayUtils.getScreenWidth();
+        if (screenWidth >= 1080) {
+            setContentView(R.layout.activity_main);
+        } else {
+            setContentView(R.layout.activity_main_720);
+        }
         rootViewGroup = findViewById(R.id.rootScrollView);
         remoteServerRemarkText = findViewById(R.id.remoteServerRemarkText);
         remoteAddrText = findViewById(R.id.remoteAddrText);
@@ -249,8 +253,6 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         ipv6Switch = findViewById(R.id.ipv6Switch);
         verifySwitch = findViewById(R.id.verifySwitch);
         clashSwitch = findViewById(R.id.clashSwitch);
-        clashLink = findViewById(R.id.clashLink);
-        clashLink.setMovementMethod(LinkMovementMethod.getInstance());
         startStopButton = findViewById(R.id.startStopButton);
 
         copyRawResourceToDir(R.raw.cacert, Globals.getCaCertPath(), true);
@@ -410,9 +412,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 return true;
             }
         });
-        horseIv.setOnTouchListener((v, event) -> {
-            return gestureDetector.onTouchEvent(event);
-        });
+        horseIv.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
     }
 
     private void swayTheHorse() {
