@@ -71,6 +71,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    packagingOptions{
+        doNotStrip "*/armeabi-v7a/libgojni.so"
+        doNotStrip "*/arm64-v8a/libgojni.so"
+        doNotStrip "*/x86/libgojni.so"
+        doNotStrip "*/x86_64/libgojni.so"
+    }
 }
 
 repositories {
