@@ -9,7 +9,7 @@
     <string name="common_update">更新</string>
     <string name="common_save_success">保存成功</string>
 
-    <string name="remote_server_remark">远程服务标识</string>
+    <string name="remote_server_remark">远程服务备注</string>
     <string name="remote_addr">远程地址</string>
     <string name="remote_server_sni">远程服务 SNI</string>
     <string name="remote_port">远程端口</string>
