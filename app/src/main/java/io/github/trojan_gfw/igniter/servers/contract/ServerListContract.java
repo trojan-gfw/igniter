@@ -31,6 +31,7 @@ public interface ServerListContract {
         void saveSubscribeSettings(String url);
         void hideSubscribeSettings();
         void saveServerList(List<TrojanConfig> configList);
+        void pingAllProxyServer(List<TrojanConfig> configList);
     }
 
     interface View extends BaseView<Presenter> {
@@ -57,5 +58,6 @@ public interface ServerListContract {
         void dismissSubscribeSettings();
         void showSubscribeUpdateSuccess();
         void showSubscribeUpdateFailed();
+        void setPingServerDelayTime(TrojanConfig config, float timeout);
     }
 }

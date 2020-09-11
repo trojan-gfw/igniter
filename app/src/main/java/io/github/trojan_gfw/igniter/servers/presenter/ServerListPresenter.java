@@ -6,7 +6,10 @@ import android.text.TextUtils;
 
 import androidx.annotation.WorkerThread;
 
+import com.stealthcopter.networktools.ping.PingStats;
+
 import java.lang.ref.WeakReference;
+import java.math.BigDecimal;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,8 +22,11 @@ import io.github.trojan_gfw.igniter.common.os.Threads;
 import io.github.trojan_gfw.igniter.common.sp.CommonSP;
 import io.github.trojan_gfw.igniter.servers.contract.ServerListContract;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataSource;
+import io.github.trojan_gfw.igniter.servers.data.ServerListDataManager;
 
 public class ServerListPresenter implements ServerListContract.Presenter {
+    private final static String TAG = "ServerListPresenter";
+
     private final ServerListContract.View mView;
     private final ServerListDataSource mDataManager;
     private Set<TrojanConfig> mBatchDeleteConfigSet;
@@ -204,6 +210,30 @@ public class ServerListPresenter implements ServerListContract.Presenter {
     @Override
     public void gotoScanQRCode() {
         mView.gotoScanQRCode();
+    }
+
+    @Override
+    public void pingAllProxyServer(List<TrojanConfig> configList) {
+        for (TrojanConfig config : configList) {
+            mDataManager.pingTrojanConfigServer(config, new ServerListDataSource.PingCallback() {
+                @Override
+                public void onSuccess(PingStats pingStats) {
+                    BigDecimal b = new BigDecimal(pingStats.getAverageTimeTaken());
+                    float pintTime = b.setScale(1,BigDecimal.ROUND_HALF_UP).floatValue();
+                    Threads.instance().runOnUiThread(() -> {
+                        mView.setPingServerDelayTime(config, pintTime);
+                    });
+                }
+
+                @Override
+                public void onFailed() {
+                    Threads.instance().runOnUiThread(() -> {
+                        mView.setPingServerDelayTime(config, ServerListDataManager.SERVER_UNABLE_TO_REACH);
+                    });
+
+                }
+            });
+        }
     }
 
     @WorkerThread

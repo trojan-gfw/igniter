@@ -6,6 +6,8 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
 
+import com.stealthcopter.networktools.ping.PingStats;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -24,6 +26,8 @@ public interface ServerListDataSource {
     void replaceServerConfigs(List<TrojanConfig> list);
     @WorkerThread
     void requestSubscribeServerConfigs(String url, @NonNull Callback callback);
+    @WorkerThread
+    void pingTrojanConfigServer(TrojanConfig config, @NonNull PingCallback callback);
 
     /**
      * Parse trojan configs from {@param fileUri}. Combine with current trojan config list and return
@@ -40,6 +44,11 @@ public interface ServerListDataSource {
 
     interface Callback {
         void onSuccess();
+        void onFailed();
+    }
+
+    interface PingCallback {
+        void onSuccess(PingStats pingStats);
         void onFailed();
     }
 }
