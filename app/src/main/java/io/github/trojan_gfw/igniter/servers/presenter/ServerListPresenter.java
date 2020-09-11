@@ -6,7 +6,10 @@ import android.text.TextUtils;
 
 import androidx.annotation.WorkerThread;
 
+import com.stealthcopter.networktools.ping.PingStats;
+
 import java.lang.ref.WeakReference;
+import java.math.BigDecimal;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,8 +22,12 @@ import io.github.trojan_gfw.igniter.common.os.Threads;
 import io.github.trojan_gfw.igniter.common.sp.CommonSP;
 import io.github.trojan_gfw.igniter.servers.contract.ServerListContract;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataSource;
+import io.github.trojan_gfw.igniter.servers.data.ServerListDataManager;
+import io.github.trojan_gfw.igniter.servers.data.TrojanConfigWrapper;
 
 public class ServerListPresenter implements ServerListContract.Presenter {
+    private final static String TAG = "ServerListPresenter";
+
     private final ServerListContract.View mView;
     private final ServerListDataSource mDataManager;
     private Set<TrojanConfig> mBatchDeleteConfigSet;
@@ -206,6 +213,13 @@ public class ServerListPresenter implements ServerListContract.Presenter {
         mView.gotoScanQRCode();
     }
 
+    @Override
+    public void pingAllProxyServer(List<TrojanConfig> configList) {
+        for (TrojanConfig config : configList) {
+            mDataManager.pingTrojanConfigServer(config, new PingServerCallBack(this));
+        }
+    }
+
     @WorkerThread
     private void loadConfigs() {
         List<TrojanConfig> trojanConfigs = mDataManager.loadServerConfigList();
@@ -225,6 +239,12 @@ public class ServerListPresenter implements ServerListContract.Presenter {
         Threads.instance().runOnUiThread(() -> {
             mView.dismissLoading();
             mView.showSubscribeUpdateFailed();
+        });
+    }
+
+    private void setPingDelayTime(TrojanConfig config, float pingDelayTime) {
+        Threads.instance().runOnUiThread(() -> {
+            mView.setPingServerDelayTime(config, pingDelayTime);
         });
     }
 
@@ -248,6 +268,32 @@ public class ServerListPresenter implements ServerListContract.Presenter {
             ServerListPresenter presenter = mPresenterRef.get();
             if (presenter != null) {
                 presenter.showSubscribeServersFailed();
+            }
+        }
+    }
+
+    private static class PingServerCallBack implements ServerListDataSource.PingCallback {
+        private final WeakReference<ServerListPresenter> mPresenterRef;
+
+        public PingServerCallBack(ServerListPresenter presenter) {
+            mPresenterRef = new WeakReference<>(presenter);
+        }
+
+        @Override
+        public void onSuccess(TrojanConfig config, PingStats pingStats) {
+            ServerListPresenter presenter = mPresenterRef.get();
+            if (presenter != null) {
+                BigDecimal b = new BigDecimal(pingStats.getAverageTimeTaken());
+                float pingDelayTime = b.setScale(1,BigDecimal.ROUND_HALF_UP).floatValue();
+                presenter.setPingDelayTime(config, pingDelayTime);
+            }
+        }
+
+        @Override
+        public void onFailed(TrojanConfig config) {
+            ServerListPresenter presenter = mPresenterRef.get();
+            if (presenter != null) {
+                presenter.setPingDelayTime(config, ServerListDataManager.SERVER_UNABLE_TO_REACH);
             }
         }
     }

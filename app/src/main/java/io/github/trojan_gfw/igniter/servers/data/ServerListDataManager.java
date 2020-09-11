@@ -3,9 +3,14 @@ package io.github.trojan_gfw.igniter.servers.data;
 import android.content.Context;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.stealthcopter.networktools.Ping;
+import com.stealthcopter.networktools.ping.PingResult;
+import com.stealthcopter.networktools.ping.PingStats;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,9 +42,15 @@ import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.TrojanHelper;
 import io.github.trojan_gfw.igniter.TrojanURLHelper;
 import io.github.trojan_gfw.igniter.common.constants.ConfigFileConstants;
+import io.github.trojan_gfw.igniter.common.os.Threads;
 import io.github.trojan_gfw.igniter.common.utils.DecodeUtils;
 
 public class ServerListDataManager implements ServerListDataSource {
+    public static final float SERVER_UNABLE_TO_REACH = -200;
+    public static final float SERVER_STATUS_INIT = -100;
+    public static final int HIGH_SPEED_NETWORK = 80; // < 80ms
+    public static final int SLOW_SPEED_NETWORK = 1000; // > 1s
+
     private final String mConfigFilePath;
     private boolean mProxyOn;
     private String mProxyHost;
@@ -327,5 +338,26 @@ public class ServerListDataManager implements ServerListDataSource {
             e.printStackTrace();
         }
         return jsonObject.toString();
+    }
+
+    @Override
+    public void pingTrojanConfigServer(TrojanConfig config, @NonNull PingCallback callback) {
+        // Asynchronously
+        Ping.onAddress(config.getRemoteAddr()).setTimeOutMillis(1000).setTimes(5).doPing(new Ping.PingListener() {
+            @Override
+            public void onResult(PingResult pingResult) {
+//                    Log.d(TAG, pingResult.toString());
+            }
+
+            @Override
+            public void onError(Exception e) {
+                callback.onFailed(config);
+            }
+
+            @Override
+            public void onFinished(PingStats pingStats) {
+                callback.onSuccess(config, pingStats);
+            }
+        });
     }
 }

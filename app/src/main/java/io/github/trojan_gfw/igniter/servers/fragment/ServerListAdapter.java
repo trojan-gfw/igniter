@@ -1,7 +1,9 @@
 package io.github.trojan_gfw.igniter.servers.fragment;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,17 +15,22 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import io.github.trojan_gfw.igniter.R;
 import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.servers.ItemVerticalMoveCallback;
 import io.github.trojan_gfw.igniter.servers.data.TrojanConfigWrapper;
+import io.github.trojan_gfw.igniter.servers.data.ServerListDataManager;
 
 public class ServerListAdapter extends RecyclerView.Adapter<ViewHolder> implements ItemVerticalMoveCallback.ItemTouchHelperContract {
+    private final static String TAG = "ServerListAdapter";
+
     private final LayoutInflater mInflater;
     private final List<TrojanConfigWrapper> mData;
     private OnItemClickListener mOnItemClickListener;
@@ -76,7 +83,19 @@ public class ServerListAdapter extends RecyclerView.Adapter<ViewHolder> implemen
         for (TrojanConfig config : data) {
             mData.add(new TrojanConfigWrapper(config));
         }
-        notifyDataSetChanged();
+        sortConfigByDelayTime();
+    }
+
+    public void setPingServerDelayTime(TrojanConfig tagetConfig, float timeout) {
+        int index = 0;
+        for (TrojanConfigWrapper configWrapper : mData) {
+            if (tagetConfig.equals(configWrapper.getDelegate())) {
+                configWrapper.setPingDelayTime(timeout);
+                sortConfigByDelayTime();
+                break;
+            }
+            index += 1;
+        }
     }
 
     public void removeItemOnPosition(int pos) {
@@ -120,6 +139,19 @@ public class ServerListAdapter extends RecyclerView.Adapter<ViewHolder> implemen
         }
     }
 
+    private void sortConfigByDelayTime() {
+        Collections.sort(mData,new Comparator<TrojanConfigWrapper>(){
+            @Override
+            public int compare(TrojanConfigWrapper o1, TrojanConfigWrapper o2) {
+                if (o1.getPingDelayTime() < 0) {
+                    return 1;
+                }
+                return (int) (o1.getPingDelayTime()- o2.getPingDelayTime());
+            }
+        });
+        notifyItemRangeChanged(0, mData.size());
+    }
+
     public interface OnItemClickListener {
         void onItemSelected(TrojanConfig config, int pos);
 
@@ -130,6 +162,7 @@ public class ServerListAdapter extends RecyclerView.Adapter<ViewHolder> implemen
 class ViewHolder extends RecyclerView.ViewHolder {
     private TrojanConfigWrapper mConfig;
     private TextView mRemoteServerRemarkTv;
+    private TextView mPingDelayTimeView;
     private CheckBox mCheckBox;
     private boolean mBatchDeleteMode;
     private ServerListAdapter.OnItemClickListener mItemClickListener;
@@ -139,6 +172,41 @@ class ViewHolder extends RecyclerView.ViewHolder {
             mItemClickListener.onItemBatchSelected(mConfig, getBindingAdapterPosition(), isChecked);
         }
     });
+
+    public void bindData(TrojanConfigWrapper config, boolean batchDeleteMode) {
+        this.mConfig = config;
+        String name = config.getRemoteServerRemark();
+        if (TextUtils.isEmpty(name)) { // only display remote address when remark is empty.
+            name = config.getRemoteAddr();
+        }
+        mRemoteServerRemarkTv.setText(name);
+        mCheckBox.setVisibility(batchDeleteMode ? View.VISIBLE : View.GONE);
+        mCheckBox.setOnCheckedChangeListener(null);
+        mCheckBox.setChecked(config.isSelected());
+        mCheckBox.setOnCheckedChangeListener(mOnCheckedChangeListener);
+        mBatchDeleteMode = batchDeleteMode;
+        mPingDelayTimeView.setTextColor(Color.DKGRAY);
+
+        if (config.getPingDelayTime() == ServerListDataManager.SERVER_STATUS_INIT) {
+            mPingDelayTimeView.setVisibility(View.INVISIBLE);
+        } else if (config.getPingDelayTime() == ServerListDataManager.SERVER_UNABLE_TO_REACH) {
+            mPingDelayTimeView.setText(mPingDelayTimeView.getContext().getString(R.string.trojan_service_not_available));
+            mPingDelayTimeView.setTextColor(Color.RED);
+        } else{
+            mPingDelayTimeView.setVisibility(View.VISIBLE);
+            if (config.getPingDelayTime() > ServerListDataManager.SLOW_SPEED_NETWORK) {
+                BigDecimal b = new BigDecimal(config.getPingDelayTime() /1000);
+                float pintTime = b.setScale(2,BigDecimal.ROUND_HALF_UP).floatValue();
+                mPingDelayTimeView.setText(String.valueOf(pintTime) + " s");
+                mPingDelayTimeView.setTextColor(Color.RED);
+            } else {
+                mPingDelayTimeView.setText(String.valueOf(config.getPingDelayTime() ) + " ms");
+                if(config.getPingDelayTime() < ServerListDataManager.HIGH_SPEED_NETWORK) {
+                    mPingDelayTimeView.setTextColor(Color.BLUE);
+                }
+            }
+        }
+    }
 
     public ViewHolder(@NonNull final View itemView) {
         super(itemView);
@@ -153,20 +221,7 @@ class ViewHolder extends RecyclerView.ViewHolder {
             }
         });
         mCheckBox = itemView.findViewById(R.id.serverCb);
-    }
-
-    public void bindData(TrojanConfigWrapper config, boolean batchDeleteMode) {
-        this.mConfig = config;
-        String name = config.getRemoteServerRemark();
-        if (TextUtils.isEmpty(name)) { // only display remote address when remark is empty.
-            name = config.getRemoteAddr();
-        }
-        mRemoteServerRemarkTv.setText(name);
-        mCheckBox.setVisibility(batchDeleteMode ? View.VISIBLE : View.GONE);
-        mCheckBox.setOnCheckedChangeListener(null);
-        mCheckBox.setChecked(config.isSelected());
-        mCheckBox.setOnCheckedChangeListener(mOnCheckedChangeListener);
-        mBatchDeleteMode = batchDeleteMode;
+        mPingDelayTimeView = itemView.findViewById(R.id.server_speed);
     }
 
     public void setItemSelected(boolean selected) {

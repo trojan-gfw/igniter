@@ -47,4 +47,9 @@
         app:showAsAction="always"
         android:visible="false" />
 
+    <item android:id="@+id/action_test_all_proxy_server"
+        android:title="@string/server_list_menu_test_all_proxy_server"
+        app:showAsAction="never"
+        android:visible="true"/>
+
 </menu>
