@@ -50,6 +50,7 @@
     <string name="server_list_import_file_desc">Import config in file extension (*.txt)</string>
     <string name="server_list_file_chooser_msg">Select a TXT file</string>
     <string name="server_list_menu_import_from_file">Import from file</string>
+    <string name="server_list_menu_test_all_proxy_server">Test all proxy server</string>
     <string name="server_list_menu_export_to_file">Export to file</string>
     <string name="server_list_delete_btn">@string/common_delete</string>
     <string name="server_list_lack_of_camera_permission">Lack of camera permission!</string>

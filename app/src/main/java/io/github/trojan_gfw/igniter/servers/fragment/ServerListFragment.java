@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +32,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -245,6 +247,7 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
         menu.findItem(R.id.action_select_all_servers).setVisible(mBatchOperationMode);
         menu.findItem(R.id.action_deselect_all_servers).setVisible(mBatchOperationMode);
         menu.findItem(R.id.action_batch_delete_servers).setVisible(mBatchOperationMode);
+        menu.findItem(R.id.action_test_all_proxy_server).setVisible(!mBatchOperationMode);
         // Tint scan QRCode icon to white.
         if (qrCodeItem.getIcon() != null) {
             Drawable drawable = qrCodeItem.getIcon();
@@ -311,6 +314,9 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
                 return true;
             case R.id.action_subscribe_servers:
                 mPresenter.updateSubscribeServers();
+                return true;
+            case R.id.action_test_all_proxy_server:
+                mPresenter.pingAllProxyServer(mServerListAdapter.getData());
                 return true;
             default:
                 break;
@@ -427,5 +433,10 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
     @Override
     public void setPresenter(ServerListContract.Presenter presenter) {
         mPresenter = presenter;
+    }
+
+    @Override
+    public void setPingServerDelayTime(TrojanConfig config, float timeout) {
+        mServerListAdapter.setPingServerDelayTime(config, timeout);
     }
 }

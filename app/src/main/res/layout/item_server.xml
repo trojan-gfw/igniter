@@ -1,27 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:contentPaddingLeft="15dp"
-    app:contentPaddingRight="5dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
     android:clickable="true"
     android:focusable="true"
-    android:orientation="vertical" android:layout_width="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="50dp">
+    android:orientation="horizontal"
+    app:contentPaddingLeft="15dp"
+    app:contentPaddingRight="5dp">
 
-    <TextView
-        tools:text="www.google.com"
-        android:id="@+id/serverRemarkTv"
-        android:textSize="16sp"
-        android:layout_gravity="center_vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <com.google.android.material.circularreveal.CircularRevealRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/serverCb"
-        tools:checked="true"
-        android:layout_width="wrap_content"
-        android:layout_gravity="end|center_vertical"
-        android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/serverRemarkTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
+            android:textSize="16sp"
+            tools:text="www.google.com" />
+
+        <TextView
+            android:id="@+id/server_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="4dp"
+            android:layout_toLeftOf="@+id/serverCb"
+            android:layout_alignWithParentIfMissing="true"
+            android:textSize="14sp">
+        </TextView>
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/serverCb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            tools:checked="true" />
+
+    </com.google.android.material.circularreveal.CircularRevealRelativeLayout>
+
 
 </com.google.android.material.card.MaterialCardView>
