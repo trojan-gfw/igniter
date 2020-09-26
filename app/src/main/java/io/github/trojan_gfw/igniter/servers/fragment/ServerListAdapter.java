@@ -176,8 +176,8 @@ class ViewHolder extends RecyclerView.ViewHolder {
     public void bindData(TrojanConfigWrapper config, boolean batchDeleteMode) {
         this.mConfig = config;
         String name = config.getRemoteServerRemark();
-        if (TextUtils.isEmpty(name)) { // only display remote address when remark is empty.
-            name = config.getRemoteAddr();
+        if (TextUtils.isEmpty(name)) { // only display server identifier when remark is empty.
+            name = config.getIdentifier();
         }
         mRemoteServerRemarkTv.setText(name);
         mCheckBox.setVisibility(batchDeleteMode ? View.VISIBLE : View.GONE);

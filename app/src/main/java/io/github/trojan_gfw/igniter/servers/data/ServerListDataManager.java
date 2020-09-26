@@ -71,13 +71,13 @@ public class ServerListDataManager implements ServerListDataSource {
 
     @Override
     public void batchDeleteServerConfigs(Collection<TrojanConfig> configs) {
-        Set<String> remoteAddrSet = new HashSet<>();
+        Set<String> serverIdentifierSet = new HashSet<>();
         for (TrojanConfig config : configs) {
-            remoteAddrSet.add(config.getRemoteAddr());
+            serverIdentifierSet.add(config.getIdentifier());
         }
         List<TrojanConfig> trojanConfigs = loadServerConfigList();
         for (int i = trojanConfigs.size() - 1; i >= 0; i--) {
-            if (remoteAddrSet.contains(trojanConfigs.get(i).getRemoteAddr())) {
+            if (serverIdentifierSet.contains(trojanConfigs.get(i).getIdentifier())) {
                 trojanConfigs.remove(i);
             }
         }
@@ -88,7 +88,7 @@ public class ServerListDataManager implements ServerListDataSource {
     public void deleteServerConfig(TrojanConfig config) {
         List<TrojanConfig> trojanConfigs = loadServerConfigList();
         for (int i = trojanConfigs.size() - 1; i >= 0; i--) {
-            if (trojanConfigs.get(i).getRemoteAddr().equals(config.getRemoteAddr())) {
+            if (trojanConfigs.get(i).getIdentifier().equals(config.getIdentifier())) {
                 trojanConfigs.remove(i);
                 replaceServerConfigs(trojanConfigs);
                 break;
@@ -101,22 +101,22 @@ public class ServerListDataManager implements ServerListDataSource {
         if (config == null) {
             return;
         }
-        final String remoteAddr = config.getRemoteAddr();
-        if (remoteAddr == null) {
+        final String serverIdentifier = config.getIdentifier();
+        if (serverIdentifier == null) {
             return;
         }
-        boolean configRemoteAddrExists = false;
+        boolean configIsSameServerIdentifier = false;
         List<TrojanConfig> trojanConfigs = loadServerConfigList();
         for (int i = trojanConfigs.size() - 1; i >= 0; i--) {
             TrojanConfig cacheConfig = trojanConfigs.get(i);
             if (cacheConfig == null) continue;
-            if (remoteAddr.equals(cacheConfig.getRemoteAddr())) {
+            if (serverIdentifier.equals(cacheConfig.getIdentifier())) {
                 trojanConfigs.set(i, config);
-                configRemoteAddrExists = true;
+                configIsSameServerIdentifier = true;
                 break;
             }
         }
-        if (!configRemoteAddrExists) {
+        if (!configIsSameServerIdentifier) {
             trojanConfigs.add(config);
         }
         replaceServerConfigs(trojanConfigs);
@@ -193,7 +193,7 @@ public class ServerListDataManager implements ServerListDataSource {
                     TrojanConfig config = TrojanURLHelper.ParseTrojanURL(trojanUrl);
                     if (config != null) {
                         config.setRemoteServerRemark(remark);
-                        configMap.put(config.getRemoteAddr(), config);
+                        configMap.put(config.getIdentifier(), config);
                     }
                 }
                 idxOfLineStart = idxOfLineEnd + 1;
@@ -203,9 +203,9 @@ public class ServerListDataManager implements ServerListDataSource {
         List<TrojanConfig> previousList = loadServerConfigList();
         for (int i = 0, size = previousList.size(); i < size; i++) {
             TrojanConfig config = previousList.get(i);
-            String remoteAddr = config.getRemoteAddr();
-            if (configMap.containsKey(remoteAddr)) {
-                previousList.set(i, configMap.remove(remoteAddr));
+            String serverIdentifier = config.getIdentifier();
+            if (configMap.containsKey(serverIdentifier)) {
+                previousList.set(i, configMap.remove(serverIdentifier));
             }
         }
         Collection<TrojanConfig> remainConfigs = configMap.values();
@@ -213,7 +213,7 @@ public class ServerListDataManager implements ServerListDataSource {
             // sort the remaining new TrojanConfigs from subscription, and append them to the end
             // of server list.
             List<TrojanConfig> newList = new ArrayList<>(remainConfigs);
-            Collections.sort(newList, (a, b) -> b.getRemoteAddr().compareTo(a.getRemoteAddr()));
+            Collections.sort(newList, (a, b) -> b.getIdentifier().compareTo(a.getIdentifier()));
             previousList.addAll(newList);
         }
         replaceServerConfigs(previousList);
@@ -253,14 +253,14 @@ public class ServerListDataManager implements ServerListDataSource {
         // Used for filtering trojan configs with the same remote url address.
         Map<String, TrojanConfig> currentConfigUrlMap = new HashMap<>();
         for (TrojanConfig config : currentConfigs) {
-            currentConfigUrlMap.put(config.getRemoteAddr(), config);
+            currentConfigUrlMap.put(config.getIdentifier(), config);
         }
         // Find out the intersection of previous configs and configs to be imported by comparing
         // the remote url address. Replace the previous properties with the new imported ones.
         int overlapCount = 0;
         for (int i = importedSize - 1; i >= 0; i--) {
             TrojanConfig config = trojanConfigsFromFile.get(i);
-            TrojanConfig currentIdenticalConfig = currentConfigUrlMap.get(config.getRemoteAddr());
+            TrojanConfig currentIdenticalConfig = currentConfigUrlMap.get(config.getIdentifier());
             if (currentIdenticalConfig != null) {
                 currentIdenticalConfig.copyFrom(config);
                 ++overlapCount;

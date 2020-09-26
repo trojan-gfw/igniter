@@ -77,6 +77,11 @@ public class TrojanConfigWrapper extends TrojanConfig {
     }
 
     @Override
+    public String getIdentifier() {
+        return mDelegate.getIdentifier();
+    }
+
+    @Override
     public String getRemoteAddr() {
         return mDelegate.getRemoteAddr();
     }
