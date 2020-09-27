@@ -284,14 +284,14 @@ public class ServerListPresenter implements ServerListContract.Presenter {
         public void onSuccess(TrojanConfig config, PingStats pingStats) {
             ServerListPresenter presenter = mPresenterRef.get();
             if (presenter != null) {
+                //LogHelper.d(TAG, "ping "+ config.getRemoteAddr() + ": "+ pingStats.toString());
+                if (!pingStats.isReachable()) {
+                    presenter.setPingDelayTime(config, ServerListDataManager.SERVER_UNABLE_TO_REACH);
+                    return;
+                }
                 BigDecimal b = BigDecimal.valueOf(pingStats.getAverageTimeTaken());
                 float pingDelayTime = b.setScale(1, BigDecimal.ROUND_HALF_UP).floatValue();
-                if (Float.compare(pingDelayTime, 0F) == 0) {
-                    presenter.setPingDelayTime(config, ServerListDataManager.SERVER_UNABLE_TO_REACH);
-                } else {
-                    presenter.setPingDelayTime(config, pingDelayTime);
-                }
-                //LogHelper.d(TAG, "ping "+ config.getRemoteAddr() + ": "+ pingDelayTime);
+                presenter.setPingDelayTime(config, pingDelayTime);
             }
         }
 

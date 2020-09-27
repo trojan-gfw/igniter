@@ -37,6 +37,7 @@ import java.util.Set;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import io.github.trojan_gfw.igniter.LogHelper;
 import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.TrojanHelper;
 import io.github.trojan_gfw.igniter.TrojanURLHelper;
@@ -346,7 +347,7 @@ public class ServerListDataManager implements ServerListDataSource {
         Ping.onAddress(config.getRemoteAddr()).setTimeOutMillis(1000).setTimes(5).doPing(new Ping.PingListener() {
             @Override
             public void onResult(PingResult pingResult) {
-//                    Log.d(TAG, pingResult.toString());
+                //LogHelper.d("igniter", pingResult.toString());
             }
 
             @Override
