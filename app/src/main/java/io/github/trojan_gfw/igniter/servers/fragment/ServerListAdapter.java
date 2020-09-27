@@ -140,13 +140,10 @@ public class ServerListAdapter extends RecyclerView.Adapter<ViewHolder> implemen
     }
 
     private void sortConfigByDelayTime() {
-        Collections.sort(mData,new Comparator<TrojanConfigWrapper>(){
+        Collections.sort(mData, new Comparator<TrojanConfigWrapper>() {
             @Override
             public int compare(TrojanConfigWrapper o1, TrojanConfigWrapper o2) {
-                if (o1.getPingDelayTime() < 0) {
-                    return 1;
-                }
-                return (int) (o1.getPingDelayTime()- o2.getPingDelayTime());
+                return Float.compare(o1.getPingDelayTime(), o2.getPingDelayTime());
             }
         });
         notifyItemRangeChanged(0, mData.size());
@@ -192,16 +189,16 @@ class ViewHolder extends RecyclerView.ViewHolder {
         } else if (config.getPingDelayTime() == ServerListDataManager.SERVER_UNABLE_TO_REACH) {
             mPingDelayTimeView.setText(mPingDelayTimeView.getContext().getString(R.string.trojan_service_not_available));
             mPingDelayTimeView.setTextColor(Color.RED);
-        } else{
+        } else {
             mPingDelayTimeView.setVisibility(View.VISIBLE);
             if (config.getPingDelayTime() > ServerListDataManager.SLOW_SPEED_NETWORK) {
-                BigDecimal b = new BigDecimal(config.getPingDelayTime() /1000);
-                float pintTime = b.setScale(2,BigDecimal.ROUND_HALF_UP).floatValue();
-                mPingDelayTimeView.setText(String.valueOf(pintTime) + " s");
+                BigDecimal b = BigDecimal.valueOf(config.getPingDelayTime() / 1000);
+                float pintTime = b.setScale(2, BigDecimal.ROUND_HALF_UP).floatValue();
+                mPingDelayTimeView.setText(pintTime + " s");
                 mPingDelayTimeView.setTextColor(Color.RED);
             } else {
-                mPingDelayTimeView.setText(String.valueOf(config.getPingDelayTime() ) + " ms");
-                if(config.getPingDelayTime() < ServerListDataManager.HIGH_SPEED_NETWORK) {
+                mPingDelayTimeView.setText(config.getPingDelayTime() + " ms");
+                if (config.getPingDelayTime() < ServerListDataManager.HIGH_SPEED_NETWORK) {
                     mPingDelayTimeView.setTextColor(Color.BLUE);
                 }
             }

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import io.github.trojan_gfw.igniter.Globals;
+import io.github.trojan_gfw.igniter.LogHelper;
 import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.TrojanURLHelper;
 import io.github.trojan_gfw.igniter.common.os.Task;
@@ -283,9 +284,14 @@ public class ServerListPresenter implements ServerListContract.Presenter {
         public void onSuccess(TrojanConfig config, PingStats pingStats) {
             ServerListPresenter presenter = mPresenterRef.get();
             if (presenter != null) {
-                BigDecimal b = new BigDecimal(pingStats.getAverageTimeTaken());
-                float pingDelayTime = b.setScale(1,BigDecimal.ROUND_HALF_UP).floatValue();
-                presenter.setPingDelayTime(config, pingDelayTime);
+                BigDecimal b = BigDecimal.valueOf(pingStats.getAverageTimeTaken());
+                float pingDelayTime = b.setScale(1, BigDecimal.ROUND_HALF_UP).floatValue();
+                if (Float.compare(pingDelayTime, 0F) == 0) {
+                    presenter.setPingDelayTime(config, ServerListDataManager.SERVER_UNABLE_TO_REACH);
+                } else {
+                    presenter.setPingDelayTime(config, pingDelayTime);
+                }
+                //LogHelper.d(TAG, "ping "+ config.getRemoteAddr() + ": "+ pingDelayTime);
             }
         }
 
