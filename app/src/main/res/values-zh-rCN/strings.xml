@@ -37,8 +37,8 @@
     <string name="action_test_connection">测试连接</string>
     <string name="action_show_develop_info_logcat">在logcat中显示开发信息</string>
 
-    <string name="server_list_import_file_desc">导入配置 (*.txt)</string>
-    <string name="server_list_file_chooser_msg">选择 TXT 文件</string>
+    <string name="server_list_import_file_desc">导入配置文件</string>
+    <string name="server_list_file_chooser_msg">选择文本文件</string>
     <string name="server_list_menu_import_from_file">从文件中导入</string>
     <string name="server_list_menu_test_all_proxy_server">测试所有代理服务器</string>
     <string name="server_list_delete_btn">@string/common_delete</string>
