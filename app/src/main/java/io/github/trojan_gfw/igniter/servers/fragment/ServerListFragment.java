@@ -385,7 +385,7 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
     @Override
     public void openFileChooser() {
         Intent intent = new Intent()
-                .setType("application/octet-stream")
+                .setTypeAndNormalize("*/*")
                 .setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, getString(R.string.server_list_file_chooser_msg)), FILE_IMPORT_REQUEST_CODE);
     }
