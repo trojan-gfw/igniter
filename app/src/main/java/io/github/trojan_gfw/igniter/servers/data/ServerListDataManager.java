@@ -3,7 +3,6 @@ package io.github.trojan_gfw.igniter.servers.data;
 import android.content.Context;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -42,7 +41,6 @@ import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.TrojanHelper;
 import io.github.trojan_gfw.igniter.TrojanURLHelper;
 import io.github.trojan_gfw.igniter.common.constants.ConfigFileConstants;
-import io.github.trojan_gfw.igniter.common.os.Threads;
 import io.github.trojan_gfw.igniter.common.utils.DecodeUtils;
 
 public class ServerListDataManager implements ServerListDataSource {
@@ -287,14 +285,15 @@ public class ServerListDataManager implements ServerListDataSource {
             List<TrojanConfig> list = new ArrayList<>(len);
             for (int i = 0; i < len; i++) {
                 JSONObject config = configs.getJSONObject(i);
-                String remoteAddr = config.optString(ConfigFileConstants.SERVER, null);
-                if (remoteAddr == null) {
+                String remoteAddr = config.optString(ConfigFileConstants.SERVER, ConfigFileConstants.EMPTY_STRING);
+                if (ConfigFileConstants.EMPTY_STRING.equals(remoteAddr)) {
                     continue;
                 }
                 TrojanConfig tmp = new TrojanConfig();
-                tmp.setRemoteServerRemark(config.optString(ConfigFileConstants.REMARKS, ConfigFileConstants.NO_REMARKS));
+                tmp.setRemoteServerRemark(config.optString(ConfigFileConstants.REMARKS, ConfigFileConstants.EMPTY_STRING));
                 tmp.setRemoteAddr(remoteAddr);
                 tmp.setRemotePort(config.optInt(ConfigFileConstants.SERVER_PORT));
+                tmp.setSNI(config.optString(ConfigFileConstants.SNI, ConfigFileConstants.EMPTY_STRING));
                 tmp.setPassword(config.optString(ConfigFileConstants.PASSWORD));
                 tmp.setVerifyCert(config.optBoolean(ConfigFileConstants.VERIFY));
                 list.add(tmp);
@@ -321,6 +320,7 @@ public class ServerListDataManager implements ServerListDataSource {
                 jsonObject.put(ConfigFileConstants.REMARKS, trojanConfig.getRemoteServerRemark());
                 jsonObject.put(ConfigFileConstants.SERVER, trojanConfig.getRemoteAddr());
                 jsonObject.put(ConfigFileConstants.SERVER_PORT, trojanConfig.getRemotePort());
+                jsonObject.put(ConfigFileConstants.SNI, trojanConfig.getSNI());
                 jsonObject.put(ConfigFileConstants.PASSWORD, trojanConfig.getPassword());
                 jsonObject.put(ConfigFileConstants.VERIFY, trojanConfig.getVerifyCert());
                 // for future
