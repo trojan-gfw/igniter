@@ -24,7 +24,7 @@ public class LoadingDialog extends Dialog {
     }
 
     private void init(Context context) {
-        Window window =getWindow();
+        Window window = getWindow();
         if (window != null) {
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         }
@@ -32,7 +32,7 @@ public class LoadingDialog extends Dialog {
         ContentLoadingProgressBar pb = findViewById(R.id.dialogLoadingPb);
         pb.getIndeterminateDrawable().setColorFilter(
                 new PorterDuffColorFilter(ContextCompat.getColor(context, R.color.colorPrimary),
-                PorterDuff.Mode.MULTIPLY));
+                        PorterDuff.Mode.MULTIPLY));
         mMsgTv = findViewById(R.id.dialogLoadingMsgTv);
     }
 

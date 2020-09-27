@@ -19,7 +19,7 @@ import android.text.TextWatcher;
  *            // intuitive usation of parametters
  *            String completeOldText = before + old + after;
  *            String completeNewText = before + aNew + after;
- *
+ * <p>
  *            // update TextView
  *             startUpdates(); // to prevent infinite loop.
  *             myEditText.setText(myNewText);
@@ -58,14 +58,14 @@ public abstract class TextViewListener implements TextWatcher {
 
     @Override
     public void beforeTextChanged(CharSequence sequence, int start, int count, int after) {
-        _before = sequence.subSequence(0,start).toString();
-        _old = sequence.subSequence(start, start+count).toString();
-        _after = sequence.subSequence(start+count, sequence.length()).toString();
+        _before = sequence.subSequence(0, start).toString();
+        _old = sequence.subSequence(start, start + count).toString();
+        _after = sequence.subSequence(start + count, sequence.length()).toString();
     }
 
     @Override
     public void onTextChanged(CharSequence sequence, int start, int before, int count) {
-        _new = sequence.subSequence(start, start+count).toString();
+        _new = sequence.subSequence(start, start + count).toString();
     }
 
     @Override
@@ -84,25 +84,27 @@ public abstract class TextViewListener implements TextWatcher {
      * and to call {@link #endUpdates()} after them.
      *
      * @param before Unchanged part of the text placed before the updated part.
-     * @param old Old updated part of the text.
-     * @param aNew New updated part of the text?
-     * @param after Unchanged part of the text placed after the updated part.
+     * @param old    Old updated part of the text.
+     * @param aNew   New updated part of the text?
+     * @param after  Unchanged part of the text placed after the updated part.
      */
     protected abstract void onTextChanged(String before, String old, String aNew, String after);
 
     /**
      * Call this method when you start to update the text view, so it stops listening to it and then prevent an infinite loop.
+     *
      * @see #endUpdates()
      */
-    protected void startUpdates(){
+    protected void startUpdates() {
         _ignore = true;
     }
 
     /**
      * Call this method when you finished to update the text view in order to restart to listen to it.
+     *
      * @see #startUpdates()
      */
-    protected void endUpdates(){
+    protected void endUpdates() {
         _ignore = false;
     }
 }

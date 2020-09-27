@@ -158,7 +158,7 @@ public class ExemptAppPresenter implements ExemptAppContract.Presenter {
             appInfo.setExempt(packageNameSet.contains(appInfo.getPackageName()));
         }
         Collections.sort(allAppInfoList, AppInfo::compareTo);
-        Threads.instance().runOnUiThread(()->{
+        Threads.instance().runOnUiThread(() -> {
             if (inAllowMode) {
                 mView.showAllowAppList(allAppInfoList);
             } else {

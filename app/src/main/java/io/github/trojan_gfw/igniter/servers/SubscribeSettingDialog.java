@@ -55,6 +55,7 @@ public class SubscribeSettingDialog extends Dialog implements View.OnClickListen
 
     public interface OnButtonClickListener {
         void onConfirm(String url);
+
         void onCancel();
     }
 }

@@ -120,7 +120,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
                 onResult(TUN2SOCKS5_SERVER_HOST, false, 0L, getString(R.string.proxy_service_not_connected));
                 return;
             }
-            new Thread(()-> new TestConnection(TUN2SOCKS5_SERVER_HOST, tun2socksPort,
+            new Thread(() -> new TestConnection(TUN2SOCKS5_SERVER_HOST, tun2socksPort,
                     new TestConnectionCallback(ProxyService.this)).testLatency(testUrl)).start();
         }
 
@@ -391,8 +391,8 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
                 ClashHelper.ShowConfig(Globals.getClashConfigPath());
                 ClashStartOptions clashStartOptions = new ClashStartOptions();
                 clashStartOptions.setHomeDir(getFilesDir().toString());
-                clashStartOptions.setTrojanProxyServer("127.0.0.1:"+trojanPort);
-                clashStartOptions.setSocksListener("127.0.0.1:"+clashSocksPort);
+                clashStartOptions.setTrojanProxyServer("127.0.0.1:" + trojanPort);
+                clashStartOptions.setSocksListener("127.0.0.1:" + clashSocksPort);
                 clashStartOptions.setTrojanProxyServerUdpEnabled(true);
                 Clash.start(clashStartOptions);
                 LogHelper.i("Clash", "clash started");
@@ -483,6 +483,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         android.os.Process.killProcess(android.os.Process.myPid());
     }
 }
+
 class TestConnectionCallback implements TestConnection.OnResultListener {
     private final WeakReference<ProxyService> mServiceRef;
 

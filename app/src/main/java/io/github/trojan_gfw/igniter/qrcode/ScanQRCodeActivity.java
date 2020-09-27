@@ -20,6 +20,7 @@ public class ScanQRCodeActivity extends AppCompatActivity implements ZXingView.D
     }
 
     private ZXingView mZXingView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
