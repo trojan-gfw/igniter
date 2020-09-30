@@ -311,20 +311,23 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
 
         VpnService.Builder b = new VpnService.Builder();
         applyApplicationOrientedRule(b);
-
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // VPN apps targeting {@link android.os.Build.VERSION_CODES#Q} or above will be
+            // considered metered by default, because of which Google Play Store treat the network
+            // as cellular.
+            b.setMetered(false);
+        }
         enable_clash = readClashPreference();
         LogHelper.e(TAG, "enable_clash: " + enable_clash);
         boolean enable_ipv6 = false;
 
         File file = new File(getFilesDir(), "config.json");
         if (file.exists()) {
-            try {
-                try (FileInputStream fis = new FileInputStream(file)) {
-                    byte[] content = new byte[(int) file.length()];
-                    fis.read(content);
-                    JSONObject json = new JSONObject(new String(content));
-                    enable_ipv6 = json.getBoolean("enable_ipv6");
-                }
+            try (FileInputStream fis = new FileInputStream(file)) {
+                byte[] content = new byte[(int) file.length()];
+                fis.read(content);
+                JSONObject json = new JSONObject(new String(content));
+                enable_ipv6 = json.getBoolean("enable_ipv6");
             } catch (Exception e) {
                 e.printStackTrace();
             }
