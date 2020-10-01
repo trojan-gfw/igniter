@@ -11,6 +11,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.net.Uri;
 import android.net.VpnService;
 import android.os.Build;
@@ -20,12 +24,9 @@ import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 
 import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
-import org.json.JSONObject;
-
-import java.io.File;
-import java.io.FileInputStream;
 import java.lang.ref.WeakReference;
 import java.util.Set;
 
@@ -86,6 +87,8 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
     int state = STATE_NONE;
     private ParcelFileDescriptor pfd;
     private ExemptAppDataSource mExemptAppDataSource;
+    private NetworkConnectivityMonitor networkConnectivityMonitor = new NetworkConnectivityMonitor();
+    private boolean networkConnectivityMonitorStarted = false;
     /**
      * Receives stop event.
      */
@@ -125,12 +128,12 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         }
 
         @Override
-        public String getProxyHost() throws RemoteException {
+        public String getProxyHost() {
             return TUN2SOCKS5_SERVER_HOST;
         }
 
         @Override
-        public long getProxyPort() throws RemoteException {
+        public long getProxyPort() {
             return tun2socksPort;
         }
 
@@ -174,6 +177,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         mCallbackList.kill();
         setState(STOPPED);
         unregisterReceiver(mStopBroadcastReceiver);
+        stopNetworkConnectivityMonitor();
         pfd = null;
     }
 
@@ -317,11 +321,22 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
             // as cellular.
             b.setMetered(false);
         }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            final ConnectivityManager connectivityManager =
+                    (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            final Network activeNetwork = connectivityManager.getActiveNetwork();
+            if (activeNetwork != null) {
+                b.setUnderlyingNetworks(new Network[]{activeNetwork});
+            }
+        }
+
         enable_clash = readClashPreference();
         LogHelper.e(TAG, "enable_clash: " + enable_clash);
 
         TrojanConfig ins = TrojanHelper.readTrojanConfig(Globals.getTrojanConfigPath());
-        LogHelper.e(TAG, "ProxyService trojanConfigInstance: "+ ins.toString());
+        assert ins != null;
+        LogHelper.e(TAG, "ProxyService trojanConfigInstance: " + ins.toString());
         boolean enable_ipv6 = ins.getEnableIpv6();
         LogHelper.e(TAG, "enable_ipv6: " + enable_ipv6);
 
@@ -360,6 +375,9 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
             return START_NOT_STICKY;
         }
         int fd = pfd.detachFd();
+
+        startNetworkConnectivityMonitor();
+
         long trojanPort;
         try {
             trojanPort = Freeport.getFreePort();
@@ -443,6 +461,9 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
     private void shutdown() {
         LogHelper.i(TAG, "shutdown");
         setState(STOPPING);
+
+        stopNetworkConnectivityMonitor();
+
         JNIHelper.stop();
         if (Clash.isRunning()) {
             Clash.stop();
@@ -478,6 +499,71 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         // this is essential for gomobile aar
         android.os.Process.killProcess(android.os.Process.myPid());
     }
+
+    private void startNetworkConnectivityMonitor() {
+        final ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkRequest.Builder nrb = new NetworkRequest.Builder()
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .addCapability(NetworkCapabilities.NET_CAPABILITY_NOT_RESTRICTED);
+
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M) {  // workarounds for OEM bugs
+            nrb.removeCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
+            nrb.removeCapability(NetworkCapabilities.NET_CAPABILITY_CAPTIVE_PORTAL);
+        }
+        NetworkRequest request = nrb.build();
+
+        try {
+            // `registerNetworkCallback` returns the VPN interface as the default network since Android P.
+            // Use `requestNetwork` instead (requires android.permission.CHANGE_NETWORK_STATE).
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                connectivityManager.registerNetworkCallback(request, networkConnectivityMonitor);
+            } else {
+                connectivityManager.requestNetwork(request, networkConnectivityMonitor);
+            }
+            networkConnectivityMonitorStarted = true;
+        } catch (SecurityException se) {
+            se.printStackTrace();
+        }
+
+    }
+
+    private void stopNetworkConnectivityMonitor() {
+        final ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        try {
+            if (networkConnectivityMonitorStarted) {
+                connectivityManager.unregisterNetworkCallback(networkConnectivityMonitor);
+                networkConnectivityMonitorStarted = false;
+            }
+        } catch (Exception e) {
+            // Ignore, monitor not installed if the connectivity checks failed.
+        }
+    }
+
+    private class NetworkConnectivityMonitor extends ConnectivityManager.NetworkCallback {
+        @Override
+        public void onAvailable(@NonNull Network network) {
+            // Indicate that traffic will be sent over the current active network.
+            // Although setting the underlying network to an available network may not seem like the
+            // correct behavior, this method has been observed only to fire only when a preferred
+            // network becomes available. It will not fire, for example, when the mobile network becomes
+            // available if WiFi is the active network. Additionally, `getActiveNetwork` and
+            // `getActiveNetworkInfo` have been observed to return the underlying network set by us.
+            setUnderlyingNetworks(new Network[]{network});
+        }
+
+        @Override
+        public void onCapabilitiesChanged(@NonNull Network network,
+                                          @NonNull NetworkCapabilities networkCapabilities) {
+            setUnderlyingNetworks(new Network[]{network});
+        }
+
+        @Override
+        public void onLost(@NonNull Network network) {
+            setUnderlyingNetworks(null);
+        }
+    }
 }
 
 class TestConnectionCallback implements TestConnection.OnResultListener {
@@ -495,3 +581,5 @@ class TestConnectionCallback implements TestConnection.OnResultListener {
         }
     }
 }
+
+
