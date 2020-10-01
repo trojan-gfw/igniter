@@ -211,27 +211,33 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         clashSwitch.setEnabled(inputEnabled);
     }
 
-    private void applyConfigString(String configString) {
+    private void applyConfigInstance(TrojanConfig config) {
         TrojanConfig ins = Globals.getTrojanConfigInstance();
-        TrojanConfig parsedConfig = TrojanURLHelper.ParseTrojanURL(configString);
-        if (parsedConfig != null) {
-            String remoteServerRemark = parsedConfig.getRemoteServerRemark();
-            String remoteAddress = parsedConfig.getRemoteAddr();
-            String remoteServerSNI = parsedConfig.getSNI();
-            int remotePort = parsedConfig.getRemotePort();
-            String password = parsedConfig.getPassword();
+        if (config != null) {
+            String remoteServerRemark = config.getRemoteServerRemark();
+            String remoteAddress = config.getRemoteAddr();
+            String remoteServerSNI = config.getSNI();
+            int remotePort = config.getRemotePort();
+            String password = config.getPassword();
+            boolean verifyCert = config.getVerifyCert();
+            boolean enableIpv6 = config.getEnableIpv6();
 
             ins.setRemoteServerRemark(remoteServerRemark);
             ins.setSNI(remoteServerSNI);
             ins.setRemoteAddr(remoteAddress);
             ins.setRemotePort(remotePort);
             ins.setPassword(password);
+            ins.setVerifyCert(verifyCert);
+            ins.setEnableIpv6(enableIpv6);
 
             remoteServerRemarkText.setText(remoteServerRemark);
             remoteServerSNIText.setText(remoteServerSNI);
             passwordText.setText(password);
             remotePortText.setText(String.valueOf(remotePort));
             remoteAddrText.setText(remoteAddress);
+            remoteAddrText.setSelection(remoteAddrText.length());
+            verifySwitch.setChecked(verifyCert);
+            ipv6Switch.setChecked(enableIpv6);
         }
     }
 
@@ -333,7 +339,11 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         builder.setPositiveButton(R.string.common_update, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                applyConfigString(trojanURLText.getText().toString());
+                TrojanURLParseResult parseResult = TrojanURLHelper.ParseTrojanURL(trojanURLText.getText().toString());
+                if (parseResult != null) {
+                    Globals.setTrojanConfigInstance(TrojanURLHelper.CombineTrojanURLParseResultToTrojanConfig(parseResult, Globals.getTrojanConfigInstance()));
+                    applyConfigInstance(Globals.getTrojanConfigInstance());
+                }
                 dialog.cancel();
             }
         });
@@ -449,8 +459,8 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 }
                 final CharSequence clipboardText = clipData.getItemAt(0).coerceToText(MainActivity.this);
                 // check scheme
-                TrojanConfig config = TrojanURLHelper.ParseTrojanURL(clipboardText.toString());
-                if (config == null) {
+                TrojanURLParseResult parseResult = TrojanURLHelper.ParseTrojanURL(clipboardText.toString());
+                if (parseResult == null) {
                     return;
                 }
 
@@ -463,7 +473,9 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                         .setPositiveButton(R.string.common_confirm, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                applyConfigString(clipboardText.toString());
+                                TrojanConfig newConfig = TrojanURLHelper.CombineTrojanURLParseResultToTrojanConfig(parseResult, Globals.getTrojanConfigInstance());
+                                Globals.setTrojanConfigInstance(newConfig);
+                                applyConfigInstance(newConfig);
                             }
                         })
                         .setNegativeButton(R.string.common_cancel, null)

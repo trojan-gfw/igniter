@@ -18,6 +18,7 @@ import io.github.trojan_gfw.igniter.Globals;
 import io.github.trojan_gfw.igniter.LogHelper;
 import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.TrojanURLHelper;
+import io.github.trojan_gfw.igniter.TrojanURLParseResult;
 import io.github.trojan_gfw.igniter.common.os.Task;
 import io.github.trojan_gfw.igniter.common.os.Threads;
 import io.github.trojan_gfw.igniter.common.sp.CommonSP;
@@ -151,9 +152,10 @@ public class ServerListPresenter implements ServerListContract.Presenter {
         Threads.instance().runOnWorkThread(new Task() {
             @Override
             public void onRun() {
-                TrojanConfig config = TrojanURLHelper.ParseTrojanURL(trojanUrl);
-                if (config != null) {
-                    mDataManager.saveServerConfig(config);
+                TrojanURLParseResult parseResult = TrojanURLHelper.ParseTrojanURL(trojanUrl);
+                if (parseResult != null) {
+                    TrojanConfig newConfig = TrojanURLHelper.CombineTrojanURLParseResultToTrojanConfig(parseResult, Globals.getTrojanConfigInstance());
+                    mDataManager.saveServerConfig(newConfig);
                     loadConfigs();
                     mView.showAddTrojanConfigSuccess();
                 } else {

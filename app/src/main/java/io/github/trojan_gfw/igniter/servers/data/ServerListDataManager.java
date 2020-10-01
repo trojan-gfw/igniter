@@ -191,10 +191,11 @@ public class ServerListDataManager implements ServerListDataSource {
                 if (idxOfSharp != -1) {
                     String trojanUrl = configLines.substring(idxOfLineStart, idxOfSharp);
                     String remark = configLines.substring(idxOfSharp + 1, idxOfLineEnd).trim();
-                    TrojanConfig config = TrojanURLHelper.ParseTrojanURL(trojanUrl);
-                    if (config != null) {
-                        config.setRemoteServerRemark(remark);
-                        configMap.put(config.getIdentifier(), config);
+                    TrojanURLParseResult parseResult = TrojanURLHelper.ParseTrojanURL(trojanUrl);
+                    if (parseResult != null) {
+                        TrojanConfig newConfig = TrojanURLHelper.CombineTrojanURLParseResultToTrojanConfig(parseResult, Globals.getTrojanConfigInstance());
+                        newConfig.setRemoteServerRemark(remark);
+                        configMap.put(newConfig.getIdentifier(), newConfig);
                     }
                 }
                 idxOfLineStart = idxOfLineEnd + 1;
