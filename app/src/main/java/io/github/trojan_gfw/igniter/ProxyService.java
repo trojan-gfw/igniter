@@ -319,19 +319,12 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         }
         enable_clash = readClashPreference();
         LogHelper.e(TAG, "enable_clash: " + enable_clash);
-        boolean enable_ipv6 = false;
 
-        File file = new File(getFilesDir(), "config.json");
-        if (file.exists()) {
-            try (FileInputStream fis = new FileInputStream(file)) {
-                byte[] content = new byte[(int) file.length()];
-                fis.read(content);
-                JSONObject json = new JSONObject(new String(content));
-                enable_ipv6 = json.getBoolean("enable_ipv6");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        TrojanConfig ins = TrojanHelper.readTrojanConfig(Globals.getTrojanConfigPath());
+        LogHelper.e(TAG, "ProxyService trojanConfigInstance: "+ ins.toString());
+        boolean enable_ipv6 = ins.getEnableIpv6();
+        LogHelper.e(TAG, "enable_ipv6: " + enable_ipv6);
+
         b.setSession(getString(R.string.app_name));
         b.setMtu(VPN_MTU);
         b.addAddress(PRIVATE_VLAN4_CLIENT, 30);

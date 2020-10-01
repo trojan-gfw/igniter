@@ -737,28 +737,9 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        File file = new File(Globals.getTrojanConfigPath());
-        if (file.exists()) {
-            try {
-                try (FileInputStream fis = new FileInputStream(file)) {
-                    byte[] content = new byte[(int) file.length()];
-                    fis.read(content);
-                    String contentStr = new String(content);
-                    TrojanConfig ins = Globals.getTrojanConfigInstance();
-                    ins.fromJSON(contentStr);
-
-                    remoteServerRemarkText.setText(ins.getRemoteServerRemark());
-                    remoteAddrText.setText(ins.getRemoteAddr());
-                    remoteAddrText.setSelection(remoteAddrText.length());
-                    remoteServerSNIText.setText(ins.getSNI());
-                    remotePortText.setText(String.valueOf(ins.getRemotePort()));
-                    passwordText.setText(ins.getPassword());
-                    ipv6Switch.setChecked(ins.getEnableIpv6());
-                    verifySwitch.setChecked(ins.getVerifyCert());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        TrojanConfig cachedConfig = TrojanHelper.readTrojanConfig(Globals.getTrojanConfigPath());
+        if (cachedConfig != null) {
+            applyConfigInstance(cachedConfig);
         }
     }
 
