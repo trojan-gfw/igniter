@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.os.RemoteException;
 
 import androidx.annotation.NonNull;
@@ -28,7 +29,7 @@ import io.github.trojan_gfw.igniter.proxy.aidl.ITrojanServiceCallback;
  * @see ITrojanServiceCallback
  */
 public class TrojanConnection implements ServiceConnection, Binder.DeathRecipient {
-    private final Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
     private ITrojanService mTrojanService;
     private Callback mCallback;
     private boolean mServiceCallbackRegistered;

@@ -37,10 +37,12 @@ import java.util.Set;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import io.github.trojan_gfw.igniter.Globals;
 import io.github.trojan_gfw.igniter.LogHelper;
 import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.TrojanHelper;
 import io.github.trojan_gfw.igniter.TrojanURLHelper;
+import io.github.trojan_gfw.igniter.TrojanURLParseResult;
 import io.github.trojan_gfw.igniter.common.constants.ConfigFileConstants;
 import io.github.trojan_gfw.igniter.common.utils.DecodeUtils;
 

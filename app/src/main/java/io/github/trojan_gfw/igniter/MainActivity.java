@@ -1,7 +1,6 @@
 package io.github.trojan_gfw.igniter;
 
 
-import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.DialogInterface;
@@ -11,7 +10,6 @@ import android.net.VpnService;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.text.InputType;
-import android.text.method.LinkMovementMethod;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,9 +22,11 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -379,7 +379,14 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                     // start ProxyService
                     Intent i = VpnService.prepare(getApplicationContext());
                     if (i != null) {
-                        startActivityForResult(i, VPN_REQUEST_CODE);
+                        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                                new ActivityResultCallback<ActivityResult>() {
+                                    @Override
+                                    public void onActivityResult(ActivityResult result) {
+                                        if (result.getResultCode() == RESULT_OK)
+                                            ProxyHelper.startProxyService(getApplicationContext());
+                                    }
+                                }).launch(i);
                     } else {
                         ProxyHelper.startProxyService(getApplicationContext());
                     }
@@ -596,39 +603,6 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (SERVER_LIST_CHOOSE_REQUEST_CODE == requestCode && resultCode == Activity.RESULT_OK && data != null) {
-            shareLink = "";
-            final TrojanConfig config = data.getParcelableExtra(ServerListActivity.KEY_TROJAN_CONFIG);
-            if (config != null) {
-                config.setCaCertPath(Globals.getCaCertPath());
-                Globals.setTrojanConfigInstance(config);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        remoteServerRemarkText.setText(config.getRemoteServerRemark());
-                        remoteAddrText.setText(config.getRemoteAddr());
-                        remoteServerSNIText.setText(config.getSNI());
-                        remotePortText.setText(String.valueOf(config.getRemotePort()));
-                        passwordText.setText(config.getPassword());
-                        TrojanHelper.WriteTrojanConfig(Globals.getTrojanConfigInstance(), Globals.getTrojanConfigPath());
-                    }
-                });
-                shareLink = TrojanURLHelper.GenerateTrojanURL(config);
-                ipv6Switch.setChecked(config.getEnableIpv6());
-                verifySwitch.setChecked(config.getVerifyCert());
-            }
-        } else if (EXEMPT_APP_CONFIGURE_REQUEST_CODE == requestCode && Activity.RESULT_OK == resultCode) {
-            if (ProxyService.STARTED == proxyState) {
-                SnackbarUtils.showTextLong(rootViewGroup, R.string.main_restart_proxy_service_tip);
-            }
-        } else if (VPN_REQUEST_CODE == requestCode && RESULT_OK == resultCode) {
-            ProxyHelper.startProxyService(getApplicationContext());
-        }
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -676,7 +650,17 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 trojanURLText.selectAll();
                 return true;
             case R.id.action_exempt_app:
-                startActivityForResult(ExemptAppActivity.create(this), EXEMPT_APP_CONFIGURE_REQUEST_CODE);
+                registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                        new ActivityResultCallback<ActivityResult>() {
+                            @Override
+                            public void onActivityResult(ActivityResult result) {
+                                if (result.getResultCode() == RESULT_OK) {
+                                    if (ProxyService.STARTED == proxyState) {
+                                        SnackbarUtils.showTextLong(rootViewGroup, R.string.main_restart_proxy_service_tip);
+                                    }
+                                }
+                            }
+                        }).launch(ExemptAppActivity.create(this));
                 return true;
             default:
                 // Invoke the superclass to handle it.
