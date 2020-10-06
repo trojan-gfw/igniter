@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -80,6 +81,9 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     private volatile ITrojanService trojanService;
     private ServerListDataSource serverListDataManager;
     private AlertDialog linkDialog;
+    private ActivityResultLauncher<Intent> goToServerListActivityResultLauncher;
+    private ActivityResultLauncher<Intent> exemptAppSettingsActivityResultLauncher;
+    private ActivityResultLauncher<Intent> startProxyActivityResultLauncher;
 
     private TextViewListener remoteServerRemarkTextListener = new TextViewListener() {
         @Override
@@ -250,6 +254,60 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         } else {
             setContentView(R.layout.activity_main_720);
         }
+
+        goToServerListActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        Intent data = result.getData();
+                        if (result.getResultCode() == RESULT_OK && data != null) {
+                            shareLink = "";
+                            final TrojanConfig selectedConfig = data.getParcelableExtra(ServerListActivity.KEY_TROJAN_CONFIG);
+                            if (selectedConfig != null) {
+                                LogHelper.e("gotoServer: ", selectedConfig.toString());
+
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        TrojanConfig ins = Globals.getTrojanConfigInstance();
+                                        ins.setRemoteServerRemark(selectedConfig.getRemoteServerRemark());
+                                        ins.setRemoteAddr(selectedConfig.getRemoteAddr());
+                                        ins.setSNI(selectedConfig.getSNI());
+                                        ins.setRemotePort(selectedConfig.getRemotePort());
+                                        ins.setPassword(selectedConfig.getPassword());
+                                        ins.setEnableIpv6(selectedConfig.getEnableIpv6());
+                                        ins.setVerifyCert(selectedConfig.getVerifyCert());
+                                        TrojanHelper.WriteTrojanConfig(Globals.getTrojanConfigInstance(), Globals.getTrojanConfigPath());
+                                        applyConfigInstance(ins);
+                                    }
+                                });
+                                shareLink = TrojanURLHelper.GenerateTrojanURL(selectedConfig);
+                            }
+                        }
+                    }
+                });
+
+        exemptAppSettingsActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == RESULT_OK) {
+                            if (ProxyService.STARTED == proxyState) {
+                                SnackbarUtils.showTextLong(rootViewGroup, R.string.main_restart_proxy_service_tip);
+                            }
+                        }
+                    }
+                });
+
+        startProxyActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if (result.getResultCode() == RESULT_OK)
+                            ProxyHelper.startProxyService(getApplicationContext());
+                    }
+                });
+
         rootViewGroup = findViewById(R.id.rootScrollView);
         remoteServerRemarkText = findViewById(R.id.remoteServerRemarkText);
         remoteAddrText = findViewById(R.id.remoteAddrText);
@@ -389,14 +447,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                     // start ProxyService
                     Intent i = VpnService.prepare(getApplicationContext());
                     if (i != null) {
-                        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                                new ActivityResultCallback<ActivityResult>() {
-                                    @Override
-                                    public void onActivityResult(ActivityResult result) {
-                                        if (result.getResultCode() == RESULT_OK)
-                                            ProxyHelper.startProxyService(getApplicationContext());
-                                    }
-                                }).launch(i);
+                        startProxyActivityResultLauncher.launch(i);
                     } else {
                         ProxyHelper.startProxyService(getApplicationContext());
                     }
@@ -662,17 +713,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 trojanURLText.selectAll();
                 return true;
             case R.id.action_exempt_app:
-                registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                        new ActivityResultCallback<ActivityResult>() {
-                            @Override
-                            public void onActivityResult(ActivityResult result) {
-                                if (result.getResultCode() == RESULT_OK) {
-                                    if (ProxyService.STARTED == proxyState) {
-                                        SnackbarUtils.showTextLong(rootViewGroup, R.string.main_restart_proxy_service_tip);
-                                    }
-                                }
-                            }
-                        }).launch(ExemptAppActivity.create(this));
+                exemptAppSettingsActivityResultLauncher.launch(ExemptAppActivity.create(this));
                 return true;
             default:
                 // Invoke the superclass to handle it.
@@ -700,37 +741,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
             }
         }
 
-        registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        Intent data = result.getData();
-                        if (result.getResultCode() == RESULT_OK && data != null) {
-                            shareLink = "";
-                            final TrojanConfig selectedConfig = data.getParcelableExtra(ServerListActivity.KEY_TROJAN_CONFIG);
-                            if (selectedConfig != null) {
-                                LogHelper.e("gotoServer: ", selectedConfig.toString());
-
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        TrojanConfig ins = Globals.getTrojanConfigInstance();
-                                        ins.setRemoteServerRemark(selectedConfig.getRemoteServerRemark());
-                                        ins.setRemoteAddr(selectedConfig.getRemoteAddr());
-                                        ins.setSNI(selectedConfig.getSNI());
-                                        ins.setRemotePort(selectedConfig.getRemotePort());
-                                        ins.setPassword(selectedConfig.getPassword());
-                                        ins.setEnableIpv6(selectedConfig.getEnableIpv6());
-                                        ins.setVerifyCert(selectedConfig.getVerifyCert());
-                                        TrojanHelper.WriteTrojanConfig(Globals.getTrojanConfigInstance(), Globals.getTrojanConfigPath());
-                                        applyConfigInstance(ins);
-                                    }
-                                });
-                                shareLink = TrojanURLHelper.GenerateTrojanURL(selectedConfig);
-                            }
-                        }
-                    }
-                }).launch(ServerListActivity.create(MainActivity.this,
+        goToServerListActivityResultLauncher.launch(ServerListActivity.create(MainActivity.this,
                 proxyOn, proxyHost, proxyPort));
     }
 
