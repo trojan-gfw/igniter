@@ -311,10 +311,15 @@ public class ServerListDataManager implements ServerListDataSource {
 
     @Override
     public boolean exportServers(String exportPath) {
-        return TrojanHelper.writeStringToFile(getExportContent(), exportPath);
+        try {
+            return TrojanHelper.writeStringToFile(getExportContent(), exportPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    private String getExportContent() {
+    private String getExportContent() throws JSONException {
         List<TrojanConfig> trojanConfigs = loadServerConfigList();
         JSONArray array = new JSONArray();
         int index = 0;
@@ -341,7 +346,7 @@ public class ServerListDataManager implements ServerListDataSource {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return jsonObject.toString();
+        return jsonObject.toString(2);
     }
 
     @Override
