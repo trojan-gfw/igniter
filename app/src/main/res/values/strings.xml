@@ -109,6 +109,6 @@
     <string name="trojan_service_not_available">Trojan service is not available.</string>
     <string name="trojan_service_error">Trojan service throws RemoteException.</string>
     <string name="proxy_service_not_connected">ProxyService not yet connected.</string>
-    <string name="export_server_list_success">Export Config Success</string>
+    <string name="export_server_list_success">Exported Config to %s</string>
     <string name="export_server_list_error">Export Config Error</string>
 </resources>

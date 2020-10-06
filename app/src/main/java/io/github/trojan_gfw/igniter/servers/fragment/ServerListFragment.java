@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import io.github.trojan_gfw.igniter.Globals;
 import io.github.trojan_gfw.igniter.R;
 import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.common.app.BaseFragment;
@@ -410,7 +411,7 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
         mRootView.post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getApplicationContext(), getString(R.string.export_server_list_success), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.export_server_list_success, Globals.getIgniterExportPath()), Toast.LENGTH_LONG).show();
             }
         });
     }
