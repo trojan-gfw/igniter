@@ -110,4 +110,8 @@
     <string name="subscribe_servers_success">更新成功</string>
     <string name="subscribe_servers_failed">更新失败，请检查订阅设置或者尝试开启代理后再更新，也可能是Igniter不支持该订阅信息的格式</string>
     <string name="common_exit">退出</string>
+    <string name="scan_qr_code_failed_to_pick_photo">无法获取图片</string>
+    <string name="scan_qr_code_from_camera">开相机扫描二维码</string>
+    <string name="scan_qr_code_from_gallery">从相册读取二维码</string>
+    <string name="server_list_lack_of_read_permission">缺少读取外部存储权限</string>
 </resources>

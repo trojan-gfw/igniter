@@ -57,6 +57,7 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
     public static final String KEY_TROJAN_CONFIG = ServerListActivity.KEY_TROJAN_CONFIG;
 
     private ActivityResultLauncher<String> scanQRCodeRequestPermissionStartActivityLaunch;
+    private ActivityResultLauncher<String> mScanQRCodeReadExternalPermissionRequestLaunch;
     private ActivityResultLauncher<String> importConfigStartActivityLaunch;
     private ActivityResultLauncher<Intent> scanQRCodeGotResultStartActivityLaunch;
 
@@ -79,14 +80,22 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mScanQRCodeReadExternalPermissionRequestLaunch = registerForActivityResult(new ActivityResultContracts.RequestPermission(),
+                result -> {
+                    if (result) {
+                        scanQRCodeFromGallery();
+                    } else {
+                        Toast.makeText(mContext.getApplicationContext(), R.string.server_list_lack_of_read_permission, Toast.LENGTH_SHORT).show();
+                    }
+                });
         scanQRCodeRequestPermissionStartActivityLaunch = registerForActivityResult(new ActivityResultContracts.RequestPermission(),
                 new ActivityResultCallback<Boolean>() {
                     @Override
                     public void onActivityResult(Boolean result) {
                         if (result) {
-                            gotoScanQRCodeInner();
+                            scanQRCodeGotResultStartActivityLaunch.launch(ScanQRCodeActivity.create(mContext, false));
                         } else {
-                            Toast.makeText(getContext(), R.string.server_list_lack_of_camera_permission, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(mContext.getApplicationContext(), R.string.server_list_lack_of_camera_permission, Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -189,16 +198,29 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
     }
 
     @Override
-    public void gotoScanQRCode() {
+    public void askTheWayToScanQRCode() {
+        new AlertDialog.Builder(mContext)
+                .setItems(R.array.scan_qr_code_choices,
+                        (dialog, which) -> mPresenter.gotoScanQRCode(1 == which))
+                .show();
+    }
+
+    @Override
+    public void scanQRCodeFromCamera() {
         if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA)) {
-            gotoScanQRCodeInner();
+            scanQRCodeGotResultStartActivityLaunch.launch(ScanQRCodeActivity.create(mContext, false));
         } else {
             scanQRCodeRequestPermissionStartActivityLaunch.launch(Manifest.permission.CAMERA);
         }
     }
 
-    private void gotoScanQRCodeInner() {
-        scanQRCodeGotResultStartActivityLaunch.launch(ScanQRCodeActivity.create(mContext));
+    @Override
+    public void scanQRCodeFromGallery() {
+        if (PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            scanQRCodeGotResultStartActivityLaunch.launch(ScanQRCodeActivity.create(mContext, true));
+        } else {
+            mScanQRCodeReadExternalPermissionRequestLaunch.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
     }
 
     @Override
@@ -304,7 +326,7 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_scan_qr_code:
-                mPresenter.gotoScanQRCode();
+                askTheWayToScanQRCode();
                 return true;
             case R.id.action_import_from_file:
                 mPresenter.displayImportFileDescription();
@@ -454,5 +476,14 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
     @Override
     public void setPingServerDelayTime(TrojanConfig config, float timeout) {
         mServerListAdapter.setPingServerDelayTime(config, timeout);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mScanQRCodeReadExternalPermissionRequestLaunch != null) {
+            mScanQRCodeReadExternalPermissionRequestLaunch.unregister();
+            mScanQRCodeReadExternalPermissionRequestLaunch = null;
+        }
     }
 }

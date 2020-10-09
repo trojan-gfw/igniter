@@ -158,5 +158,8 @@
         <item>208.0.0.0/4</item>
     </string-array>
     <!-- Reply Preference -->
-
+    <string-array name="scan_qr_code_choices">
+        <item>@string/scan_qr_code_from_camera</item>
+        <item>@string/scan_qr_code_from_gallery</item>
+    </string-array>
 </resources>
