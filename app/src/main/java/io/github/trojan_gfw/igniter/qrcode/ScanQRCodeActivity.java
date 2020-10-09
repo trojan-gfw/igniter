@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -85,7 +86,11 @@ public class ScanQRCodeActivity extends BaseAppCompatActivity {
             String picturePath = cursor.getString(columnIndex);
             cursor.close();
             String result = QRCodeDecoder.syncDecodeQRCode(picturePath);
-            returnScanResult(result);
+            if (TextUtils.isEmpty(result)) {
+                showToast(getString(R.string.scan_qr_code_failed, result));
+            } else {
+                returnScanResult(result);
+            }
         } else {
             showPickPhotoFailed();
         }
@@ -98,8 +103,12 @@ public class ScanQRCodeActivity extends BaseAppCompatActivity {
     }
 
     private void showPickPhotoFailed() {
+        showToast(getString(R.string.scan_qr_code_failed_to_pick_photo));
+    }
+
+    private void showToast(String msg) {
         Context context = mContext.getApplicationContext();
-        runOnUiThread(() -> Toast.makeText(context, R.string.scan_qr_code_failed_to_pick_photo, Toast.LENGTH_SHORT).show());
+        runOnUiThread(() -> Toast.makeText(context, msg, Toast.LENGTH_SHORT).show());
     }
 
     private void scanQRCodeFromCamera() {
