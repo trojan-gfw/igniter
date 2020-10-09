@@ -54,6 +54,7 @@
     <string name="server_list_menu_export_to_file">Export to file</string>
     <string name="server_list_delete_btn">@string/common_delete</string>
     <string name="server_list_lack_of_camera_permission">Lack of camera permission!</string>
+    <string name="server_list_lack_of_read_permission">Lack of read external storage permission!</string>
     <string name="main_save_success">@string/common_save_success</string>
     <string name="main_save_failed">Save failed</string>
 
@@ -67,10 +68,13 @@
     </string>
     <string name="main_menu_server_list">Load Server</string>
 
+    <string name="scan_qr_code_from_camera">Scan from camera</string>
+    <string name="scan_qr_code_from_gallery">Scan from gallery</string>
     <string name="scan_qr_code_success">Add server success</string>
     <string name="scan_qr_code_failed">Cannot recognize trojanURL: %s</string>
     <string name="scan_qr_code">Scan QR</string>
     <string name="scan_qr_code_camera_error">Camera Error</string>
+    <string name="scan_qr_code_failed_to_pick_photo">Failed to pick photo</string>
 
     <string name="menu_action_exempt_app_save">Save</string>
     <string name="menu_action_exempt_app">Exempt Apps</string>

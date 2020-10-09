@@ -16,7 +16,7 @@ public interface ServerListContract {
 
         void handleServerSelection(TrojanConfig config);
 
-        void gotoScanQRCode();
+        void gotoScanQRCode(boolean fromGallery);
 
         void displayImportFileDescription();
 
@@ -56,6 +56,8 @@ public interface ServerListContract {
     interface View extends BaseView<Presenter> {
         void showAddTrojanConfigSuccess();
 
+        void askTheWayToScanQRCode();
+
         void showQRCodeScanError(String scanContent);
 
         void selectServerConfig(TrojanConfig config);
@@ -64,7 +66,9 @@ public interface ServerListContract {
 
         void removeServerConfig(TrojanConfig config, int pos);
 
-        void gotoScanQRCode();
+        void scanQRCodeFromCamera();
+
+        void scanQRCodeFromGallery();
 
         void showImportFileDescription();
 

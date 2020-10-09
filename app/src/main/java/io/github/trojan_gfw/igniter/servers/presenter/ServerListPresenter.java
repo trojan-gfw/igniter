@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 
 import io.github.trojan_gfw.igniter.Globals;
-import io.github.trojan_gfw.igniter.LogHelper;
 import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.TrojanURLHelper;
 import io.github.trojan_gfw.igniter.TrojanURLParseResult;
@@ -23,9 +22,8 @@ import io.github.trojan_gfw.igniter.common.os.Task;
 import io.github.trojan_gfw.igniter.common.os.Threads;
 import io.github.trojan_gfw.igniter.common.sp.CommonSP;
 import io.github.trojan_gfw.igniter.servers.contract.ServerListContract;
-import io.github.trojan_gfw.igniter.servers.data.ServerListDataSource;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataManager;
-import io.github.trojan_gfw.igniter.servers.data.TrojanConfigWrapper;
+import io.github.trojan_gfw.igniter.servers.data.ServerListDataSource;
 
 public class ServerListPresenter implements ServerListContract.Presenter {
     private final static String TAG = "ServerListPresenter";
@@ -212,8 +210,12 @@ public class ServerListPresenter implements ServerListContract.Presenter {
     }
 
     @Override
-    public void gotoScanQRCode() {
-        mView.gotoScanQRCode();
+    public void gotoScanQRCode(boolean fromGallery) {
+        if (fromGallery) {
+            mView.scanQRCodeFromGallery();
+        } else {
+            mView.scanQRCodeFromCamera();
+        }
     }
 
     @Override
