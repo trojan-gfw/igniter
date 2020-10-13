@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 ext.versionMajor = 0
 ext.versionMinor = 10
@@ -85,6 +87,7 @@ repositories {
     flatDir {
         dirs 'src/libs'
     }
+    mavenCentral()
 }
 
 dependencies {
@@ -104,4 +107,6 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     api(name: 'golibs', ext: 'aar')
+    implementation "androidx.core:core-ktx:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
