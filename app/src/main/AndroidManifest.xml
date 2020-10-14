@@ -4,7 +4,9 @@
     package="io.github.trojan_gfw.igniter"
     android:installLocation="internalOnly">
 
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
+    <uses-feature android:name="android.hardware.camera.any" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -12,7 +14,7 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <application xmlns:tools="http://schemas.android.com/tools"
+    <application
         android:name=".IgniterApplication"
         android:allowBackup="true"
         android:extractNativeLibs="true"
@@ -32,7 +34,7 @@
         <activity
             android:name=".exempt.activity.ExemptAppActivity"
             android:theme="@style/AppThemeNoTitle" />
-        <activity android:name=".qrcode.ScanQRCodeActivity" />
+        <activity android:name=".qrcode.ScanQRCodeActivity" android:screenOrientation="locked"/>
         <activity
             android:name=".servers.activity.ServerListActivity"
             android:theme="@style/AppThemeNoTitle" />
