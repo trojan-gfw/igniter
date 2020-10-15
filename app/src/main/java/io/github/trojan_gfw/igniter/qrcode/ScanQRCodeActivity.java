@@ -16,7 +16,6 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -83,12 +82,12 @@ public class ScanQRCodeActivity extends BaseAppCompatActivity {
                     ActivityCompat.checkSelfPermission(mContext, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 ActivityResultLauncher<String> requestPermission =
                         registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted -> {
-                    if (granted) {
-                        scanQRCodeFromGallery();
-                    } else {
-                        finish();
-                    }
-                });
+                            if (granted) {
+                                scanQRCodeFromGallery();
+                            } else {
+                                finish();
+                            }
+                        });
                 requestPermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
             } else {
                 // Reading images from gallery does not require permission READ_EXTERNAL_STORAGE on Android Q or above
@@ -156,7 +155,7 @@ public class ScanQRCodeActivity extends BaseAppCompatActivity {
             }
 
             @Override
-            public void onNoQRCodeDetected() {
+            public void onNoQRCode() {
                 LogHelper.i(TAG, "onNoQRCodeDetected");
                 setResult(RESULT_CANCELED);
                 finish();
@@ -165,7 +164,7 @@ public class ScanQRCodeActivity extends BaseAppCompatActivity {
             @Override
             public void onError(@NonNull Exception exception) {
                 LogHelper.e(TAG, "scan QRCode error: " + exception.getMessage());
-                onNoQRCodeDetected();
+                onNoQRCode();
             }
 
             @Override
