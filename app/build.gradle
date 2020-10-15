@@ -85,7 +85,6 @@ repositories {
     flatDir {
         dirs 'src/libs'
     }
-    mavenCentral()
 }
 
 dependencies {
@@ -98,7 +97,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     implementation 'androidx.core:core:1.5.0-alpha04'
     implementation 'androidx.preference:preference:1.1.1'
-    def camerax_version = "1.0.0-beta10"
+    def camerax_version = "1.0.0-beta11"
     // CameraX core library using camera2 implementation
     implementation "androidx.camera:camera-camera2:$camerax_version"
     // CameraX Lifecycle Library
