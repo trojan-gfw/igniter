@@ -5,14 +5,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -25,9 +23,8 @@ import androidx.annotation.WorkerThread;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
 
-import java.io.FileInputStream;
+import java.io.FileDescriptor;
 import java.io.IOException;
-import java.io.InputStream;
 
 import io.github.trojan_gfw.igniter.LogHelper;
 import io.github.trojan_gfw.igniter.R;
@@ -107,25 +104,15 @@ public class ScanQRCodeActivity extends BaseAppCompatActivity {
     private Bitmap resolveBitmapFromUri(@NonNull Uri uri) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = 4; // use lesser memory to decode the Bitmap
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            try (ParcelFileDescriptor pfd = getContentResolver().openFile(uri, "r", null);
-                 InputStream is = new FileInputStream(pfd.getFileDescriptor())) {
-                return BitmapFactory.decodeStream(is, null, options);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getContentResolver().query(uri,
-                    filePathColumn, null, null, null);
-            if (cursor != null) {
-                cursor.moveToFirst();
-                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                String picturePath = cursor.getString(columnIndex);
-                cursor.close();
-                return BitmapFactory.decodeFile(picturePath, options);
-            }
+
+        try (ParcelFileDescriptor parcelFileDescriptor =
+                     getContentResolver().openFileDescriptor(uri, "r");) {
+            FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+            return BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
         return null;
     }
 
