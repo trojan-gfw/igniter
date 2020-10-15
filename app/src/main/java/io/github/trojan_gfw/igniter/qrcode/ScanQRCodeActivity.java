@@ -106,7 +106,7 @@ public class ScanQRCodeActivity extends BaseAppCompatActivity {
         options.inSampleSize = 4; // use lesser memory to decode the Bitmap
 
         try (ParcelFileDescriptor parcelFileDescriptor =
-                     getContentResolver().openFileDescriptor(uri, "r");) {
+                     getContentResolver().openFileDescriptor(uri, "r")) {
             FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
             return BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options);
         } catch (IOException e) {
