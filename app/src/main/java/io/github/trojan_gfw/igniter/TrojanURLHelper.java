@@ -12,12 +12,12 @@ public class TrojanURLHelper {
                     trojanConfig.getRemoteAddr(),
                     trojanConfig.getRemotePort(),
                     null, null, null);
-        } catch (java.net.URISyntaxException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
 
-        return trojanUri.toString();
+        return trojanUri.toASCIIString();
     }
 
     public static TrojanURLParseResult ParseTrojanURL(String trojanURLStr) {
