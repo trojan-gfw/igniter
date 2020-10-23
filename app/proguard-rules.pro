@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# for GSON
+-keep class io.github.trojan_gfw.igniter.TrojanURLParseResult { *; }
+-keep class io.github.trojan_gfw.igniter.TrojanConfig { *; }
