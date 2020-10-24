@@ -17,7 +17,6 @@ public class ProxyInitializer extends Initializer {
         if (cacheConfig == null) {
             LogHelper.e(TAG, "read null trojan config");
         } else {
-            cacheConfig.setCaCertPath(Globals.getCaCertPath());
             Globals.setTrojanConfigInstance(cacheConfig);
         }
         if (!Globals.getTrojanConfigInstance().isValidRunningConfig()) {

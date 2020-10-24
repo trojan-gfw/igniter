@@ -52,6 +52,7 @@ public class TrojanConfig implements Parcelable {
                 + "TLS_CHACHA20_POLY1305_SHA256:"
                 + "TLS_AES_256_GCM_SHA384";
         this.SNI = "";
+        this.caCertPath = Globals.getCaCertPath();
     }
 
     protected TrojanConfig(Parcel in) {

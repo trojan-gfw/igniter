@@ -19,7 +19,6 @@ public class Globals {
         cacheDir = ctx.getCacheDir().getAbsolutePath();
         filesDir = ctx.getFilesDir().getAbsolutePath();
         trojanConfigInstance = new TrojanConfig();
-        trojanConfigInstance.setCaCertPath(Globals.getCaCertPath());
         exportDir = exportDir(ctx, filesDir);
     }
 
