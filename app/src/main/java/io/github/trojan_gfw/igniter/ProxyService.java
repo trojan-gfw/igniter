@@ -342,8 +342,15 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
 
         b.setSession(getString(R.string.app_name));
         b.setMtu(VPN_MTU);
+
+        // Address settings
         b.addAddress(PRIVATE_VLAN4_CLIENT, 30);
+        if (enable_ipv6) {
+            b.addAddress(PRIVATE_VLAN6_CLIENT, 126);
+        }
+
         if (enable_clash) {
+            // Bypass LAN/China mode
             for (String route : getResources().getStringArray(R.array.bypass_private_route)) {
                 String[] parts = route.split("/", 2);
                 b.addRoute(parts[0], Integer.parseInt(parts[1]));
@@ -351,14 +358,18 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
             // fake ip range for go-tun2socks
             // should match clash configuration
             b.addRoute("198.18.0.0", 16);
+            // https://issuetracker.google.com/issues/149636790
+            if (enable_ipv6) {
+                b.addRoute("2000::", 3);
+            }
         } else {
+            // Global mode
             b.addRoute("0.0.0.0", 0);
+            if (enable_ipv6) {
+                b.addRoute("::", 0);
+            }
         }
 
-        if (enable_ipv6) {
-            b.addAddress(PRIVATE_VLAN6_CLIENT, 126);
-            b.addRoute("::", 0);
-        }
         b.addDnsServer("8.8.8.8");
         b.addDnsServer("8.8.4.4");
         b.addDnsServer("1.1.1.1");
