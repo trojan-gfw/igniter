@@ -437,7 +437,13 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         tun2socksStartOptions.setEnableIPv6(enable_ipv6);
         tun2socksStartOptions.setMTU(VPN_MTU);
 
-        Tun2socks.setLoglevel("info");
+        // debug/info/warn/error/none
+        if (BuildConfig.DEBUG || BuildConfig.VERSION_NAME.contains("SNAPSHOT")) {
+            Tun2socks.setLoglevel("debug");
+        } else {
+            Tun2socks.setLoglevel("info");
+        }
+
         if (enable_clash) {
             tun2socksStartOptions.setFakeIPRange("198.18.0.1/16");
         } else {
