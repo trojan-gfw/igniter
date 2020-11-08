@@ -117,6 +117,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/verifySwitch" />
 
+        <Switch
+            android:id="@+id/allowLanSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/MainSwitchStyle"
+            android:checked="false"
+            android:text="@string/label_allowLan"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/clashSwitch" />
         <Button
             android:id="@+id/startStopButton"
             android:layout_width="match_parent"
@@ -128,7 +138,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/clashSwitch" />
+            app:layout_constraintTop_toBottomOf="@+id/allowLanSwitch" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

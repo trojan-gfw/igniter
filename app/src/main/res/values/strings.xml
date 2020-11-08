@@ -22,6 +22,7 @@
     <string name="button_service__stopping">Stopping</string>
     <string name="verify_certificate">Verify Certificate</string>
     <string name="label_clash">Exempt Chinese Domain/IPs</string>
+    <string name="label_allowLan">Allow Traffic from LAN</string>
     <string name="enable_ipv6">Enable IPv6</string>
     <string name="stop_service" translatable="false">io.github.trojan_gfw.igniter.STOP_SERVICE</string>
     <string name="bind_service" translatable="false">io.github.trojan_gfw.igniter.BIND_SERVICE</string>

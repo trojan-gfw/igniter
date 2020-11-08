@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     private Switch ipv6Switch;
     private Switch verifySwitch;
     private Switch clashSwitch;
+    private Switch allowLanSwitch;
     private Button startStopButton;
     private EditText trojanURLText;
     private @ProxyService.ProxyState
@@ -213,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         passwordText.setEnabled(inputEnabled);
         verifySwitch.setEnabled(inputEnabled);
         clashSwitch.setEnabled(inputEnabled);
+        allowLanSwitch.setEnabled(inputEnabled);
     }
 
     private void applyConfigInstance(TrojanConfig config) {
@@ -317,6 +319,7 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
         ipv6Switch = findViewById(R.id.ipv6Switch);
         verifySwitch = findViewById(R.id.verifySwitch);
         clashSwitch = findViewById(R.id.clashSwitch);
+        allowLanSwitch = findViewById(R.id.allowLanSwitch);
         startStopButton = findViewById(R.id.startStopButton);
 
         copyRawResourceToDir(R.raw.cacert, Globals.getCaCertPath(), true);
@@ -355,6 +358,21 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 // switching.
                 PreferenceUtils.putBooleanPreference(getContentResolver(),
                         Uri.parse(Constants.PREFERENCE_URI), Constants.PREFERENCE_KEY_ENABLE_CLASH,
+                        isChecked);
+            }
+        });
+
+        boolean allowLan = PreferenceUtils.getBooleanPreference(getContentResolver(),
+                Uri.parse(Constants.PREFERENCE_URI), Constants.PREFERENCE_KEY_ALLOW_LAN, false);
+        allowLanSwitch.setChecked(allowLan);
+        allowLanSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // Generally speaking, it's better to insert content into ContentProvider in background
+                // thread, but that may cause data inconsistency when user starts proxy right after
+                // switching.
+                PreferenceUtils.putBooleanPreference(getContentResolver(),
+                        Uri.parse(Constants.PREFERENCE_URI), Constants.PREFERENCE_KEY_ALLOW_LAN,
                         isChecked);
             }
         });

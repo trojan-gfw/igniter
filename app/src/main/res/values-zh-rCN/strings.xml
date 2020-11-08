@@ -21,6 +21,7 @@
     <string name="button_service__stopping">正在断开连接</string>
     <string name="verify_certificate">验证证书</string>
     <string name="label_clash">过滤大陆域名/IP</string>
+    <string name="label_allowLan">允许局域网访问</string>
     <string name="enable_ipv6">开启 IPv6</string>
     <string name="stop_service">io.github.trojan_gfw.igniter.STOP_SERVICE</string>
     <string name="bind_service">io.github.trojan_gfw.igniter.BIND_SERVICE</string>
