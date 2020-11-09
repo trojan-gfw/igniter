@@ -186,4 +186,21 @@ public class TrojanHelper {
             e.printStackTrace();
         }
     }
+
+    public static String RemoveAllEmoji(String str) {
+        /*
+         * [\\p{L}\\p{M}\\p{N}\\p{P}\\p{Z}\\p{Cf}\\p{Cs}\\s] is a range representing
+         * all numeric (\\p{N}), letter (\\p{L}), mark (\\p{M}), punctuation (\\p{P}),
+         * whitespace/separator (\\p{Z}), other formatting (\\p{Cf}) and other characters
+         * above U+FFFF in Unicode (\\p{Cs}), and newline (\\s) characters.
+         * \\p{L} specifically includes the characters from other alphabets
+         * such as Cyrillic, Latin, Kanji, etc.
+         */
+        if (str == null || str.length() <= 0) {
+            // do nothing
+            return str;
+        }
+        String characterFilter = "[^\\p{L}\\p{M}\\p{N}\\p{P}\\p{Z}\\p{Cf}\\p{Cs}\\s]";
+        return str.replaceAll(characterFilter,"");
+    }
 }

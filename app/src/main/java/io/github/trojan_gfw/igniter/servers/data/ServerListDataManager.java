@@ -190,7 +190,8 @@ public class ServerListDataManager implements ServerListDataSource {
                 idxOfLineEnd = i;
                 if (idxOfSharp != -1) {
                     String trojanUrl = configLines.substring(idxOfLineStart, idxOfSharp);
-                    String remark = configLines.substring(idxOfSharp + 1, idxOfLineEnd).trim();
+                    String rawRemark = configLines.substring(idxOfSharp + 1, idxOfLineEnd).trim();
+                    String remark = TrojanHelper.RemoveAllEmoji(rawRemark);
                     TrojanURLParseResult parseResult = TrojanURLHelper.ParseTrojanURL(trojanUrl);
                     if (parseResult != null) {
                         TrojanConfig newConfig = TrojanURLHelper.CombineTrojanURLParseResultToTrojanConfig(parseResult, Globals.getTrojanConfigInstance());
@@ -294,7 +295,9 @@ public class ServerListDataManager implements ServerListDataSource {
                     continue;
                 }
                 TrojanConfig tmp = new TrojanConfig();
-                tmp.setRemoteServerRemark(config.optString(ConfigFileConstants.REMARKS, ConfigFileConstants.EMPTY_STRING));
+                String rawRemoteServerRemark = config.optString(ConfigFileConstants.REMARKS, ConfigFileConstants.EMPTY_STRING);
+                String remoteServerRemark = TrojanHelper.RemoveAllEmoji(rawRemoteServerRemark);
+                tmp.setRemoteServerRemark(remoteServerRemark);
                 tmp.setRemoteAddr(remoteAddr);
                 tmp.setRemotePort(config.optInt(ConfigFileConstants.SERVER_PORT));
                 tmp.setSNI(config.optString(ConfigFileConstants.SNI, ConfigFileConstants.EMPTY_STRING));
