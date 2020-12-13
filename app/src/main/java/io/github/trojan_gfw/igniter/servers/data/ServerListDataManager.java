@@ -38,7 +38,6 @@ import java.util.Set;
 import javax.net.ssl.HttpsURLConnection;
 
 import io.github.trojan_gfw.igniter.Globals;
-import io.github.trojan_gfw.igniter.LogHelper;
 import io.github.trojan_gfw.igniter.TrojanConfig;
 import io.github.trojan_gfw.igniter.TrojanHelper;
 import io.github.trojan_gfw.igniter.TrojanURLHelper;
@@ -180,28 +179,10 @@ public class ServerListDataManager implements ServerListDataSource {
     }
 
     private void parseAndSaveSubscribeServers(@NonNull String configLines) {
-        int idxOfLineStart = 0, idxOfSharp = -1, idxOfLineEnd = -1;
         Map<String, TrojanConfig> configMap = new HashMap<>(60);
-        for (int i = 0, len = configLines.length(); i < len; i++) {
-            char c = configLines.charAt(i);
-            if (c == '#') {
-                idxOfSharp = i;
-            } else if (c == '\n') {
-                idxOfLineEnd = i;
-                if (idxOfSharp != -1) {
-                    String trojanUrl = configLines.substring(idxOfLineStart, idxOfSharp);
-                    String rawRemark = configLines.substring(idxOfSharp + 1, idxOfLineEnd).trim();
-                    String remark = TrojanHelper.RemoveAllEmoji(rawRemark);
-                    TrojanURLParseResult parseResult = TrojanURLHelper.ParseTrojanURL(trojanUrl);
-                    if (parseResult != null) {
-                        TrojanConfig newConfig = TrojanURLHelper.CombineTrojanURLParseResultToTrojanConfig(parseResult, Globals.getTrojanConfigInstance());
-                        newConfig.setRemoteServerRemark(remark);
-                        configMap.put(newConfig.getIdentifier(), newConfig);
-                    }
-                }
-                idxOfLineStart = idxOfLineEnd + 1;
-                idxOfSharp = -1;
-            }
+        List<TrojanConfig> parsedList = TrojanURLHelper.ParseTrojanConfigsFromContent(configLines);
+        for (TrojanConfig ins : parsedList) {
+            configMap.put(ins.getIdentifier(), ins);
         }
         List<TrojanConfig> previousList = loadServerConfigList();
         for (int i = 0, size = previousList.size(); i < size; i++) {

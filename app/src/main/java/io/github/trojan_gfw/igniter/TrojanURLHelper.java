@@ -55,6 +55,29 @@ public class TrojanURLHelper {
         return retConfig;
     }
 
+    public static List<TrojanURLParseResult> ParseMultipleTrojanURL(String inputStr) {
+        ArrayList<TrojanURLParseResult> ret = new ArrayList<TrojanURLParseResult>(5);
+        String[] trojanURLLines = inputStr.split("\\R+");
+
+        for (String trojanURLLine : trojanURLLines) {
+            TrojanURLParseResult parseResult = TrojanURLHelper.ParseTrojanURL(trojanURLLine);
+            if (parseResult != null) {
+                ret.add(parseResult);
+            }
+        }
+        return ret;
+    }
+
+    public static List<TrojanConfig> ParseTrojanConfigsFromContent(String content) {
+        List<TrojanConfig> ret = Collections.emptyList();
+        List<TrojanURLParseResult> parseResults = ParseMultipleTrojanURL(content);
+        for (TrojanURLParseResult singleParseResult : parseResults) {
+            TrojanConfig newConfig = CombineTrojanURLParseResultToTrojanConfig(singleParseResult, Globals.getTrojanConfigInstance());
+            ret.add(newConfig);
+        }
+        return ret;
+    }
+
     /**
      * Merge Trojan URL parse result and Trojan config instance
      *
