@@ -69,7 +69,7 @@ public class TrojanURLHelper {
     }
 
     public static List<TrojanConfig> ParseTrojanConfigsFromContent(String content) {
-        List<TrojanConfig> ret = Collections.emptyList();
+        ArrayList<TrojanConfig> ret = new ArrayList<TrojanConfig>(5);
         List<TrojanURLParseResult> parseResults = ParseMultipleTrojanURL(content);
         for (TrojanURLParseResult singleParseResult : parseResults) {
             TrojanConfig newConfig = CombineTrojanURLParseResultToTrojanConfig(singleParseResult, Globals.getTrojanConfigInstance());
