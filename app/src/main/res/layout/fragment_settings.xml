@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/cardview_shadow_end_color"
+    tools:context=".settings.fragment.SettingsFragment">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/settings_top_bar"
+        style="@style/CommonToolBar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/top_bar_height" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollIndicators="end"
+        android:scrollbarStyle="insideOverlay"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:id="@+id/settings_parent_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="@dimen/main_vertical_margin"
+            android:paddingHorizontal="@dimen/main_horizontal_margin"
+            android:orientation="vertical">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                app:cardBackgroundColor="@android:color/white"
+                app:cardCornerRadius="@dimen/settings_card_corner_radius"
+                app:cardPreventCornerOverlap="true"
+                app:cardUseCompatPadding="true"
+                app:contentPadding="@dimen/settings_card_padding">
+
+                <LinearLayout
+                    android:id="@+id/settings_dns_list_ll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:text="@string/settings_extra_dns_desc"
+                            android:textSize="@dimen/text_size" />
+
+                        <ImageView
+                            android:id="@+id/settings_add_dns_input_iv"
+                            android:layout_width="@dimen/settings_dns_add_btn_size"
+                            android:layout_height="@dimen/settings_dns_add_btn_size"
+                            android:layout_gravity="end"
+                            android:scaleType="fitXY"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:src="@drawable/icon_add" />
+                    </FrameLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

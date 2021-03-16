@@ -31,6 +31,7 @@
         <activity
             android:name=".AboutActivity"
             android:label="@string/title_activity_about" />
+        <activity android:name=".settings.activity.SettingsActivity" android:theme="@style/AppThemeNoTitle" />
         <activity
             android:name=".exempt.activity.ExemptAppActivity"
             android:theme="@style/AppThemeNoTitle" />

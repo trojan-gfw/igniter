@@ -28,6 +28,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.Set;
 
 import clash.Clash;
@@ -40,6 +41,7 @@ import io.github.trojan_gfw.igniter.exempt.data.ExemptAppDataManager;
 import io.github.trojan_gfw.igniter.exempt.data.ExemptAppDataSource;
 import io.github.trojan_gfw.igniter.proxy.aidl.ITrojanService;
 import io.github.trojan_gfw.igniter.proxy.aidl.ITrojanServiceCallback;
+import io.github.trojan_gfw.igniter.settings.data.SettingsDataManager;
 import tun2socks.Tun2socks;
 import tun2socks.Tun2socksStartOptions;
 
@@ -313,6 +315,15 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         void applyRule(VpnService.Builder builder, String packageName) throws PackageManager.NameNotFoundException;
     }
 
+    private void addExtraDNS(VpnService.Builder b) {
+        SettingsDataManager dataManager = new SettingsDataManager(this);
+        List<String> dnsList = dataManager.loadExtraDNSList();
+        for (String dns : dnsList) {
+            LogHelper.i(TAG, "add DnsServer: " + dns);
+            b.addDnsServer(dns);
+        }
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         LogHelper.i(TAG, "onStartCommand");
@@ -325,6 +336,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
 
         VpnService.Builder b = new VpnService.Builder();
         applyApplicationOrientedRule(b);
+        addExtraDNS(b);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             // VPN apps targeting {@link android.os.Build.VERSION_CODES#Q} or above will be
             // considered metered by default, because of which Google Play Store treat the network
