@@ -8,6 +8,7 @@
     <string name="common_never">Never</string>
     <string name="common_update">Update</string>
     <string name="common_exit">Exit</string>
+    <string name="common_save">Save</string>
     <string name="common_save_success">Save success</string>
 
     <string name="remote_server_remark">Remote Server Remark</string>
@@ -38,6 +39,7 @@
     <!-- App Bar Menu -->
     <string name="action_test_connection">Test Connection</string>
     <string name="action_show_develop_info_logcat">Show develop info in logcat</string>
+    <string name="action_settings">Settings</string>
 
     <string name="action_subscribe_server_list">Subscribe</string>
     <string name="action_subscribe_settings">Subscribe settings</string>
@@ -77,7 +79,7 @@
     <string name="scan_qr_code_camera_error">Camera Error</string>
     <string name="scan_qr_code_failed_to_pick_photo">Failed to pick photo</string>
 
-    <string name="menu_action_exempt_app_save">Save</string>
+    <string name="menu_action_exempt_app_save">@string/common_save</string>
     <string name="menu_action_exempt_app">Exempt Apps</string>
     <string name="exempt_app_search_title">Search Apps</string>
     <string name="exempt_app_exit">@string/common_exit</string>
@@ -107,6 +109,13 @@
     <string name="credit_item1_title" translatable="false">Dreamacro/clash</string>
     <string name="credit_item2_title" translatable="false">eycorsican/go-tun2socks</string>
     <string name="credit_item3_title" translatable="false">bingoogolapple/BGAQRCode-Android</string>
+
+    <!-- Settings  -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_extra_dns_desc" translatable="false">DNS</string>
+    <string name="settings_exit_confirm">Exit without saving settings?</string>
+    <string name="settings_save_success">Settings saved.</string>
+    <string name="settings_dns_format_error">Invalid DNS</string>
 
     <string name="action_about">About</string>
 

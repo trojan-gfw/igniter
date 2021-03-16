@@ -8,6 +8,10 @@ import com.google.android.material.snackbar.Snackbar;
 
 public class SnackbarUtils {
 
+    public static Snackbar makeTextShort(View view, @StringRes int id) {
+        return Snackbar.make(view, id, Snackbar.LENGTH_SHORT);
+    }
+
     public static void showTextShort(View view, @StringRes int id) {
         Snackbar.make(view, id, Snackbar.LENGTH_SHORT).show();
     }

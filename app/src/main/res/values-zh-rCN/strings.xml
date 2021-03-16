@@ -115,4 +115,10 @@
     <string name="scan_qr_code_from_camera">开相机扫描二维码</string>
     <string name="scan_qr_code_from_gallery">从相册读取二维码</string>
     <string name="server_list_lack_of_read_permission">缺少读取外部存储权限</string>
+    <string name="action_settings">设置</string>
+    <string name="settings_exit_confirm">尚未保存设置，确认退出吗？</string>
+    <string name="settings_save_success">保存成功</string>
+    <string name="settings_dns_format_error">非法DNS</string>
+    <string name="common_save">保存</string>
+    <string name="settings_title">设置</string>
 </resources>

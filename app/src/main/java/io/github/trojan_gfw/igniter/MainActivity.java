@@ -51,6 +51,7 @@ import io.github.trojan_gfw.igniter.proxy.aidl.ITrojanService;
 import io.github.trojan_gfw.igniter.servers.activity.ServerListActivity;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataManager;
 import io.github.trojan_gfw.igniter.servers.data.ServerListDataSource;
+import io.github.trojan_gfw.igniter.settings.activity.SettingsActivity;
 import io.github.trojan_gfw.igniter.tile.ProxyHelper;
 
 
@@ -732,6 +733,9 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
                 return true;
             case R.id.action_exempt_app:
                 exemptAppSettingsActivityResultLauncher.launch(ExemptAppActivity.create(this));
+                return true;
+            case R.id.action_settings:
+                startActivity(SettingsActivity.create(this));
                 return true;
             default:
                 // Invoke the superclass to handle it.

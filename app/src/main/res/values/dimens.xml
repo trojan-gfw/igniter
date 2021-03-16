@@ -14,4 +14,9 @@
     <dimen name="main_switch_horizontal_margin">20dp</dimen>
 
     <dimen name="dialog_margin">20dp</dimen>
+    <dimen name="settings_dns_input_width">250dp</dimen>
+    <dimen name="settings_card_padding">15dp</dimen>
+    <dimen name="settings_card_corner_radius">5dp</dimen>
+    <dimen name="settings_dns_add_btn_size">20dp</dimen>
+    <dimen name="settings_dns_delete_btn_size">18dp</dimen>
 </resources>

@@ -35,4 +35,27 @@ public abstract class PreferenceUtils {
         contentValues.put(key, value);
         resolver.update(uri, contentValues, null, null);
     }
+
+    public static String getStringPreference(ContentResolver resolver, Uri uri, String key, String defVal) {
+        try (Cursor query = ContentResolverCompat.query(resolver, uri, new String[]{key}, null,
+                null, null, null)) {
+            if (query.moveToFirst()) {
+                int columnIndex = query.getColumnIndex(key);
+                if (columnIndex >= 0) {
+                    int type = query.getType(columnIndex);
+                    if (type == Cursor.FIELD_TYPE_STRING) {
+                        return query.getString(columnIndex);
+                    }
+                    return defVal;
+                }
+            }
+        }
+        return defVal;
+    }
+
+    public static void putStringPreference(ContentResolver resolver, Uri uri, String key, String value) {
+        ContentValues contentValues = new ContentValues(1);
+        contentValues.put(key, value);
+        resolver.update(uri, contentValues, null, null);
+    }
 }
