@@ -32,8 +32,6 @@
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/white"
-                app:cardBackgroundColor="@android:color/white"
                 app:cardCornerRadius="@dimen/settings_card_corner_radius"
                 app:cardPreventCornerOverlap="true"
                 app:cardUseCompatPadding="true"
