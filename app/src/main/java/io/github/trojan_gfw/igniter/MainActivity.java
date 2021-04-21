@@ -60,7 +60,7 @@ import io.github.trojan_gfw.igniter.tile.ProxyHelper;
 
 public class MainActivity extends AppCompatActivity implements TrojanConnection.Callback {
     private static final String TAG = "MainActivity";
-    private static final long INVALID_PORT = 0;
+    private static final long INVALID_PORT = -1L;
     private static final String CONNECTION_TEST_URL = "https://www.google.com";
 
     private String shareLink;
@@ -568,11 +568,11 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     @UiThread
     private void updatePortInfo(long port) {
         currentProxyPort = port;
-        if (INVALID_PORT == port) {
-            copyPortBtn.setVisibility(View.INVISIBLE);
-        } else {
+        if (port >= 0L && port <= 65535) {
             copyPortBtn.setText(getString(R.string.notification_listen_port, String.valueOf(port)));
             copyPortBtn.setVisibility(View.VISIBLE);
+        } else {
+            copyPortBtn.setVisibility(View.INVISIBLE);
         }
     }
 
