@@ -139,5 +139,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/allowLanSwitch" />
 
+        <Button
+            android:id="@+id/copyPortBtn"
+            app:layout_constraintTop_toBottomOf="@id/startStopButton"
+            app:layout_constraintStart_toStartOf="@id/startStopButton"
+            app:layout_constraintEnd_toEndOf="@id/startStopButton"
+            android:layout_margin="@dimen/main_btn_margin"
+            tools:text="Listening on port: 40199"
+            android:visibility="invisible"
+            tools:visibility="visible"
+            android:textSize="@dimen/text_size"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/main_btn_height" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

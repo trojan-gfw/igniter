@@ -33,6 +33,7 @@
     <string name="notification_channel_id" translatable="false">igniter_notify_chan</string>
     <string name="notification_channel_name">Igniter notifications</string>
     <string name="notification_starting_service">Starting service</string>
+    <string name="notification_listen_port">listening on port: %1$s</string>
     <string name="main_restart_proxy_service_tip">Restart proxy yourself to apply new exempt apps configuration.</string>
     <string name="clipboard_import_tip">Do you want to import the Trojan URL you just copied?</string>
 
@@ -60,6 +61,7 @@
     <string name="server_list_lack_of_read_permission">Lack of read external storage permission!</string>
     <string name="main_save_success">@string/common_save_success</string>
     <string name="main_save_failed">Save failed</string>
+    <string name="main_proxy_port_copied_to_clipboard">Proxy port %1$s copied to clipboard</string>
 
     <string name="main_write_external_storage_permission_requirement">
         Igniter needs to read and write external storage for reading or writing exempted app
