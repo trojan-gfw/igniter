@@ -76,7 +76,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
     public static final int STOPPING = 2;
     public static final int STOPPED = 3;
     public static final int IGNITER_STATUS_NOTIFY_MSG_ID = 114514;
-    private static final long INVALID_PORT = 0L;
+    private static final long INVALID_PORT = -1L;
     public long tun2socksPort = INVALID_PORT;
     public boolean enable_clash = false;
     public boolean allowLan = false;
