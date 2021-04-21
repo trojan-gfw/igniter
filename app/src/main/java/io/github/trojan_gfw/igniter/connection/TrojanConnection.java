@@ -11,6 +11,7 @@ import android.os.Looper;
 import android.os.RemoteException;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.UiThread;
 
 import io.github.trojan_gfw.igniter.ProxyService;
 import io.github.trojan_gfw.igniter.R;
@@ -84,8 +85,10 @@ public class TrojanConnection implements ServiceConnection, Binder.DeathRecipien
 
         void onServiceDisconnected();
 
+        @UiThread
         void onStateChanged(int state, String msg);
 
+        @UiThread
         void onTestResult(String testUrl, boolean connected, long delay, @NonNull String error);
 
         void onBinderDied();

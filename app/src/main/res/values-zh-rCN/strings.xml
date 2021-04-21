@@ -121,4 +121,6 @@
     <string name="settings_dns_format_error">非法DNS</string>
     <string name="common_save">保存</string>
     <string name="settings_title">设置</string>
+    <string name="notification_listen_port">代理端口: %1$s</string>
+    <string name="main_proxy_port_copied_to_clipboard">代理端口 %1$s 已复制到剪贴板</string>
 </resources>
