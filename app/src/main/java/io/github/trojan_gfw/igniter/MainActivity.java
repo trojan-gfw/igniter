@@ -60,10 +60,6 @@ import io.github.trojan_gfw.igniter.tile.ProxyHelper;
 
 public class MainActivity extends AppCompatActivity implements TrojanConnection.Callback {
     private static final String TAG = "MainActivity";
-    private static final int READ_WRITE_EXT_STORAGE_PERMISSION_REQUEST = 514;
-    private static final int VPN_REQUEST_CODE = 233;
-    private static final int SERVER_LIST_CHOOSE_REQUEST_CODE = 1024;
-    private static final int EXEMPT_APP_CONFIGURE_REQUEST_CODE = 2077;
     private static final long INVALID_PORT = 0;
     private static final String CONNECTION_TEST_URL = "https://www.google.com";
 
