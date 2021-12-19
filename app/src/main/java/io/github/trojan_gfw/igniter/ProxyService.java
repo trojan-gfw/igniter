@@ -542,8 +542,10 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
 
         JNIHelper.stop();
 
-        Clash.stop();
-        LogHelper.i("Clash", "clash stopped");
+        if (enable_clash) {
+            Clash.stop();
+            LogHelper.i("Clash", "clash stopped");
+        }
         Tun2socks.stop();
 
         stopSelf();
