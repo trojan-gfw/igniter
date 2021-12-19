@@ -273,7 +273,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
     private void startForegroundNotification(String channelId) {
         Intent openMainActivityIntent = new Intent(this, MainActivity.class);
         openMainActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingOpenMainActivityIntent = PendingIntent.getActivity(this, 0, openMainActivityIntent, 0);
+        PendingIntent pendingOpenMainActivityIntent = PendingIntent.getActivity(this, 0, openMainActivityIntent, PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
                 .setSmallIcon(R.drawable.ic_tile)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
@@ -364,13 +364,11 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
             b.setMetered(false);
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            final ConnectivityManager connectivityManager =
-                    (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            final Network activeNetwork = connectivityManager.getActiveNetwork();
-            if (activeNetwork != null) {
-                b.setUnderlyingNetworks(new Network[]{activeNetwork});
-            }
+        final ConnectivityManager connectivityManager =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        final Network activeNetwork = connectivityManager.getActiveNetwork();
+        if (activeNetwork != null) {
+            b.setUnderlyingNetworks(new Network[]{activeNetwork});
         }
 
         enable_clash = readClashPreference();
@@ -513,7 +511,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
 
         Intent openMainActivityIntent = new Intent(this, MainActivity.class);
         openMainActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingOpenMainActivityIntent = PendingIntent.getActivity(this, 0, openMainActivityIntent, 0);
+        PendingIntent pendingOpenMainActivityIntent = PendingIntent.getActivity(this, 0, openMainActivityIntent, PendingIntent.FLAG_IMMUTABLE);
         String igniterRunningStatusStr = getString(R.string.notification_listen_port, String.valueOf(tun2socksPort));
         final String channelId = getString(R.string.notification_channel_id);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
