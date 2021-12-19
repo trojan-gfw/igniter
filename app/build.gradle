@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 ext.versionMajor = 0
-ext.versionMinor = 10
-ext.versionPatch = 4
+ext.versionMinor = 11
+ext.versionPatch = 0
 ext.versionClassifier = "beta" // or null
-ext.isSnapshot = false // set to false when publishing new releases
+ext.isSnapshot = true // set to false when publishing new releases
 ext.minimumSdkVersion = 23
 ext.targetSdkVersion = 31
 
