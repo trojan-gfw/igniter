@@ -24,7 +24,7 @@ import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
 
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.mlkit.vision.barcode.Barcode;
+import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
@@ -105,9 +105,10 @@ public class ScanQRCodeFragment extends BaseFragment implements ImageAnalysis.An
         }, mMainExecutor);
     }
 
+    @androidx.camera.core.ExperimentalGetImage
     @Override
     public void analyze(@NonNull ImageProxy imageProxy) {
-        @SuppressLint("UnsafeExperimentalUsageError") Image image = imageProxy.getImage();
+        Image image = imageProxy.getImage();
         if (image == null) {
             imageProxy.close();
             return;
