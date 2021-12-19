@@ -193,7 +193,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         setState(STOPPED);
         unregisterReceiver(mStopBroadcastReceiver);
         stopNetworkConnectivityMonitor();
-        pfd = null;
+        stop();
     }
 
     /**
@@ -429,7 +429,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
             stop();
             return START_NOT_STICKY;
         }
-        int fd = pfd.detachFd();
+        int fd = pfd.getFd();
 
         startNetworkConnectivityMonitor();
 
@@ -481,7 +481,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
 
         String socks5ServerAddrPort;
         if (allowLan) {
-            socks5ServerAddrPort = TUN2SOCKS5_SERVER_HOST_ANY_v4+ ":" + tun2socksPort;
+            socks5ServerAddrPort = TUN2SOCKS5_SERVER_HOST_ANY_v4 + ":" + tun2socksPort;
         } else {
             socks5ServerAddrPort = TUN2SOCKS5_SERVER_HOST_LOOPBACK_v4 + ":" + tun2socksPort;
         }
@@ -536,12 +536,16 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         setState(STOPPING);
 
         stopNetworkConnectivityMonitor();
+        try {
+            pfd.close();
+        } catch (Exception e) {
+            LogHelper.e(TAG, "error closing pfd: " + e);
+        }
 
         JNIHelper.stop();
-        if (Clash.isRunning()) {
-            Clash.stop();
-            LogHelper.i("Clash", "clash stopped");
-        }
+
+        Clash.stop();
+        LogHelper.i("Clash", "clash stopped");
         Tun2socks.stop();
 
         stopSelf();
