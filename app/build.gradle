@@ -71,16 +71,13 @@ android {
         coreLibraryDesugaringEnabled true
     }
     packagingOptions {
-        doNotStrip "*/armeabi-v7a/libgojni.so"
-        doNotStrip "*/arm64-v8a/libgojni.so"
-        doNotStrip "*/x86/libgojni.so"
-        doNotStrip "*/x86_64/libgojni.so"
         jniLibs {
             // During installation, the installer decompresses the libraries, and the linker loads
             // the decompressed libraries at runtime; in this case, the APK would be smaller, but
             // installation time might be slightly longer.
             // We optimize for size to make users happy
             useLegacyPackaging = true
+            keepDebugSymbols += ['*/armeabi-v7a/libgojni.so', '*/arm64-v8a/libgojni.so', '*/x86/libgojni.so', '*/x86_64/libgojni.so']
         }
     }
     splits {
