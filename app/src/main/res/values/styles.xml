@@ -65,4 +65,15 @@
         <item name="android:layout_marginTop">@dimen/main_vertical_margin_small</item>
         <item name="android:textSize">@dimen/text_size_extra_small</item>
     </style>
+
+    <style name="SettingsCardStyle">
+        <item name="cardCornerRadius">@dimen/settings_card_corner_radius</item>
+        <item name="cardPreventCornerOverlap">true</item>
+        <item name="cardUseCompatPadding">true</item>
+        <item name="contentPadding">@dimen/settings_card_padding</item>
+        <item name="android:layout_marginStart">@dimen/main_horizontal_margin</item>
+        <item name="android:layout_marginEnd">@dimen/main_horizontal_margin</item>
+        <item name="android:layout_marginTop">@dimen/main_vertical_margin</item>
+        <item name="android:layout_marginBottom">@dimen/main_vertical_margin</item>
+    </style>
 </resources>

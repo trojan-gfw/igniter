@@ -11,4 +11,10 @@ public interface ISettingsDataManager {
     List<String> loadExtraDNSList();
     @WorkerThread
     void saveExtraDNSList(@NonNull List<String> dnsList);
+    void saveFixedPort(int port);
+
+    /***
+     * Load fixed port from settings. If no fixed port is specified, returns -1.
+     */
+    int loadFixedPort();
 }

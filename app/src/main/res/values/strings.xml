@@ -118,6 +118,8 @@
     <string name="settings_exit_confirm">Exit without saving settings?</string>
     <string name="settings_save_success">Settings saved.</string>
     <string name="settings_dns_format_error">Invalid DNS</string>
+    <string name="settings_fixed_port">Fixed Port</string>
+    <string name="settings_port_help_text">Port is range from 49152 to 65535. For random port, just keep it blank.</string>
 
     <string name="action_about">About</string>
 
@@ -127,4 +129,5 @@
     <string name="proxy_service_not_connected">ProxyService not yet connected.</string>
     <string name="export_server_list_success">Exported Config to %s</string>
     <string name="export_server_list_error">Export Config Error</string>
+    <string name="settings_fixed_port_usage">Only works when allow traffic from LAN is enable.\nPort is range from 49152 to 65535. For random port, just keep it blank.</string>
 </resources>

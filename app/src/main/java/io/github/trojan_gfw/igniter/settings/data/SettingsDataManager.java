@@ -56,4 +56,18 @@ public class SettingsDataManager implements ISettingsDataManager {
                 Uri.parse(Constants.PREFERENCE_URI), Constants.PREFERENCE_KEY_EXTRA_DNS,
                 jsonArray.toString());
     }
+
+    @Override
+    public void saveFixedPort(int port) {
+        PreferenceUtils.putIntPreference(mContext.getContentResolver(),
+                Uri.parse(Constants.PREFERENCE_URI),
+                Constants.PREFERENCE_KEY_FIXED_PORT, port);
+    }
+
+    @Override
+    public int loadFixedPort() {
+        return PreferenceUtils.getIntPreference(mContext.getContentResolver(),
+                Uri.parse(Constants.PREFERENCE_URI),
+                Constants.PREFERENCE_KEY_FIXED_PORT, -1);
+    }
 }

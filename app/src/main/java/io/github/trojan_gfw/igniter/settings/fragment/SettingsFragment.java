@@ -18,6 +18,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentActivity;
 
+import com.google.android.material.textfield.TextInputEditText;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -34,9 +36,10 @@ public class SettingsFragment extends BaseFragment
         implements SettingsContract.View, InputEntryView.Listener {
     public static final String TAG = "SettingsFragment";
     private SettingsContract.Presenter mPresenter;
-    private LinearLayout mParentLl, mDNSInputLl;
+    private LinearLayout mDNSInputLl;
     private ImageView mAddDNSIv;
     private LoadingDialog mLoadingDialog;
+    private TextInputEditText mPortTiet;
     private final List<InputEntryView> mExtraDNSInputList = new LinkedList<>();
 
     public SettingsFragment() {
@@ -64,9 +67,9 @@ public class SettingsFragment extends BaseFragment
     }
 
     private void findViews() {
-        mParentLl = findViewById(R.id.settings_parent_ll);
         mDNSInputLl = findViewById(R.id.settings_dns_list_ll);
         mAddDNSIv = findViewById(R.id.settings_add_dns_input_iv);
+        mPortTiet = findViewById(R.id.settings_port_tiet);
         FragmentActivity activity = getActivity();
         if (activity instanceof AppCompatActivity) {
             Toolbar toolbar = findViewById(R.id.settings_top_bar);
@@ -133,10 +136,16 @@ public class SettingsFragment extends BaseFragment
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         final int id = item.getItemId();
         if (R.id.action_save_settings == id) {
-            mPresenter.saveDNSList(getInputDNSList());
+            mPresenter.saveSettings(getInputDNSList(), mPortTiet.getEditableText().toString());
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void showPortNumberError() {
+        runOnUiThread(() -> SnackbarUtils
+                .showTextShort(requireView(), R.string.settings_port_help_text));
     }
 
     @Override
@@ -166,7 +175,6 @@ public class SettingsFragment extends BaseFragment
     @Override
     public void showExtraDNSList(@NonNull List<String> dnsList) {
         runOnUiThread(() -> {
-            LinearLayout layout = mDNSInputLl;
             for (int i = 0, size = dnsList.size(); i < size; i++) {
                 String dns = dnsList.get(i);
                 createInputEntry(dns);
@@ -176,7 +184,8 @@ public class SettingsFragment extends BaseFragment
 
     @Override
     public void showDNSFormatError(int errorIndexInList) {
-        mExtraDNSInputList.get(errorIndexInList).setError(getString(R.string.settings_dns_format_error));
+        runOnUiThread(() -> mExtraDNSInputList
+                .get(errorIndexInList).setError(getString(R.string.settings_dns_format_error)));
     }
 
     @Override

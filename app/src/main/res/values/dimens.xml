@@ -3,6 +3,7 @@
     <dimen name="text_size">18sp</dimen>
     <dimen name="text_size_small">16sp</dimen>
     <dimen name="text_size_extra_small">14sp</dimen>
+    <dimen name="text_size_tiny">12sp</dimen>
     <dimen name="top_bar_height">55dp</dimen>
     <dimen name="common_corner_radius">15dp</dimen>
 
@@ -14,6 +15,7 @@
     <dimen name="main_switch_horizontal_margin">20dp</dimen>
 
     <dimen name="dialog_margin">20dp</dimen>
+    <dimen name="settings_item_margin">10dp</dimen>
     <dimen name="settings_dns_input_width">250dp</dimen>
     <dimen name="settings_card_padding">15dp</dimen>
     <dimen name="settings_card_corner_radius">5dp</dimen>
