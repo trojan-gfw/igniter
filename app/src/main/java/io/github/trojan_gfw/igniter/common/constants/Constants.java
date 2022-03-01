@@ -11,4 +11,5 @@ public abstract class Constants {
     public static final String PREFERENCE_KEY_FIRST_START = "first_start";
     public static final String PREFERENCE_KEY_PROXY_IN_ALLOW_MODE = "proxy_allow_mode";
     public static final String PREFERENCE_KEY_EXTRA_DNS = "extra_dns";
+    public static final String PREFERENCE_KEY_FIXED_PORT = "fixed_port";
 }

@@ -12,7 +12,7 @@ public interface SettingsContract {
     interface Presenter extends BasePresenter {
         void addDNSInput();
         void removeDNSInput(int viewIndex);
-        void saveDNSList(@NonNull List<String> dnsList);
+        void saveSettings(@NonNull List<String> dnsList, String port);
         void exit();
     }
     interface View extends BaseView<Presenter> {
@@ -24,6 +24,7 @@ public interface SettingsContract {
         void appendDNSInput();
         void removeDNSInput(int index);
         void showExitConfirm();
+        void showPortNumberError();
         @AnyThread
         void showLoading();
         @AnyThread

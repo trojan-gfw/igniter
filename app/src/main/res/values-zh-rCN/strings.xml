@@ -123,4 +123,7 @@
     <string name="settings_title">设置</string>
     <string name="notification_listen_port">代理端口: %1$s</string>
     <string name="main_proxy_port_copied_to_clipboard">代理端口 %1$s 已复制到剪贴板</string>
+    <string name="settings_fixed_port">固定端口</string>
+    <string name="settings_port_help_text">端口范围:49152~65535,使用随机端口的话不需要填数字</string>
+    <string name="settings_fixed_port_usage">仅当允许局域网访问时生效\n范围:49152~65535,使用随机端口的话不需要填数字</string>
 </resources>
