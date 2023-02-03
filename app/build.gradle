@@ -114,6 +114,7 @@ dependencies {
     // CameraX View class
     implementation 'androidx.camera:camera-view:1.0.0-alpha32'
     implementation 'com.google.mlkit:barcode-scanning:17.0.1'
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
     testImplementation 'junit:junit:4.13.1'
