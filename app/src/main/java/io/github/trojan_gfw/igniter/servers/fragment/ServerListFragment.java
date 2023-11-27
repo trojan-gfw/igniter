@@ -311,43 +311,50 @@ public class ServerListFragment extends BaseFragment implements ServerListContra
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_scan_qr_code:
-                askTheWayToScanQRCode();
-                return true;
-            case R.id.action_import_from_file:
-                mPresenter.displayImportFileDescription();
-                return true;
-            case R.id.action_export_to_file:
-                mPresenter.exportServerListToFile();
-                return true;
-            case R.id.action_enter_batch_mode:
-                mPresenter.batchOperateServerList();
-                return true;
-            case R.id.action_exit_batch_operation:
-                mPresenter.saveServerList(mServerListAdapter.getData());
-                mPresenter.exitServerListBatchOperation();
-                return true;
-            case R.id.action_select_all_servers:
-                mPresenter.selectAll(mServerListAdapter.getData());
-                return true;
-            case R.id.action_deselect_all_servers:
-                mPresenter.deselectAll(mServerListAdapter.getData());
-                return true;
-            case R.id.action_batch_delete_servers:
-                mPresenter.batchDelete();
-                return true;
-            case R.id.action_subscribe_settings:
-                mPresenter.displaySubscribeSettings();
-                return true;
-            case R.id.action_subscribe_servers:
-                mPresenter.updateSubscribeServers();
-                return true;
-            case R.id.action_test_all_proxy_server:
-                mPresenter.pingAllProxyServer(mServerListAdapter.getData());
-                return true;
-            default:
-                break;
+        if (item.getItemId() == R.id.action_scan_qr_code){
+            askTheWayToScanQRCode();
+            return true;
+        }
+        if (item.getItemId() == R.id.action_import_from_file){
+            mPresenter.displayImportFileDescription();
+            return true;
+        }
+        if (item.getItemId() == R.id.action_export_to_file){
+            mPresenter.exportServerListToFile();
+            return true;
+        }
+        if (item.getItemId() == R.id.action_enter_batch_mode){
+            mPresenter.batchOperateServerList();
+            return true;
+        }
+        if (item.getItemId() == R.id.action_exit_batch_operation){
+            mPresenter.saveServerList(mServerListAdapter.getData());
+            mPresenter.exitServerListBatchOperation();
+            return true;
+        }
+        if (item.getItemId() == R.id.action_select_all_servers){
+            mPresenter.selectAll(mServerListAdapter.getData());
+            return true;
+        }
+        if (item.getItemId() == R.id.action_deselect_all_servers){
+            mPresenter.deselectAll(mServerListAdapter.getData());
+            return true;
+        }
+        if (item.getItemId() == R.id.action_batch_delete_servers){
+            mPresenter.batchDelete();
+            return true;
+        }
+        if (item.getItemId() == R.id.action_subscribe_settings){
+            mPresenter.displaySubscribeSettings();
+            return true;
+        }
+        if (item.getItemId() == R.id.action_subscribe_servers){
+            mPresenter.updateSubscribeServers();
+            return true;
+        }
+        if (item.getItemId() == R.id.action_test_all_proxy_server){
+            mPresenter.pingAllProxyServer(mServerListAdapter.getData());
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

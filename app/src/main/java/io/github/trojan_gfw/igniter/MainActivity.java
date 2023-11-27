@@ -726,53 +726,58 @@ public class MainActivity extends AppCompatActivity implements TrojanConnection.
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Bind menu items to their relative actions
-        switch (item.getItemId()) {
-            case R.id.action_test_connection:
-                testConnection();
-                return true;
-            case R.id.action_show_develop_info_logcat:
-                // log of this process
-                LogHelper.showDevelopInfoInLogcat();
-                // log of other processes
-                showDevelopInfoInLogcat();
-                return true;
-            case R.id.action_save_profile:
-                if (!Globals.getTrojanConfigInstance().isValidRunningConfig()) {
-                    Toast.makeText(MainActivity.this, R.string.invalid_configuration, Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-                Threads.instance().runOnWorkThread(new Task() {
-                    @Override
-                    public void onRun() {
-                        TrojanConfig config = Globals.getTrojanConfigInstance();
-                        TrojanHelper.WriteTrojanConfig(config, Globals.getTrojanConfigPath());
-                        serverListDataManager.saveServerConfig(config);
-                        showSaveConfigResult(true);
-                    }
-                });
-                return true;
-            case R.id.action_view_server_list:
-                gotoServerList();
-                return true;
-            case R.id.action_about:
-                clearEditTextFocus();
-                startActivity(AboutActivity.create(MainActivity.this));
-                return true;
-            case R.id.action_share_link:
-                trojanURLText.setText(shareLink);
-                linkDialog.show();
-                trojanURLText.selectAll();
-                return true;
-            case R.id.action_exempt_app:
-                exemptAppSettingsActivityResultLauncher.launch(ExemptAppActivity.create(this));
-                return true;
-            case R.id.action_settings:
-                startActivity(SettingsActivity.create(this));
-                return true;
-            default:
-                // Invoke the superclass to handle it.
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.action_test_connection) {
+            testConnection();
+            return true;
         }
+        if (item.getItemId() == R.id.action_show_develop_info_logcat) {
+            // log of this process
+            LogHelper.showDevelopInfoInLogcat();
+            // log of other processes
+            showDevelopInfoInLogcat();
+            return true;
+        }
+        if (item.getItemId() == R.id.action_save_profile) {
+            if (!Globals.getTrojanConfigInstance().isValidRunningConfig()) {
+                Toast.makeText(MainActivity.this, R.string.invalid_configuration, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            Threads.instance().runOnWorkThread(new Task() {
+                @Override
+                public void onRun() {
+                    TrojanConfig config = Globals.getTrojanConfigInstance();
+                    TrojanHelper.WriteTrojanConfig(config, Globals.getTrojanConfigPath());
+                    serverListDataManager.saveServerConfig(config);
+                    showSaveConfigResult(true);
+                }
+            });
+            return true;
+        }
+        if (item.getItemId() == R.id.action_view_server_list) {
+            gotoServerList();
+            return true;
+        }
+        if (item.getItemId() == R.id.action_about) {
+            clearEditTextFocus();
+            startActivity(AboutActivity.create(MainActivity.this));
+            return true;
+        }
+        if (item.getItemId() == R.id.action_share_link) {
+            trojanURLText.setText(shareLink);
+            linkDialog.show();
+            trojanURLText.selectAll();
+            return true;
+        }
+        if (item.getItemId() == R.id.action_exempt_app) {
+            exemptAppSettingsActivityResultLauncher.launch(ExemptAppActivity.create(this));
+                return true;
+        }
+        if (item.getItemId() == R.id.action_settings) {
+            startActivity(SettingsActivity.create(this));
+            return true;
+        }
+        // Invoke the superclass to handle it.
+        return super.onOptionsItemSelected(item);
     }
 
     private void gotoServerList() {

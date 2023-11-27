@@ -1,5 +1,7 @@
 package io.github.trojan_gfw.igniter;
 
+import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -292,7 +294,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         // it's required to create a notification channel before startForeground on SDK >= Android O
         createNotificationChannel(channelId);
         LogHelper.i(TAG, "start foreground notification");
-        startForeground(IGNITER_STATUS_NOTIFY_MSG_ID, builder.build());
+        startForeground(IGNITER_STATUS_NOTIFY_MSG_ID, builder.build(), FOREGROUND_SERVICE_TYPE_DATA_SYNC);
     }
 
     private boolean readClashPreference() {
@@ -335,8 +337,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         void applyRule(VpnService.Builder builder, String packageName) throws PackageManager.NameNotFoundException;
     }
 
-    private void addExtraDNS(VpnService.Builder b) {
-        SettingsDataManager dataManager = new SettingsDataManager(this);
+    private void addExtraDNS(VpnService.Builder b, SettingsDataManager dataManager) {
         List<String> dnsList = dataManager.loadExtraDNSList();
         for (String dns : dnsList) {
             LogHelper.i(TAG, "add DnsServer: " + dns);
@@ -356,7 +357,8 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
 
         VpnService.Builder b = new VpnService.Builder();
         applyApplicationOrientedRule(b);
-        addExtraDNS(b);
+        SettingsDataManager settingsDataManager = new SettingsDataManager(this);
+        addExtraDNS(b, settingsDataManager);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             // VPN apps targeting {@link android.os.Build.VERSION_CODES#Q} or above will be
             // considered metered by default, because of which Google Play Store treat the network
@@ -430,30 +432,55 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
         int fd = pfd.getFd();
 
         startNetworkConnectivityMonitor();
-
-        long trojanPort;
-        try {
-            trojanPort = Freeport.getFreePort();
-        } catch (Exception e) {
-            e.printStackTrace();
-            trojanPort = 1081;
+        final int fixedPort = settingsDataManager.loadFixedPort();
+        long trojanPort, clashSocksPort = 1080; // default value in case fail to get free port
+        // Determine trojanPort and clashSocksPort according to the user configurations (Clash, fixed port).
+        // If allowLan is false, both trojanPort and clashSocksPort will be assigned by Freeport.
+        // If allowLan is true, user-specified port will be assigned to clashSocksPort if clash is enable,
+        // otherwise, user-specified port will be assigned to trojanPort. Eventually, the user-specified
+        // port will be assigned to tun2socksPort, which is visible to user over the notification.
+        if (enable_clash) {
+            try {
+                do {
+                    trojanPort = Freeport.getFreePort();
+                } while (trojanPort == fixedPort);
+            } catch (Exception e) {
+                e.printStackTrace();
+                trojanPort = 1081;
+            }
+            if (!allowLan || -1 == fixedPort) {
+                try {
+                    do { // clash and trojan should NOT listen on the same port
+                        clashSocksPort = Freeport.getFreePort();
+                    }
+                    while (clashSocksPort == trojanPort);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                clashSocksPort = fixedPort;
+            }
+        } else {
+            if (!allowLan || -1 == fixedPort) {
+                try {
+                    trojanPort = Freeport.getFreePort();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    trojanPort = 1081;
+                }
+            } else {
+                trojanPort = fixedPort;
+            }
         }
+
         LogHelper.i("Igniter", "trojan port is " + trojanPort);
         TrojanHelper.ChangeListenPort(Globals.getTrojanConfigPath(), trojanPort);
         TrojanHelper.ShowConfig(Globals.getTrojanConfigPath());
 
         JNIHelper.trojan(Globals.getTrojanConfigPath());
 
-        long clashSocksPort = 1080; // default value in case fail to get free port
         if (enable_clash) {
             try {
-
-                // clash and trojan should NOT listen on the same port
-                do {
-                    clashSocksPort = Freeport.getFreePort();
-                }
-                while (clashSocksPort == trojanPort);
-
                 LogHelper.i("igniter", "clash port is " + clashSocksPort);
                 ClashHelper.ShowConfig(Globals.getClashConfigPath());
                 ClashStartOptions clashStartOptions = new ClashStartOptions();
@@ -525,7 +552,7 @@ public class ProxyService extends VpnService implements TestConnection.OnResultL
                 .setContentIntent(pendingOpenMainActivityIntent)
                 .setAutoCancel(false)
                 .setOngoing(true);
-        startForeground(IGNITER_STATUS_NOTIFY_MSG_ID, builder.build());
+        startForeground(IGNITER_STATUS_NOTIFY_MSG_ID, builder.build(), FOREGROUND_SERVICE_TYPE_DATA_SYNC);
         return START_STICKY;
     }
 
@@ -658,5 +685,3 @@ class TestConnectionCallback implements TestConnection.OnResultListener {
         }
     }
 }
-
-

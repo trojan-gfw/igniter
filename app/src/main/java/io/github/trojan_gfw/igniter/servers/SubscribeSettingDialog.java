@@ -34,22 +34,20 @@ public class SubscribeSettingDialog extends Dialog implements View.OnClickListen
     @Override
     public void onClick(View v) {
         if (mListener == null) return;
-        switch (v.getId()) {
-            case R.id.subscribeSettingConfirmBtn:
-                Editable editable = mSubscribeUrlTiet.getText();
-                String text;
-                if (editable != null) {
-                    text = editable.toString();
-                } else {
-                    text = "";
-                }
-                mListener.onConfirm(text);
-                break;
-            case R.id.subscribeSettingCancelBtn:
-                mListener.onCancel();
-                break;
-            default:
-                break;
+        if (v.getId() == R.id.subscribeSettingConfirmBtn){
+            Editable editable = mSubscribeUrlTiet.getText();
+            String text;
+            if (editable != null) {
+                text = editable.toString();
+            } else {
+                text = "";
+            }
+            mListener.onConfirm(text);
+            return;
+        }
+        if (v.getId() == R.id.subscribeSettingCancelBtn){
+            mListener.onCancel();
+            return;
         }
     }
 
